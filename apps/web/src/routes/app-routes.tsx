@@ -109,18 +109,33 @@ function GuestGate() {
   return <Outlet />
 }
 
+function HomeGate() {
+  const { session, profile, loading } = useAuth()
+
+  if (loading) {
+    return <FullScreenLoader label="Hisob tekshirilmoqda" />
+  }
+
+  if (session) {
+    if (!profile) {
+      return <FullScreenLoader label="Yo'naltirilmoqda" />
+    }
+
+    return <Navigate to={profile.role === 'admin' ? '/admin/dashboard' : '/app/dashboard'} replace />
+  }
+
+  return (
+    <LazyRoute label="Bosh sahifa yuklanmoqda">
+      <LandingPage />
+    </LazyRoute>
+  )
+}
+
 export function AppRoutes() {
   return (
     <Routes>
       <Route element={<PublicLayout />}>
-        <Route
-          path="/"
-          element={
-            <LazyRoute label="Bosh sahifa yuklanmoqda">
-              <LandingPage />
-            </LazyRoute>
-          }
-        />
+        <Route path="/" element={<HomeGate />} />
         <Route
           path="/pricing"
           element={
