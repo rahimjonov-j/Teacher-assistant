@@ -30,7 +30,7 @@ export function AdminLayout() {
                 <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Control Panel</span>
               </div>
               <div>
-                <Link to="/admin/dashboard" className="flex items-center gap-3 text-3xl font-black tracking-tight text-slate-900 dark:text-white">
+                <Link to="/admin/dashboard" className="flex items-center gap-3 text-2xl font-black tracking-tight text-slate-900 dark:text-white sm:text-3xl">
                   <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-sky-500/20 bg-sky-500/10">
                     <BarChart3 className="h-6 w-6 text-sky-400" />
                   </div>

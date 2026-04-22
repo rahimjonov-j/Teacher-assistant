@@ -50,10 +50,11 @@ export function AdminSubscriptionsPage() {
                   <div className="text-xs text-muted-foreground">{subscription.user_email}</div>
                 ) : null}
                 <div className="mt-2 text-sm text-muted-foreground">
-                  Yangilanish: {formatDate(subscription.renews_at)} • Boshlangan sana: {formatDate(subscription.created_at)}
+                  Yangilanish: {formatDate(subscription.renews_at)} | Boshlangan sana:{' '}
+                  {formatDate(subscription.created_at)}
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-3 text-sm sm:min-w-[280px]">
+              <div className="grid grid-cols-1 gap-3 text-sm sm:min-w-[280px] sm:grid-cols-2">
                 <div className="rounded-2xl bg-secondary p-4">
                   <div className="text-muted-foreground">Qolgan kredit</div>
                   <div className="mt-2 text-xl font-semibold">{subscription.credits_remaining}</div>

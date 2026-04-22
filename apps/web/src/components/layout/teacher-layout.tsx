@@ -19,20 +19,20 @@ export function TeacherLayout() {
 
   return (
     <div className="app-shell selection:bg-primary/20 selection:text-primary">
-      <header className="mb-10 flex items-center justify-between gap-4 animate-in">
+      <header className="mb-10 flex flex-col gap-4 animate-in sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-4">
           <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-tr from-primary to-primary/80 text-white shadow-lg shadow-primary/25">
             <UserCircle2 className="h-8 w-8" />
           </div>
-          <div>
+          <div className="min-w-0">
             <div className="flex items-center gap-2">
-              <h2 className="text-xl font-black tracking-tight leading-none">{profile?.fullName ?? "O'qituvchi"}</h2>
+              <h2 className="truncate text-xl font-black tracking-tight leading-none">{profile?.fullName ?? "O'qituvchi"}</h2>
               <Badge variant="gradient" className="h-5 px-2 text-[9px]">PRO</Badge>
             </div>
-            <p className="mt-1.5 text-sm font-medium text-muted-foreground/60">{profile?.email}</p>
+            <p className="mt-1.5 truncate text-sm font-medium text-muted-foreground/60">{profile?.email}</p>
           </div>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex w-full items-center justify-end gap-3 sm:w-auto">
           <Link to="/app/settings" className="hidden items-center gap-2 rounded-2xl border border-border/40 bg-card/50 px-4 py-2.5 text-sm font-bold text-foreground backdrop-blur-sm transition-all hover:border-primary/30 sm:flex">
             <Bot className="h-4 w-4 text-primary" />
             Telegram

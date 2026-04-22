@@ -60,7 +60,7 @@ function UsageChartTooltip({
   const point = payload[0]?.payload
 
   return (
-    <div className="min-w-[230px] rounded-2xl border border-white/10 bg-[#09111d]/95 p-4 shadow-2xl backdrop-blur-xl">
+    <div className="w-[min(230px,calc(100vw-2.5rem))] rounded-2xl border border-white/10 bg-[#09111d]/95 p-4 shadow-2xl backdrop-blur-xl">
       <div className="text-xs font-bold uppercase tracking-[0.18em] text-slate-400">{point.longLabel}</div>
       <div className="mt-3 space-y-2 text-sm">
         <div className="flex items-center justify-between gap-4">
@@ -226,7 +226,7 @@ export function AdminUsageAnalyticsPage() {
 
       <div className="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
         <Card className="border-border/70 bg-white/85 dark:border-white/5 dark:bg-[#0f1724]">
-          <CardContent className="p-8">
+          <CardContent className="p-5 sm:p-8">
             <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
               <div>
                 <h2 className="text-xl font-black tracking-tight text-slate-900 dark:text-white">So'nggi 14 kun dinamikasi</h2>
@@ -236,12 +236,12 @@ export function AdminUsageAnalyticsPage() {
               </div>
               <div className="grid gap-3 sm:grid-cols-2">
                 <div className="rounded-2xl border border-slate-200/80 bg-slate-50/80 p-4 dark:border-white/5 dark:bg-white/[0.03]">
-                  <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">Pik kun</div>
+                  <div className="text-[10px] font-bold uppercase tracking-[0.14em] text-slate-500">Pik kun</div>
                   <div className="mt-2 text-lg font-black text-slate-900 dark:text-white">{peakDay?.label ?? '-'}</div>
                   <div className="text-xs font-medium text-sky-300">{peakDay?.totalRequests ?? 0} ta so'rov</div>
                 </div>
                 <div className="rounded-2xl border border-slate-200/80 bg-slate-50/80 p-4 dark:border-white/5 dark:bg-white/[0.03]">
-                  <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">Top funksiya</div>
+                  <div className="text-[10px] font-bold uppercase tracking-[0.14em] text-slate-500">Top funksiya</div>
                   <div className="mt-2 text-lg font-black text-slate-900 dark:text-white">
                     {topFeature ? getFeatureLabel(topFeature[0] as UsageRow['featureKey']) : '-'}
                   </div>
@@ -250,7 +250,7 @@ export function AdminUsageAnalyticsPage() {
               </div>
             </div>
 
-            <div className="h-[360px]">
+            <div className="h-[280px] sm:h-[360px]">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={chartData} margin={{ top: 8, right: 12, left: -24, bottom: 0 }}>
                   <CartesianGrid vertical={false} stroke="rgba(148,163,184,0.14)" />
@@ -297,7 +297,7 @@ export function AdminUsageAnalyticsPage() {
         </Card>
 
         <Card className="border-border/70 bg-white/85 dark:border-white/5 dark:bg-[#0f1724]">
-          <CardContent className="p-8">
+          <CardContent className="p-5 sm:p-8">
             <h2 className="text-xl font-black tracking-tight text-slate-900 dark:text-white">Qisqa xulosa</h2>
             <div className="mt-6 space-y-4">
               <div className="rounded-2xl border border-slate-200/80 bg-slate-50/80 p-4 dark:border-white/5 dark:bg-white/[0.03]">

@@ -55,7 +55,7 @@ function AdminTrendTooltip({
   const point = payload[0]?.payload
 
   return (
-    <div className="min-w-[220px] rounded-2xl border border-white/10 bg-[#09111d]/95 p-4 shadow-2xl backdrop-blur-xl">
+    <div className="w-[min(220px,calc(100vw-2.5rem))] rounded-2xl border border-white/10 bg-[#09111d]/95 p-4 shadow-2xl backdrop-blur-xl">
       <div className="text-xs font-bold uppercase tracking-[0.18em] text-slate-400">{point.longLabel}</div>
       <div className="mt-3 space-y-2 text-sm">
         <div className="flex items-center justify-between gap-4">
@@ -89,7 +89,7 @@ function AdminFeatureTooltip({
   const point = payload[0]?.payload
 
   return (
-    <div className="min-w-[220px] rounded-2xl border border-white/10 bg-[#09111d]/95 p-4 shadow-2xl backdrop-blur-xl">
+    <div className="w-[min(220px,calc(100vw-2.5rem))] rounded-2xl border border-white/10 bg-[#09111d]/95 p-4 shadow-2xl backdrop-blur-xl">
       <div className="text-xs font-bold uppercase tracking-[0.18em] text-slate-400">{point.label}</div>
       <div className="mt-3 space-y-2 text-sm">
         <div className="flex items-center justify-between gap-4">
@@ -184,11 +184,11 @@ export function AdminDashboardPage() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {data.kpis.map((kpi, i) => (
           <Card key={kpi.label} className="overflow-hidden border-border/70 bg-white/85 text-foreground dark:border-white/5 dark:bg-[#0f1724] dark:text-slate-100">
-            <CardContent className="p-6">
+            <CardContent className="p-5 sm:p-6">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">{kpi.label}</p>
-                  <p className="mt-2 text-3xl font-black tracking-tight text-slate-900 dark:text-white">{kpi.value}</p>
+                  <p className="mt-2 text-2xl font-black tracking-tight text-slate-900 dark:text-white sm:text-3xl">{kpi.value}</p>
                 </div>
                 <div
                   className={cn(
@@ -210,7 +210,7 @@ export function AdminDashboardPage() {
 
       <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
         <Card className="border-border/70 bg-white/85 dark:border-white/5 dark:bg-[#0f1724]">
-          <CardContent className="p-8">
+          <CardContent className="p-5 sm:p-8">
             <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
               <div>
                 <div className="flex items-center gap-3">
@@ -224,24 +224,24 @@ export function AdminDashboardPage() {
                 </p>
               </div>
 
-              <div className="grid gap-3 sm:grid-cols-3">
+              <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
                 <div className="rounded-2xl border border-slate-200/80 bg-slate-50/80 p-4 dark:border-white/5 dark:bg-white/[0.03]">
-                  <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">
+                  <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.14em] text-slate-500">
                     <Clock3 className="h-3.5 w-3.5" />
                     Faol kunlar
                   </div>
                   <div className="mt-3 text-2xl font-black text-slate-900 dark:text-white">{trendSummary.activeDays}</div>
                 </div>
                 <div className="rounded-2xl border border-slate-200/80 bg-slate-50/80 p-4 dark:border-white/5 dark:bg-white/[0.03]">
-                  <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">
+                  <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.14em] text-slate-500">
                     <TrendingUp className="h-3.5 w-3.5" />
                     Pik kun
                   </div>
-                  <div className="mt-3 text-lg font-black text-slate-900 dark:text-white">{trendSummary.peakDayLabel}</div>
+                  <div className="mt-3 text-xl font-black text-slate-900 dark:text-white">{trendSummary.peakDayLabel}</div>
                   <div className="text-xs font-medium text-sky-300">{trendSummary.peakDayRequests} ta so'rov</div>
                 </div>
                 <div className="rounded-2xl border border-slate-200/80 bg-slate-50/80 p-4 dark:border-white/5 dark:bg-white/[0.03]">
-                  <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">
+                  <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.14em] text-slate-500">
                     <Zap className="h-3.5 w-3.5" />
                     O'rtacha
                   </div>
@@ -251,7 +251,7 @@ export function AdminDashboardPage() {
               </div>
             </div>
 
-            <div className="h-[360px] w-full">
+            <div className="h-[280px] w-full sm:h-[360px]">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={trendData} margin={{ top: 10, right: 8, left: -24, bottom: 0 }}>
                   <defs>
@@ -306,7 +306,7 @@ export function AdminDashboardPage() {
         </Card>
 
         <Card className="border-border/70 bg-white/85 dark:border-white/5 dark:bg-[#0f1724]">
-          <CardContent className="p-8">
+          <CardContent className="p-5 sm:p-8">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <h2 className="text-xl font-black tracking-tight text-slate-900 dark:text-white">Eng ko'p ishlatilgan vositalar</h2>
@@ -375,7 +375,7 @@ export function AdminDashboardPage() {
 
       <div className="grid gap-6 lg:grid-cols-2">
         <Card className="border-border/70 bg-white/85 dark:border-white/5 dark:bg-[#0f1724]">
-          <CardContent className="p-8">
+          <CardContent className="p-5 sm:p-8">
             <div className="flex items-center justify-between gap-4">
               <div>
                 <h2 className="text-xl font-black tracking-tight text-slate-900 dark:text-white">Eng faol o'qituvchilar</h2>
@@ -392,7 +392,7 @@ export function AdminDashboardPage() {
 
             <div className="mt-8 space-y-4">
               {data.topTeachers.map((teacher, index) => (
-                <div key={teacher.userId} className="flex items-center justify-between rounded-2xl border border-slate-200/80 bg-slate-50/80 p-4 dark:border-white/5 dark:bg-white/[0.02]">
+                <div key={teacher.userId} className="flex flex-col gap-4 rounded-2xl border border-slate-200/80 bg-slate-50/80 p-4 dark:border-white/5 dark:bg-white/[0.02] sm:flex-row sm:items-center sm:justify-between">
                   <div className="flex items-center gap-4">
                     <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-sky-500/20 bg-sky-500/10 text-sky-400">
                       <UserCircle2 className="h-6 w-6" />
@@ -407,7 +407,7 @@ export function AdminDashboardPage() {
                       <div className="text-[10px] font-medium uppercase tracking-widest text-slate-500">{teacher.email}</div>
                     </div>
                   </div>
-                  <div className="text-right">
+                  <div className="text-left sm:text-right">
                     <div className="text-sm font-black text-sky-300">{teacher.totalRequests} so'rov</div>
                     <div className="text-[11px] font-medium text-slate-500 dark:text-slate-400">{teacher.totalTokens.toLocaleString('en-US')} token</div>
                   </div>
@@ -418,7 +418,7 @@ export function AdminDashboardPage() {
         </Card>
 
         <Card className="border-border/70 bg-white/85 dark:border-white/5 dark:bg-[#0f1724]">
-          <CardContent className="p-8">
+          <CardContent className="p-5 sm:p-8">
             <div className="flex items-center justify-between gap-4">
               <div>
                 <h2 className="text-xl font-black tracking-tight text-slate-900 dark:text-white">So'nggi faollik</h2>

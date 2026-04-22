@@ -37,14 +37,15 @@ export function AdminActivityPage() {
         {query.data?.activity.map((row) => (
           <Card key={row.id}>
             <CardContent className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <div className="flex items-center gap-2">
-                  <h2 className="font-medium">{row.teacherName ?? row.userId}</h2>
+              <div className="min-w-0">
+                <div className="flex flex-wrap items-center gap-2">
+                  <h2 className="truncate font-medium">{row.teacherName ?? row.userId}</h2>
                   <Badge variant="outline">{getFeatureLabel(row.featureKey)}</Badge>
                   <Badge>{row.source}</Badge>
                 </div>
                 <div className="mt-2 text-sm text-muted-foreground">
-                  {row.creditsConsumed} kredit • {row.totalTokens.toLocaleString('en-US')} token • {row.modelName}
+                  {row.creditsConsumed} kredit | {row.totalTokens.toLocaleString('en-US')} token |{' '}
+                  {row.modelName}
                 </div>
               </div>
               <div className="text-sm text-muted-foreground">{formatRelativeDate(row.createdAt)}</div>
