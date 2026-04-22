@@ -9,7 +9,6 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { apiRequest } from '@/lib/api'
-import { PLAN_MAP } from '@teacher-assistant/shared'
 import { formatRelativeDate, getFeatureLabel } from '@/lib/format'
 import { cn } from '@/lib/utils'
 
@@ -33,8 +32,14 @@ export function DashboardPage() {
     return <CardLoader />
   }
 
-  const creditsPercent = data.subscription 
-    ? Math.min(100, Math.max(0, (data.subscription.creditsRemaining / (PLAN_MAP[data.subscription.planKey]?.monthlyCredits || 1)) * 100))
+  const creditsPercent = data.subscription
+    ? Math.min(
+        100,
+        Math.max(
+          0,
+          (data.subscription.creditsRemaining / Math.max(data.subscription.creditsTotal, 1)) * 100,
+        ),
+      )
     : 0
 
   return (
@@ -65,7 +70,7 @@ export function DashboardPage() {
               </div>
               <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-wider opacity-70">
                 <span>{data.subscription?.creditsUsed ?? 0} sarflandi</span>
-                <span>{PLAN_MAP[data.subscription?.planKey || 'free_trial']?.name}</span>
+                <span>{data.subscription?.planName ?? "Obuna yo'q"}</span>
               </div>
             </div>
           </CardContent>

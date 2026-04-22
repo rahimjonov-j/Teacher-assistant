@@ -29,7 +29,9 @@ export const dashboardService = {
       subscription: subscription
         ? {
             planKey: subscription.planKey,
+            planName: subscription.planName,
             status: subscription.status,
+            creditsTotal: subscription.creditsTotal,
             creditsRemaining: subscription.creditsRemaining,
             creditsUsed: subscription.creditsUsed,
             renewsAt: subscription.renewsAt,

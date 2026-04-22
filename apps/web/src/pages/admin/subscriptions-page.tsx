@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   CalendarClock,
@@ -45,6 +45,7 @@ interface PlansResponse {
 type PlanFormState = {
   key: PlanKey
   name: string
+  monthlyCredits: string
   priceMonthlyUsd: string
   description: string
 }
@@ -138,6 +139,19 @@ export function AdminSubscriptionsPage() {
   const queryClient = useQueryClient()
   const [editingPlan, setEditingPlan] = useState<PlanFormState | null>(null)
 
+  useEffect(() => {
+    if (!editingPlan) {
+      return
+    }
+
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+
+    return () => {
+      document.body.style.overflow = previousOverflow
+    }
+  }, [editingPlan])
+
   const subscriptionsQuery = useQuery({
     queryKey: ['admin-subscriptions'],
     queryFn: () => apiRequest<SubscriptionsResponse>('/admin/subscriptions'),
@@ -154,6 +168,7 @@ export function AdminSubscriptionsPage() {
         method: 'PATCH',
         body: JSON.stringify({
           name: input.name.trim(),
+          monthlyCredits: Number(input.monthlyCredits),
           priceMonthlyUsd: Number(input.priceMonthlyUsd),
           description: input.description.trim(),
         }),
@@ -201,6 +216,7 @@ export function AdminSubscriptionsPage() {
     setEditingPlan({
       key: plan.key,
       name: plan.name,
+      monthlyCredits: String(plan.monthlyCredits),
       priceMonthlyUsd: String(plan.priceMonthlyUsd),
       description: plan.description,
     })
@@ -224,6 +240,12 @@ export function AdminSubscriptionsPage() {
       return
     }
 
+    const numericCredits = Number(editingPlan.monthlyCredits)
+    if (!Number.isInteger(numericCredits) || numericCredits < 0) {
+      toast.error("Kredit soni noto'g'ri kiritilgan.")
+      return
+    }
+
     const numericPrice = Number(editingPlan.priceMonthlyUsd)
     if (Number.isNaN(numericPrice) || numericPrice < 0) {
       toast.error("Narx noto'g'ri kiritilgan.")
@@ -241,6 +263,8 @@ export function AdminSubscriptionsPage() {
   }
 
   const editingMeta = editingPlan ? planMeta[editingPlan.key] : null
+  const previewCreditsValue = Number(editingPlan?.monthlyCredits ?? 0)
+  const previewCredits = Number.isFinite(previewCreditsValue) ? previewCreditsValue : 0
   const previewPriceValue = Number(editingPlan?.priceMonthlyUsd ?? 0)
   const previewPrice = Number.isFinite(previewPriceValue) ? previewPriceValue : 0
 
@@ -617,7 +641,7 @@ export function AdminSubscriptionsPage() {
 
       {editingPlan && editingMeta ? (
         <div
-          className="fixed inset-0 z-[120] flex items-center justify-center bg-slate-950/55 p-4 backdrop-blur-md"
+          className="fixed inset-0 z-[120] flex items-center justify-center overflow-y-auto bg-slate-950 p-4"
           onMouseDown={(event) => {
             if (event.target === event.currentTarget) {
               closeModal()
@@ -641,7 +665,7 @@ export function AdminSubscriptionsPage() {
                       <div>
                         <h3 className="text-2xl font-black tracking-tight">Tarifni tahrirlash</h3>
                         <p className="mt-1 text-sm text-muted-foreground">
-                          Title, narx va tavsifni yangilang. O‘ng tomonda natijani darhol ko‘rasiz.
+                          Title, kredit, narx va tavsifni yangilang. O'ng tomonda natijani darhol ko'rasiz.
                         </p>
                       </div>
                     </div>
@@ -658,7 +682,7 @@ export function AdminSubscriptionsPage() {
                   </div>
 
                   <div className="space-y-5 px-6 py-6 sm:px-8">
-                    <div className="grid gap-5 sm:grid-cols-[1.2fr_0.8fr]">
+                    <div className="grid gap-5 lg:grid-cols-[1.1fr_0.45fr_0.45fr]">
                       <div className="space-y-2">
                         <Label htmlFor="plan-name">Title</Label>
                         <Input
@@ -667,6 +691,23 @@ export function AdminSubscriptionsPage() {
                           value={editingPlan.name}
                           onChange={(event) =>
                             setEditingPlan((prev) => (prev ? { ...prev, name: event.target.value } : prev))
+                          }
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="plan-credits">Kredit</Label>
+                        <Input
+                          id="plan-credits"
+                          className="h-12 rounded-2xl"
+                          type="number"
+                          min={0}
+                          step="1"
+                          value={editingPlan.monthlyCredits}
+                          onChange={(event) =>
+                            setEditingPlan((prev) =>
+                              prev ? { ...prev, monthlyCredits: event.target.value } : prev,
+                            )
                           }
                         />
                       </div>
@@ -702,8 +743,9 @@ export function AdminSubscriptionsPage() {
                     </div>
 
                     <div className="rounded-[24px] border border-border/60 bg-secondary/25 p-4 text-sm text-muted-foreground">
-                      Saqlangandan keyin pricing, billing va Telegram botdagi `/plans` javobi shu qiymatlar bilan
-                      yangilanadi.
+                      Saqlangandan keyin pricing, billing, dashboard va Telegram botdagi `/plans` javobi yangi
+                      title, kredit va narx bilan yangilanadi. Aktiv foydalanuvchilarning kredit limiti ham shu
+                      qiymatga moslashtiriladi.
                     </div>
                   </div>
 
@@ -747,6 +789,13 @@ export function AdminSubscriptionsPage() {
                           <div className="mt-2 text-3xl font-black tracking-tight">{formatUsd(previewPrice)}</div>
                         </div>
 
+                        <div className="rounded-[22px] border border-border/60 bg-secondary/30 p-4">
+                          <div className="text-[10px] font-bold uppercase tracking-[0.16em] text-muted-foreground">
+                            Oylik kredit
+                          </div>
+                          <div className="mt-2 text-3xl font-black tracking-tight">{previewCredits}</div>
+                        </div>
+
                         <div className="space-y-2">
                           {editingMeta.bullets.map((bullet) => (
                             <div key={bullet} className="flex items-center gap-2 text-sm font-medium text-foreground">
@@ -779,8 +828,8 @@ export function AdminSubscriptionsPage() {
                     </div>
 
                     <div className="mt-4 text-xs leading-relaxed text-muted-foreground">
-                      Preview kartasi foydalanuvchiga chiqadigan umumiy hissani ko‘rsatadi. Kredit limitlari bu
-                      modalda o‘zgarmaydi.
+                      Preview kartasi foydalanuvchiga chiqadigan umumiy hissani ko'rsatadi. Saqlangandan keyin shu
+                      plan bilan ishlayotgan aktiv subscriptionlar ham yangi kredit limitiga moslanadi.
                     </div>
                   </div>
                 </div>

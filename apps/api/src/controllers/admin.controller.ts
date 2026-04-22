@@ -9,6 +9,7 @@ import { asyncHandler } from '../utils/async-handler.js'
 
 const updatePlanSchema = z.object({
   name: z.string().trim().min(2).max(120),
+  monthlyCredits: z.coerce.number().int().min(0).max(100000),
   priceMonthlyUsd: z.coerce.number().min(0).max(100000),
   description: z.string().trim().min(4).max(600),
 })
@@ -74,6 +75,7 @@ export const adminController = {
     const planKey = planKeySchema.parse(request.params.key)
     const payload = updatePlanSchema.parse(request.body)
     const plan = await plansRepository.updateByKey(planKey, payload)
+    await subscriptionsRepository.syncCreditsForPlan(planKey, payload.monthlyCredits)
     response.json({ plan })
   }),
 

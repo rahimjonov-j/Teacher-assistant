@@ -77,9 +77,7 @@ export function BillingPage() {
                       0,
                       Math.min(
                         100,
-                        (subscription.creditsRemaining /
-                          (subscription.creditsRemaining + subscription.creditsUsed)) *
-                          100,
+                        (subscription.creditsRemaining / Math.max(subscription.creditsTotal, 1)) * 100,
                       ),
                     )}%`,
                   }}

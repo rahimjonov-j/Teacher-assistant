@@ -31,10 +31,36 @@ export const plansRepository = {
     }))
   },
 
+  async findByKey(key: PlanKey): Promise<PlanConfigRecord | null> {
+    const supabase = getSupabaseAdminClient()
+    const { data, error } = await supabase
+      .from('plans')
+      .select('key, name, monthly_credits, price_monthly_usd, description')
+      .eq('key', key)
+      .maybeSingle()
+
+    if (error) {
+      throw new ApiError(500, 'Unable to load plan.')
+    }
+
+    if (!data) {
+      return null
+    }
+
+    return {
+      key: data.key as PlanKey,
+      name: data.name as string,
+      monthlyCredits: Number(data.monthly_credits ?? 0),
+      priceMonthlyUsd: Number(data.price_monthly_usd ?? 0),
+      description: data.description as string,
+    }
+  },
+
   async updateByKey(
     key: PlanKey,
     input: {
       name: string
+      monthlyCredits: number
       priceMonthlyUsd: number
       description: string
     },
@@ -44,6 +70,7 @@ export const plansRepository = {
       .from('plans')
       .update({
         name: input.name,
+        monthly_credits: input.monthlyCredits,
         price_monthly_usd: input.priceMonthlyUsd,
         description: input.description,
       })

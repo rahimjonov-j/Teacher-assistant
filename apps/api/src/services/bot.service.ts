@@ -114,9 +114,9 @@ function registerHandlers(instance: Telegraf) {
 
     const dashboard = await dashboardService.getTeacherDashboard(linkedUser.userId)
     await context.reply(
-      `Tarif: ${dashboard.subscription?.planKey ?? "Faol tarif yo'q"}\nQolgan kredit: ${
+      `Tarif: ${dashboard.subscription?.planName ?? "Faol tarif yo'q"}\nQolgan kredit: ${
         dashboard.subscription?.creditsRemaining ?? 0
-      }`,
+      } / ${dashboard.subscription?.creditsTotal ?? 0}`,
     )
   })
 

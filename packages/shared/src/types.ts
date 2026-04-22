@@ -47,7 +47,9 @@ export interface TeacherProfile {
 
 export interface SubscriptionSnapshot {
   planKey: PlanKey
+  planName: string
   status: 'trialing' | 'active' | 'past_due' | 'canceled' | 'expired'
+  creditsTotal: number
   creditsRemaining: number
   creditsUsed: number
   renewsAt: string | null

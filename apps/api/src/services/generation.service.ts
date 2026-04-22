@@ -57,7 +57,9 @@ export const generationService = {
       content,
       subscription: {
         planKey: updatedSubscription.planKey,
+        planName: updatedSubscription.planName,
         status: updatedSubscription.status,
+        creditsTotal: updatedSubscription.creditsTotal,
         creditsRemaining: updatedSubscription.creditsRemaining,
         creditsUsed: updatedSubscription.creditsUsed,
         renewsAt: updatedSubscription.renewsAt,
