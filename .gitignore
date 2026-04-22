@@ -10,3 +10,4 @@ coverage
 apps/web/dist
 apps/api/dist
 packages/shared/dist
+.local-change-log.md

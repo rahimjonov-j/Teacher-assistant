@@ -18,22 +18,22 @@ create table if not exists public.plans (
   key text primary key,
   name text not null,
   monthly_credits integer not null check (monthly_credits >= 0),
-  price_monthly_usd numeric(10,2) not null check (price_monthly_usd >= 0),
+  price_monthly_uzs numeric(12,0) not null check (price_monthly_uzs >= 0),
   description text not null,
   created_at timestamptz not null default timezone('utc', now())
 );
 
-insert into public.plans (key, name, monthly_credits, price_monthly_usd, description)
+insert into public.plans (key, name, monthly_credits, price_monthly_uzs, description)
 values
   ('free_trial', 'Free Trial', 12, 0, 'Explore the platform with a real classroom trial allocation.'),
-  ('basic', 'Basic', 80, 12, 'Regular planning and quick classroom support.'),
-  ('pro', 'Pro', 220, 24, 'Balanced for weekly planning, feedback, and exports.'),
-  ('premium', 'Premium', 520, 49, 'For high-usage teachers and department workflows.')
+  ('basic', 'Basic', 80, 120000, 'Regular planning and quick classroom support.'),
+  ('pro', 'Pro', 220, 240000, 'Balanced for weekly planning, feedback, and exports.'),
+  ('premium', 'Premium', 520, 490000, 'For high-usage teachers and department workflows.')
 on conflict (key) do update
 set
   name = excluded.name,
   monthly_credits = excluded.monthly_credits,
-  price_monthly_usd = excluded.price_monthly_usd,
+  price_monthly_uzs = excluded.price_monthly_uzs,
   description = excluded.description;
 
 create table if not exists public.profiles (

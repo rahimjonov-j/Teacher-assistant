@@ -10,7 +10,7 @@ import { asyncHandler } from '../utils/async-handler.js'
 const updatePlanSchema = z.object({
   name: z.string().trim().min(2).max(120),
   monthlyCredits: z.coerce.number().int().min(0).max(100000),
-  priceMonthlyUsd: z.coerce.number().min(0).max(100000),
+  priceMonthlyUzs: z.coerce.number().int().min(0).max(1000000000),
   description: z.string().trim().min(4).max(600),
 })
 

@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { apiRequest } from '@/lib/api'
 import { env } from '@/lib/env'
-import { formatDate } from '@/lib/format'
+import { formatCurrencyUzs, formatDate } from '@/lib/format'
 import { sortPlans, type PlanConfig } from '@/lib/plans'
 import { cn } from '@/lib/utils'
 
@@ -31,7 +31,7 @@ export function BillingPage() {
         key: plan.key,
         name: plan.name,
         monthlyCredits: plan.monthlyCredits,
-        priceMonthlyUsd: plan.priceMonthlyUsd,
+        priceMonthlyUzs: plan.priceMonthlyUzs,
         description: plan.description,
       }))
   const planNameByKey = new Map(plans.map((plan) => [plan.key, plan.name]))
@@ -120,14 +120,14 @@ export function BillingPage() {
                     ) : null}
                   </div>
                   <div>
-                    <span className="text-4xl font-black tracking-tight">${plan.priceMonthlyUsd}</span>
+                    <span className="text-4xl font-black tracking-tight">{formatCurrencyUzs(plan.priceMonthlyUzs)}</span>
                     <span className="text-sm font-medium text-muted-foreground">/oy</span>
                   </div>
                   <p className="text-sm font-medium text-muted-foreground/70">{plan.description}</p>
                   <ul className="space-y-2 text-sm font-medium">
                     <li className="flex items-center gap-2 text-muted-foreground">
                       <CheckCircle2 className="h-4 w-4 shrink-0 text-primary" />
-                      {plan.monthlyCredits} oylik kredit
+                      {plan.monthlyCredits} oylik token
                     </li>
                   </ul>
                   {isCurrent ? (

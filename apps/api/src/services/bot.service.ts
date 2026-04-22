@@ -9,6 +9,11 @@ import { telegramRepository } from '../repositories/telegram.repository.js'
 
 let bot: Telegraf | null = null
 const TELEGRAM_TEXT_LIMIT = 3800
+const uzsFormatter = new Intl.NumberFormat('uz-UZ', {
+  style: 'currency',
+  currency: 'UZS',
+  maximumFractionDigits: 0,
+})
 const TELEGRAM_COMMANDS = [
   { command: 'help', description: "Komandalar ro'yxati" },
   { command: 'plans', description: "Tariflar va kreditlar" },
@@ -97,7 +102,7 @@ function registerHandlers(instance: Telegraf) {
     try {
       const plans = await plansRepository.listAll()
       const lines = plans.map(
-        (plan) => `${plan.name}: ${plan.monthlyCredits} kredit / $${plan.priceMonthlyUsd}`,
+        (plan) => `${plan.name}: ${plan.monthlyCredits} token / ${uzsFormatter.format(plan.priceMonthlyUzs)}`,
       )
       await context.reply(lines.join('\n'))
     } catch {

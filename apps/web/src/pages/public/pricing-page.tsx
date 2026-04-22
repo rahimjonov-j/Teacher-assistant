@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { apiRequest } from '@/lib/api'
+import { formatCurrencyUzs } from '@/lib/format'
 import { sortPlans, type PlanConfig } from '@/lib/plans'
 import { cn } from '@/lib/utils'
 
@@ -20,7 +21,7 @@ export function PricingPage() {
         key: plan.key,
         name: plan.name,
         monthlyCredits: plan.monthlyCredits,
-        priceMonthlyUsd: plan.priceMonthlyUsd,
+        priceMonthlyUzs: plan.priceMonthlyUzs,
         description: plan.description,
       }))
 
@@ -56,7 +57,7 @@ export function PricingPage() {
             <CardHeader className="p-8 pb-4">
               <CardTitle className="text-2xl font-black tracking-tight">{plan.name}</CardTitle>
               <div className="mt-4 flex items-baseline gap-1">
-                <span className="text-4xl font-black tracking-tight">${plan.priceMonthlyUsd}</span>
+                <span className="text-4xl font-black tracking-tight">{formatCurrencyUzs(plan.priceMonthlyUzs)}</span>
                 <span className="text-sm font-bold text-muted-foreground/60">/ oyiga</span>
               </div>
             </CardHeader>
@@ -68,7 +69,7 @@ export function PricingPage() {
                   </div>
                 <div>
                   <div className="text-xl font-black">{plan.monthlyCredits}</div>
-                  <div className="text-[10px] font-bold uppercase tracking-widest opacity-70">Oylik kreditlar</div>
+                  <div className="text-[10px] font-bold uppercase tracking-widest opacity-70">Oylik tokenlar</div>
                 </div>
               </div>
 

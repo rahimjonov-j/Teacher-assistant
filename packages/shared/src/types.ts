@@ -18,7 +18,7 @@ export interface PlanDefinition {
   key: PlanKey
   name: string
   monthlyCredits: number
-  priceMonthlyUsd: number
+  priceMonthlyUzs: number
   description: string
   highlight?: string
 }

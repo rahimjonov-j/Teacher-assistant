@@ -4,7 +4,7 @@ export interface PlanConfig {
   key: PlanKey
   name: string
   monthlyCredits: number
-  priceMonthlyUsd: number
+  priceMonthlyUzs: number
   description: string
 }
 

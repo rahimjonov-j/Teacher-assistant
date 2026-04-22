@@ -1,4 +1,4 @@
-import type { PlanKey } from '@teacher-assistant/shared'
+import { PLAN_MAP, type PlanKey } from '@teacher-assistant/shared'
 import { getSupabaseAdminClient } from '../config/supabase.js'
 import { ApiError } from '../utils/api-error.js'
 
@@ -6,7 +6,7 @@ export interface PlanConfigRecord {
   key: PlanKey
   name: string
   monthlyCredits: number
-  priceMonthlyUsd: number
+  priceMonthlyUzs: number
   description: string
 }
 
@@ -15,7 +15,7 @@ export const plansRepository = {
     const supabase = getSupabaseAdminClient()
     const { data, error } = await supabase
       .from('plans')
-      .select('key, name, monthly_credits, price_monthly_usd, description')
+      .select('key, name, monthly_credits, price_monthly_uzs, description')
       .order('monthly_credits', { ascending: true })
 
     if (error) {
@@ -26,7 +26,7 @@ export const plansRepository = {
       key: row.key as PlanKey,
       name: row.name as string,
       monthlyCredits: Number(row.monthly_credits ?? 0),
-      priceMonthlyUsd: Number(row.price_monthly_usd ?? 0),
+      priceMonthlyUzs: Number(row.price_monthly_uzs ?? 0),
       description: row.description as string,
     }))
   },
@@ -35,7 +35,7 @@ export const plansRepository = {
     const supabase = getSupabaseAdminClient()
     const { data, error } = await supabase
       .from('plans')
-      .select('key, name, monthly_credits, price_monthly_usd, description')
+      .select('key, name, monthly_credits, price_monthly_uzs, description')
       .eq('key', key)
       .maybeSingle()
 
@@ -51,7 +51,7 @@ export const plansRepository = {
       key: data.key as PlanKey,
       name: data.name as string,
       monthlyCredits: Number(data.monthly_credits ?? 0),
-      priceMonthlyUsd: Number(data.price_monthly_usd ?? 0),
+      priceMonthlyUzs: Number(data.price_monthly_uzs ?? 0),
       description: data.description as string,
     }
   },
@@ -61,21 +61,24 @@ export const plansRepository = {
     input: {
       name: string
       monthlyCredits: number
-      priceMonthlyUsd: number
+      priceMonthlyUzs: number
       description: string
     },
   ): Promise<PlanConfigRecord> {
     const supabase = getSupabaseAdminClient()
     const { data, error } = await supabase
       .from('plans')
-      .update({
-        name: input.name,
-        monthly_credits: input.monthlyCredits,
-        price_monthly_usd: input.priceMonthlyUsd,
-        description: input.description,
-      })
-      .eq('key', key)
-      .select('key, name, monthly_credits, price_monthly_usd, description')
+      .upsert(
+        {
+          key,
+          name: input.name,
+          monthly_credits: input.monthlyCredits,
+          price_monthly_uzs: input.priceMonthlyUzs,
+          description: input.description,
+        },
+        { onConflict: 'key' },
+      )
+      .select('key, name, monthly_credits, price_monthly_uzs, description')
       .single()
 
     if (error || !data) {
@@ -85,8 +88,8 @@ export const plansRepository = {
     return {
       key: data.key as PlanKey,
       name: data.name as string,
-      monthlyCredits: Number(data.monthly_credits ?? 0),
-      priceMonthlyUsd: Number(data.price_monthly_usd ?? 0),
+      monthlyCredits: Number(data.monthly_credits ?? PLAN_MAP[key].monthlyCredits),
+      priceMonthlyUzs: Number(data.price_monthly_uzs ?? PLAN_MAP[key].priceMonthlyUzs),
       description: data.description as string,
     }
   },

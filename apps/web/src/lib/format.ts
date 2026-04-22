@@ -13,6 +13,14 @@ export function formatRelativeDate(value: string) {
   return format(new Date(value), 'MMM d, HH:mm')
 }
 
+export function formatCurrencyUzs(value: number) {
+  return new Intl.NumberFormat('uz-UZ', {
+    style: 'currency',
+    currency: 'UZS',
+    maximumFractionDigits: 0,
+  }).format(value)
+}
+
 export function getFeatureLabel(featureKey: FeatureKey) {
   return FEATURE_MAP[featureKey]?.label ?? featureKey
 }
