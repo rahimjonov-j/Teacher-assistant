@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import type { GeneratedContentRecord } from '@teacher-assistant/shared'
 import { toast } from 'sonner'
 import { ArrowLeft, Copy, FileDown, Loader2 } from 'lucide-react'
@@ -7,11 +7,12 @@ import { CardLoader } from '@/components/shared/loading-state'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { apiRequest } from '@/lib/api'
+import { ApiRequestError, apiRequest } from '@/lib/api'
 import { formatDate, getFeatureLabel } from '@/lib/format'
 import ReactMarkdown from 'react-markdown'
 
 export function ContentDetailPage() {
+  const navigate = useNavigate()
   const params = useParams()
 
   const query = useQuery({
@@ -30,6 +31,12 @@ export function ContentDetailPage() {
       toast.success('PDF eksport yakunlandi.')
     },
     onError: (error) => {
+      if (error instanceof ApiRequestError && error.statusCode === 402) {
+        toast.error("Kredit tugagan. Obuna sahifasiga yo'naltirildingiz.")
+        navigate('/app/billing')
+        return
+      }
+
       toast.error(error instanceof Error ? error.message : "PDF eksport qilib bo'lmadi.")
     },
   })

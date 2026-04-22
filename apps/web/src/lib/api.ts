@@ -5,6 +5,16 @@ interface ApiErrorBody {
   error?: string
 }
 
+export class ApiRequestError extends Error {
+  statusCode: number
+
+  constructor(message: string, statusCode: number) {
+    super(message)
+    this.name = 'ApiRequestError'
+    this.statusCode = statusCode
+  }
+}
+
 export async function apiRequest<T>(path: string, init: RequestInit = {}) {
   const { data } = await supabase.auth.getSession()
 
@@ -22,7 +32,7 @@ export async function apiRequest<T>(path: string, init: RequestInit = {}) {
 
   if (!response.ok) {
     const body = (await response.json().catch(() => ({}))) as ApiErrorBody
-    throw new Error(body.error ?? 'Request failed.')
+    throw new ApiRequestError(body.error ?? 'Request failed.', response.status)
   }
 
   return (await response.json()) as T

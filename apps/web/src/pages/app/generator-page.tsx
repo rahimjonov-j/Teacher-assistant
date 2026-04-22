@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { useMutation } from '@tanstack/react-query'
 import { FEATURE_DEFINITIONS, type GeneratorResponse, type FeatureKey } from '@teacher-assistant/shared'
-import { useSearchParams, Link } from 'react-router-dom'
+import { useSearchParams, Link, useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 import { Sparkles, Loader2, Copy, FileText } from 'lucide-react'
 import { PageHeader } from '@/components/shared/page-header'
@@ -11,12 +11,13 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
-import { apiRequest } from '@/lib/api'
+import { ApiRequestError, apiRequest } from '@/lib/api'
 import ReactMarkdown from 'react-markdown'
 
 const generatorFeatures = FEATURE_DEFINITIONS.filter((feature) => feature.key !== 'pdf_export')
 
 export function GeneratorPage() {
+  const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
   const initialFeature = (searchParams.get('feature') as FeatureKey) ?? 'quiz'
   const [featureKey, setFeatureKey] = useState<FeatureKey>(initialFeature)
@@ -44,6 +45,12 @@ export function GeneratorPage() {
       toast.success('Material tayyorlandi!')
     },
     onError: (error) => {
+      if (error instanceof ApiRequestError && error.statusCode === 402) {
+        toast.error("Kredit tugagan. Obuna sahifasiga yo'naltirildingiz.")
+        navigate('/app/billing')
+        return
+      }
+
       toast.error(error instanceof Error ? error.message : "Xatolik yuz berdi.")
     },
   })
