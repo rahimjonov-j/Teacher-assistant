@@ -8,23 +8,8 @@ export function FullScreenLoader({
   label?: string
 }) {
   return (
-    <div className="flex min-h-screen items-center justify-center px-4 bg-background/30 backdrop-blur-sm">
-      <div className="flex w-full max-w-sm flex-col items-center gap-6 rounded-[32px] border border-white/20 bg-white/40 p-12 text-center shadow-2xl backdrop-blur-2xl dark:border-white/10 dark:bg-black/40">
-        <div className="relative">
-          <div className="absolute inset-0 animate-ping rounded-full bg-primary/20" />
-          <div className="relative rounded-3xl bg-gradient-to-tr from-primary to-primary/80 p-5 text-white shadow-lg shadow-primary/30">
-            <LoaderCircle className="h-8 w-8 animate-spin" />
-          </div>
-        </div>
-        <div className="space-y-3">
-          <p className="text-lg font-bold tracking-tight text-foreground">{label}</p>
-          <div className="flex items-center justify-center gap-2">
-            <span className="h-1.5 w-6 animate-pulse rounded-full bg-primary/60" />
-            <span className="h-1.5 w-4 animate-pulse rounded-full bg-primary/40 [animation-delay:150ms]" />
-            <span className="h-1.5 w-2 animate-pulse rounded-full bg-primary/20 [animation-delay:300ms]" />
-          </div>
-        </div>
-      </div>
+    <div className="flex min-h-screen items-center justify-center">
+      <LoaderCircle className="h-10 w-10 animate-spin text-primary" aria-label={label} />
     </div>
   )
 }
