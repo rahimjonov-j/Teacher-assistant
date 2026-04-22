@@ -1,0 +1,12 @@
+node_modules
+dist
+build
+.DS_Store
+.env
+.env.local
+.env.*.local
+coverage
+*.log
+apps/web/dist
+apps/api/dist
+packages/shared/dist

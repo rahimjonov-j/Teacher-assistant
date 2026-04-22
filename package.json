@@ -1,0 +1,21 @@
+{
+  "name": "teacher-assistant-platform",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "postinstall": "npm run build --workspace @teacher-assistant/shared",
+    "dev": "concurrently \"npm run dev --workspace @teacher-assistant/shared\" \"npm run dev --workspace @teacher-assistant/api\" \"npm run dev --workspace @teacher-assistant/web\"",
+    "dev:web": "npm run dev --workspace @teacher-assistant/web",
+    "dev:api": "npm run dev --workspace @teacher-assistant/api",
+    "build": "npm run build --workspace @teacher-assistant/shared && npm run build --workspace @teacher-assistant/api && npm run build --workspace @teacher-assistant/web",
+    "lint": "npm run lint --workspace @teacher-assistant/web",
+    "typecheck": "npm run typecheck --workspace @teacher-assistant/shared && npm run typecheck --workspace @teacher-assistant/api && npm run typecheck --workspace @teacher-assistant/web"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}
