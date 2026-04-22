@@ -9,18 +9,34 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { apiRequest } from '@/lib/api'
 import { env } from '@/lib/env'
-import { formatDate, getPlanName } from '@/lib/format'
+import { formatDate } from '@/lib/format'
+import { sortPlans, type PlanConfig } from '@/lib/plans'
 import { cn } from '@/lib/utils'
 
 export function BillingPage() {
-  const query = useQuery({
+  const dashboardQuery = useQuery({
     queryKey: ['dashboard'],
     queryFn: () => apiRequest<TeacherDashboardPayload>('/teacher/dashboard'),
   })
 
-  const subscription = query.data?.subscription
+  const plansQuery = useQuery({
+    queryKey: ['public-plans'],
+    queryFn: () => apiRequest<{ plans: PlanConfig[] }>('/plans'),
+  })
 
-  if (query.isLoading) {
+  const subscription = dashboardQuery.data?.subscription
+  const plans = plansQuery.data?.plans?.length
+    ? sortPlans(plansQuery.data.plans)
+    : PLAN_DEFINITIONS.map((plan) => ({
+        key: plan.key,
+        name: plan.name,
+        monthlyCredits: plan.monthlyCredits,
+        priceMonthlyUsd: plan.priceMonthlyUsd,
+        description: plan.description,
+      }))
+  const planNameByKey = new Map(plans.map((plan) => [plan.key, plan.name]))
+
+  if (dashboardQuery.isLoading) {
     return <CardLoader />
   }
 
@@ -32,21 +48,18 @@ export function BillingPage() {
         description="Joriy tarifingizni boshqaring va yangi kreditlar oling."
       />
 
-      {/* Current Subscription Card */}
       <Card className="overflow-hidden border-none bg-gradient-to-tr from-primary to-sky-500 text-white shadow-2xl shadow-primary/20">
         <CardContent className="p-8">
           <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <p className="text-[10px] font-black uppercase tracking-[0.2em] opacity-70">Joriy tarif</p>
               <p className="mt-2 text-4xl font-black tracking-tight">
-                {subscription ? getPlanName(subscription.planKey) : 'Obuna yo\'q'}
+                {subscription ? planNameByKey.get(subscription.planKey) ?? subscription.planKey : "Obuna yo'q"}
               </p>
               {subscription && (
                 <div className="mt-3 flex items-center gap-4 text-sm font-medium opacity-80">
                   <span>{subscription.creditsRemaining} kredit qolgan</span>
-                  {subscription.renewsAt && (
-                    <span>· Yangilanish: {formatDate(subscription.renewsAt)}</span>
-                  )}
+                  {subscription.renewsAt ? <span>| Yangilanish: {formatDate(subscription.renewsAt)}</span> : null}
                 </div>
               )}
             </div>
@@ -60,7 +73,15 @@ export function BillingPage() {
                 <div
                   className="h-full bg-white transition-all duration-1000"
                   style={{
-                    width: `${Math.max(0, Math.min(100, (subscription.creditsRemaining / (subscription.creditsRemaining + subscription.creditsUsed)) * 100))}%`,
+                    width: `${Math.max(
+                      0,
+                      Math.min(
+                        100,
+                        (subscription.creditsRemaining /
+                          (subscription.creditsRemaining + subscription.creditsUsed)) *
+                          100,
+                      ),
+                    )}%`,
                   }}
                 />
               </div>
@@ -73,11 +94,10 @@ export function BillingPage() {
         </CardContent>
       </Card>
 
-      {/* Plan Cards */}
       <section>
         <h2 className="mb-6 text-2xl font-black tracking-tight">Tariflar</h2>
         <div className="grid gap-5 lg:grid-cols-4">
-          {PLAN_DEFINITIONS.map((plan) => {
+          {plans.map((plan) => {
             const isCurrent = subscription?.planKey === plan.key
             const upgradeLink = env.telegramBotUsername
               ? `https://t.me/${env.telegramBotUsername}?start=upgrade_${plan.key}`
@@ -88,17 +108,15 @@ export function BillingPage() {
                 key={plan.key}
                 className={cn(
                   'relative overflow-hidden bg-card/85',
-                  isCurrent ? "border-primary/40 ring-2 ring-primary/20" : "border-border/40"
+                  isCurrent ? 'border-primary/40 ring-2 ring-primary/20' : 'border-border/40',
                 )}
               >
-                {isCurrent && (
-                  <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-primary to-sky-500" />
-                )}
+                {isCurrent ? <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-primary to-sky-500" /> : null}
                 <CardContent className="space-y-5 p-6">
                   <div className="flex items-center justify-between gap-3">
                     <h3 className="text-lg font-black tracking-tight">{plan.name}</h3>
                     {isCurrent ? (
-                      <Badge className="bg-primary/10 text-primary border-primary/20 text-[9px] font-black uppercase tracking-widest">
+                      <Badge className="border-primary/20 bg-primary/10 text-[9px] font-black uppercase tracking-widest text-primary">
                         Joriy
                       </Badge>
                     ) : null}
@@ -137,7 +155,6 @@ export function BillingPage() {
         </div>
       </section>
 
-      {/* Feature credit cost */}
       <Card className="border-none bg-card/85 shadow-xl backdrop-blur-xl">
         <CardContent className="space-y-5 p-8">
           <h2 className="text-xl font-black tracking-tight">Funksiyalar kredit narxi</h2>

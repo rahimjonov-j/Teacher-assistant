@@ -8,6 +8,7 @@ import { notFoundHandler } from './middleware/not-found.js'
 import { adminRouter } from './routes/admin.routes.js'
 import { authRouter } from './routes/auth.routes.js'
 import { healthRouter } from './routes/health.routes.js'
+import { plansRouter } from './routes/plans.routes.js'
 import { teacherRouter } from './routes/teacher.routes.js'
 import { telegramRouter } from './routes/telegram.routes.js'
 
@@ -32,6 +33,7 @@ export function createApp() {
   })
 
   app.use('/api/health', healthRouter)
+  app.use('/api/plans', plansRouter)
   app.use('/api/auth', authRouter)
   app.use('/api/teacher', teacherRouter)
   app.use('/api/admin', adminRouter)

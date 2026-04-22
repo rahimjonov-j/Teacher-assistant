@@ -1,6 +1,7 @@
-import { FEATURE_MAP, PLAN_DEFINITIONS, type FeatureKey } from '@teacher-assistant/shared'
+import { FEATURE_MAP, type FeatureKey } from '@teacher-assistant/shared'
 import { Telegraf } from 'telegraf'
 import { env, hasOpenAiConfig, hasTelegramConfig } from '../config/env.js'
+import { plansRepository } from '../repositories/plans.repository.js'
 import { dashboardService } from './dashboard.service.js'
 import { generationService } from './generation.service.js'
 import { openAiService } from './openai.service.js'
@@ -93,11 +94,15 @@ function registerHandlers(instance: Telegraf) {
   })
 
   instance.command('plans', async (context) => {
-    const plans = PLAN_DEFINITIONS.map(
-      (plan) => `${plan.name}: ${plan.monthlyCredits} kredit / $${plan.priceMonthlyUsd}`,
-    ).join('\n')
-
-    await context.reply(plans)
+    try {
+      const plans = await plansRepository.listAll()
+      const lines = plans.map(
+        (plan) => `${plan.name}: ${plan.monthlyCredits} kredit / $${plan.priceMonthlyUsd}`,
+      )
+      await context.reply(lines.join('\n'))
+    } catch {
+      await context.reply("Tariflar ro'yxatini olishda xatolik bo'ldi.")
+    }
   })
 
   instance.command('balance', async (context) => {

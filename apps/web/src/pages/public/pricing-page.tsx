@@ -1,11 +1,29 @@
+import { useQuery } from '@tanstack/react-query'
 import { PLAN_DEFINITIONS } from '@teacher-assistant/shared'
 import { Check, Zap, ArrowRight } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { apiRequest } from '@/lib/api'
+import { sortPlans, type PlanConfig } from '@/lib/plans'
 import { cn } from '@/lib/utils'
 
 export function PricingPage() {
+  const plansQuery = useQuery({
+    queryKey: ['public-plans'],
+    queryFn: () => apiRequest<{ plans: PlanConfig[] }>('/plans'),
+  })
+
+  const plans = plansQuery.data?.plans?.length
+    ? sortPlans(plansQuery.data.plans)
+    : PLAN_DEFINITIONS.map((plan) => ({
+        key: plan.key,
+        name: plan.name,
+        monthlyCredits: plan.monthlyCredits,
+        priceMonthlyUsd: plan.priceMonthlyUsd,
+        description: plan.description,
+      }))
+
   return (
     <div className="container py-24 animate-in">
       <div className="mx-auto mb-20 max-w-2xl text-center">
@@ -19,17 +37,17 @@ export function PricingPage() {
       </div>
 
       <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
-        {PLAN_DEFINITIONS.map((plan) => (
+        {plans.map((plan) => (
           <Card
             key={plan.key}
               className={cn(
                 'relative flex flex-col overflow-hidden bg-card/85',
-                plan.highlight
+                plan.key === 'pro'
                   ? 'border-primary/40 bg-primary/5 shadow-2xl shadow-primary/15 ring-1 ring-primary/15'
                   : '',
               )}
           >
-            {plan.highlight && (
+            {plan.key === 'pro' && (
               <div className="absolute right-0 top-0 rounded-bl-2xl bg-primary px-4 py-1.5 text-[10px] font-black uppercase tracking-widest text-white shadow-lg">
                 Eng ommabop
               </div>
@@ -77,9 +95,9 @@ export function PricingPage() {
                 asChild
                 className={cn(
                   "w-full rounded-2xl font-bold",
-                  plan.highlight ? "" : "variant-outline"
+                  plan.key === 'pro' ? "" : "variant-outline"
                 )}
-                variant={plan.highlight ? 'gradient' : 'outline'}
+                variant={plan.key === 'pro' ? 'gradient' : 'outline'}
               >
                 <Link to="/register">
                   {plan.name} ni tanlash
