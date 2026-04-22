@@ -211,7 +211,7 @@ export function AdminDashboardPage() {
       <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
         <Card className="border-border/70 bg-white/85 dark:border-white/5 dark:bg-[#0f1724]">
           <CardContent className="p-5 sm:p-8">
-            <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+            <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
               <div>
                 <div className="flex items-center gap-3">
                   <h2 className="text-xl font-black tracking-tight text-slate-900 dark:text-white">Faollik dinamikasi</h2>
@@ -219,34 +219,31 @@ export function AdminDashboardPage() {
                     14 kun
                   </Badge>
                 </div>
-                <p className="mt-2 text-sm font-medium text-slate-600 dark:text-slate-400">
-                  Har kunlik so'rovlar oqimi. Bo'sh kunlar ham ko'rsatiladi, shuning uchun trend aniqroq ko'rinadi.
-                </p>
               </div>
 
-              <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-                <div className="rounded-2xl border border-slate-200/80 bg-slate-50/80 p-4 dark:border-white/5 dark:bg-white/[0.03]">
-                  <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.14em] text-slate-500">
+              <div className="grid grid-cols-2 gap-2 sm:gap-3 md:grid-cols-3 lg:min-w-[360px]">
+                <div className="rounded-xl border border-slate-200/80 bg-slate-50/80 p-3 dark:border-white/5 dark:bg-white/[0.03]">
+                  <div className="flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-[0.12em] text-slate-500">
                     <Clock3 className="h-3.5 w-3.5" />
                     Faol kunlar
                   </div>
-                  <div className="mt-3 text-2xl font-black text-slate-900 dark:text-white">{trendSummary.activeDays}</div>
+                  <div className="mt-2 text-xl font-black text-slate-900 dark:text-white">{trendSummary.activeDays}</div>
                 </div>
-                <div className="rounded-2xl border border-slate-200/80 bg-slate-50/80 p-4 dark:border-white/5 dark:bg-white/[0.03]">
-                  <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.14em] text-slate-500">
+                <div className="rounded-xl border border-slate-200/80 bg-slate-50/80 p-3 dark:border-white/5 dark:bg-white/[0.03]">
+                  <div className="flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-[0.12em] text-slate-500">
                     <TrendingUp className="h-3.5 w-3.5" />
                     Pik kun
                   </div>
-                  <div className="mt-3 text-xl font-black text-slate-900 dark:text-white">{trendSummary.peakDayLabel}</div>
-                  <div className="text-xs font-medium text-sky-300">{trendSummary.peakDayRequests} ta so'rov</div>
+                  <div className="mt-2 text-lg font-black leading-tight text-slate-900 dark:text-white">{trendSummary.peakDayLabel}</div>
+                  <div className="text-[11px] font-medium text-sky-300">{trendSummary.peakDayRequests} ta so'rov</div>
                 </div>
-                <div className="rounded-2xl border border-slate-200/80 bg-slate-50/80 p-4 dark:border-white/5 dark:bg-white/[0.03]">
-                  <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.14em] text-slate-500">
+                <div className="rounded-xl border border-slate-200/80 bg-slate-50/80 p-3 dark:border-white/5 dark:bg-white/[0.03]">
+                  <div className="flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-[0.12em] text-slate-500">
                     <Zap className="h-3.5 w-3.5" />
                     O'rtacha
                   </div>
-                  <div className="mt-3 text-2xl font-black text-slate-900 dark:text-white">{trendSummary.averagePerDay}</div>
-                  <div className="text-xs font-medium text-slate-500 dark:text-slate-400">kuniga so'rov</div>
+                  <div className="mt-2 text-xl font-black text-slate-900 dark:text-white">{trendSummary.averagePerDay}</div>
+                  <div className="text-[11px] font-medium text-slate-500 dark:text-slate-400">kuniga so'rov</div>
                 </div>
               </div>
             </div>
