@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom'
 import { SiteFooter } from '@/components/shared/site-footer'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import heroImage from '@/assets/hero.png'
 
 const features = [
   {
@@ -80,7 +79,7 @@ export function LandingPage() {
           </div>
 
           <div className="animate-in relative">
-            <div className="absolute -left-5 top-10 z-10 rounded-3xl bg-white/90 p-4 shadow-2xl ring-1 ring-slate-200/70 backdrop-blur dark:bg-slate-950/85 dark:ring-white/10">
+            <div className="absolute left-4 top-4 z-10 rounded-3xl bg-white/92 p-4 shadow-xl backdrop-blur dark:bg-slate-950/88">
               <div className="flex items-center gap-3">
                 <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-primary/10 text-primary">
                   <Sparkles className="h-5 w-5" />
@@ -92,15 +91,25 @@ export function LandingPage() {
               </div>
             </div>
 
-            <div className="relative overflow-hidden rounded-[36px] bg-gradient-to-br from-white via-sky-50 to-amber-50 p-3 shadow-2xl shadow-slate-900/10 ring-1 ring-white/80 dark:from-slate-900 dark:via-slate-950 dark:to-slate-900 dark:ring-white/10">
-              <img
-                src={heroImage}
-                alt="Teacher Assistant ilovasi oynasi"
-                className="h-[360px] w-full rounded-[28px] object-cover sm:h-[480px]"
-              />
+            <div
+              aria-label="Sinfxonadagi o'qituvchi va o'quvchilar"
+              className="relative min-h-[420px] overflow-hidden rounded-[36px] bg-cover bg-center shadow-2xl shadow-slate-900/10 sm:min-h-[500px]"
+              style={{
+                backgroundImage:
+                  "linear-gradient(180deg, rgba(15,23,42,0.08), rgba(15,23,42,0.52)), url('https://images.unsplash.com/photo-1577896851231-70ef18881754?auto=format&fit=crop&w=1200&q=80')",
+              }}
+            >
+              <div className="absolute inset-x-0 bottom-0 p-6 text-white sm:p-8">
+                <div className="max-w-sm text-2xl font-black tracking-tight sm:text-3xl">
+                  Reja, test va feedback bitta ish oqimida
+                </div>
+                <div className="mt-2 text-sm font-medium text-white/80">
+                  O'qituvchi uchun tez, sodda va amaliy yordamchi.
+                </div>
+              </div>
             </div>
 
-            <div className="absolute -bottom-5 right-3 rounded-3xl bg-slate-950 px-5 py-4 text-white shadow-2xl dark:bg-white dark:text-slate-950">
+            <div className="absolute -bottom-5 right-3 rounded-3xl bg-slate-950 px-5 py-4 text-white shadow-xl dark:bg-white dark:text-slate-950">
               <div className="text-[10px] font-black uppercase tracking-[0.18em] opacity-60">Bugungi natija</div>
               <div className="mt-1 text-2xl font-black">3 material</div>
             </div>

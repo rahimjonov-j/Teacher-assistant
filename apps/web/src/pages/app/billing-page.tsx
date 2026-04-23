@@ -57,29 +57,28 @@ export function BillingPage() {
   }
 
   return (
-    <div className="space-y-10 animate-in pb-12">
+    <div className="space-y-8 px-4 animate-in pb-12 sm:px-0 sm:space-y-10">
       <PageHeader
         eyebrow="Moliyaviy holat"
         title="Obuna va Tariflar"
-        description="Joriy tarifingizni boshqaring va yangi kreditlar oling."
       />
 
       <Card className="overflow-hidden border-none bg-gradient-to-tr from-primary to-sky-500 text-white shadow-2xl shadow-primary/20">
-        <CardContent className="p-8">
+        <CardContent className="p-5 sm:p-8">
           <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
-            <div>
+            <div className="min-w-0">
               <p className="text-[10px] font-black uppercase tracking-[0.2em] opacity-70">Joriy tarif</p>
-              <p className="mt-2 text-4xl font-black tracking-tight">
+              <p className="mt-2 break-words text-3xl font-black tracking-tight sm:text-4xl">
                 {subscription ? planNameByKey.get(subscription.planKey) ?? subscription.planKey : "Obuna yo'q"}
               </p>
               {subscription && (
-                <div className="mt-3 flex items-center gap-4 text-sm font-medium opacity-80">
+                <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm font-medium opacity-80">
                   <span>{subscription.creditsRemaining} kredit qolgan</span>
                   {subscription.renewsAt ? <span>| Yangilanish: {formatDate(subscription.renewsAt)}</span> : null}
                 </div>
               )}
             </div>
-            <div className="h-20 w-20 rounded-3xl bg-white/20 p-4 backdrop-blur-sm">
+            <div className="h-16 w-16 rounded-3xl bg-white/20 p-4 backdrop-blur-sm sm:h-20 sm:w-20">
               <Zap className="h-full w-full fill-white" />
             </div>
           </div>
@@ -110,7 +109,7 @@ export function BillingPage() {
 
       <section>
         <h2 className="mb-6 text-2xl font-black tracking-tight">Tariflar</h2>
-        <div className="grid gap-5 lg:grid-cols-4">
+        <div className="grid gap-3 sm:gap-5 lg:grid-cols-4">
           {plans.map((plan) => {
             const isCurrent = subscription?.planKey === plan.key
             const upgradeLink = env.telegramBotUsername
@@ -121,25 +120,25 @@ export function BillingPage() {
               <Card
                 key={plan.key}
                 className={cn(
-                  'relative overflow-hidden border-border/40 bg-card/85 transition-colors',
+                  'relative min-w-0 overflow-hidden border-border/40 bg-card/85 transition-colors',
                   isCurrent && subscription ? subscriptionTone[subscription.status] : 'hover:border-primary/30',
                 )}
               >
                 {isCurrent ? <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-emerald-400 to-sky-500" /> : null}
-                <CardContent className="space-y-5 p-6">
+                <CardContent className="min-w-0 space-y-4 p-5 sm:space-y-5 sm:p-6">
                   <div className="flex items-center justify-between gap-3">
-                    <h3 className="text-lg font-black tracking-tight">{plan.name}</h3>
+                    <h3 className="min-w-0 break-words text-lg font-black tracking-tight">{plan.name}</h3>
                     {isCurrent ? (
-                      <Badge className="border-emerald-500/20 bg-emerald-500/10 text-[9px] font-black uppercase tracking-widest text-emerald-700 dark:text-emerald-300">
+                      <Badge className="shrink-0 border-emerald-500/20 bg-emerald-500/10 text-[9px] font-black uppercase tracking-widest text-emerald-700 dark:text-emerald-300">
                         {subscription ? statusLabel[subscription.status] : 'Joriy'}
                       </Badge>
                     ) : null}
                   </div>
-                  <div>
-                    <span className="text-4xl font-black tracking-tight">{formatCurrencyUzs(plan.priceMonthlyUzs)}</span>
+                  <div className="min-w-0">
+                    <span className="break-words text-3xl font-black tracking-tight sm:text-4xl">{formatCurrencyUzs(plan.priceMonthlyUzs)}</span>
                     <span className="text-sm font-medium text-muted-foreground">/oy</span>
                   </div>
-                  <p className="text-sm font-medium text-muted-foreground/70">{plan.description}</p>
+                  <p className="text-sm font-medium leading-6 text-muted-foreground/70">{plan.description}</p>
                   <ul className="space-y-2 text-sm font-medium">
                     <li className="flex items-center gap-2 text-muted-foreground">
                       <CheckCircle2 className="h-4 w-4 shrink-0 text-primary" />
@@ -170,7 +169,7 @@ export function BillingPage() {
       </section>
 
       <Card className="border-none bg-card/85 shadow-xl backdrop-blur-xl">
-        <CardContent className="space-y-5 p-8">
+        <CardContent className="space-y-5 p-5 sm:p-8">
           <h2 className="text-xl font-black tracking-tight">Funksiyalar kredit narxi</h2>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
             {FEATURE_DEFINITIONS.map((feature) => (

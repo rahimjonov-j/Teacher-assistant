@@ -96,7 +96,7 @@
   }
 
   .surface {
-    @apply rounded-[28px] border border-border/70 bg-card/80 backdrop-blur-xl transition-all duration-300;
+    @apply rounded-[28px] border border-border/70 bg-card/80 backdrop-blur-xl;
     box-shadow: 0 22px 50px -40px rgba(15, 23, 42, 0.26);
   }
 
@@ -140,16 +140,34 @@
 }
 
 @media (max-width: 639px) {
-  .surface {
-    border-left-width: 0;
-    border-right-width: 0;
-    border-radius: 0;
-    box-shadow: none;
+  body {
+    background-image: none;
   }
 
-  .teacher-shell .surface {
-    border-color: transparent;
+  .surface {
+    border-width: 0;
+    border-radius: 0;
+    background: transparent !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+  }
+
+  .glass-card {
+    border-width: 0;
+    background: transparent !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+  }
+
+  .app-shell [class*="border-"] {
+    border-color: transparent !important;
+  }
+
+  .app-shell [class*="shadow-"] {
+    box-shadow: none !important;
+  }
+
+  .app-shell {
     background: hsl(var(--background));
-    box-shadow: none;
   }
 }
