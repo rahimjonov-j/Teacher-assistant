@@ -115,6 +115,10 @@
     @apply mx-auto min-h-screen max-w-7xl overflow-x-hidden px-4 pb-32 pt-4 sm:px-6 sm:pb-28 sm:pt-6 lg:px-8;
   }
 
+  .app-shell > main {
+    @apply mx-auto w-full min-w-0 max-w-full;
+  }
+
   .telegram-loader-line {
     @apply animate-pulse bg-slate-200/90 dark:bg-slate-800/90;
   }
@@ -187,8 +191,19 @@
 
   .app-shell,
   .app-shell > *,
+  .app-shell > main,
+  .app-shell > main > *,
   .container {
+    width: 100%;
     max-width: 100%;
+    min-width: 0;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
   }
 
   .app-shell img,
