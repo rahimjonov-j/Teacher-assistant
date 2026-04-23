@@ -3,6 +3,7 @@ import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { Loader2, LogOut, Save, Bot } from 'lucide-react'
 import { PageHeader } from '@/components/shared/page-header'
+import { ThemeToggle } from '@/components/shared/theme-toggle'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -76,7 +77,6 @@ export function SettingsPage() {
       <PageHeader
         eyebrow="Sozlamalar"
         title="Profil va Xavfsizlik"
-        description="Shaxsiy ma'lumotlaringiz va platforma sozlamalari."
       />
 
       {/* Profile Card */}
@@ -190,6 +190,16 @@ export function SettingsPage() {
               )}
             </div>
           )}
+        </CardContent>
+      </Card>
+
+      <Card className="border-none bg-card/60 shadow-xl backdrop-blur-xl">
+        <CardContent className="flex items-center justify-between gap-4 p-6">
+          <div>
+            <h3 className="font-bold">Ko'rinish rejimi</h3>
+            <p className="mt-1 text-sm text-muted-foreground/70">Light/dark rejimini shu yerdan almashtiring.</p>
+          </div>
+          <ThemeToggle />
         </CardContent>
       </Card>
 

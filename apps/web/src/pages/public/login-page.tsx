@@ -74,12 +74,7 @@ export function LoginPage() {
               )}
             </div>
             <div className="space-y-2">
-              <div className="flex items-center justify-between ml-1">
-                <Label htmlFor="password" className="text-xs font-bold uppercase tracking-widest text-muted-foreground/60">Parol</Label>
-                <Link to="#" className="text-[11px] font-bold text-primary hover:underline uppercase tracking-widest">
-                  Unutdingizmi?
-                </Link>
-              </div>
+              <Label htmlFor="password" className="ml-1 text-xs font-bold uppercase tracking-widest text-muted-foreground/60">Parol</Label>
               <Input
                 id="password"
                 type="password"
@@ -90,6 +85,11 @@ export function LoginPage() {
               {form.formState.errors.password && (
                 <p className="text-[10px] font-bold text-destructive ml-1">{form.formState.errors.password.message}</p>
               )}
+              <div className="pt-1 text-right">
+                <Link to="/reset-password" className="text-xs font-bold text-primary hover:underline">
+                  Parolingizni unutdingizmi?
+                </Link>
+              </div>
             </div>
 
             <Button

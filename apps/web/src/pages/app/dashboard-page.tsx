@@ -48,12 +48,12 @@ export function DashboardPage() {
         <div className="space-y-2">
           <h1 className="text-4xl font-black tracking-tight sm:text-5xl lg:text-6xl">
             Assalomu alaykum, <br />
-            <span className="text-primary">{data.profile.fullName?.split(' ')[0] || "Ustoz"}! 👋</span>
+            <span className="text-primary">{data.profile.fullName?.split(' ')[0] || "Ustoz"}!</span>
           </h1>
           <p className="text-lg font-medium text-muted-foreground/60">Bugun qanday material tayyorlaymiz?</p>
         </div>
 
-        <Card className="w-full max-w-sm border-none bg-gradient-to-tr from-primary to-sky-500 text-white shadow-2xl shadow-primary/20">
+        <Card className="w-full border-none bg-gradient-to-tr from-primary to-sky-500 text-white shadow-2xl shadow-primary/20 sm:max-w-sm">
           <CardContent className="p-8">
             <div className="flex items-center justify-between gap-4">
               <div className="space-y-1">
@@ -77,7 +77,7 @@ export function DashboardPage() {
         </Card>
       </section>
 
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid grid-cols-3 gap-2 sm:gap-4">
         <StatCard 
           label="Bu oydagi so'rovlar" 
           value={data.usageSummary.totalRequestsThisMonth} 

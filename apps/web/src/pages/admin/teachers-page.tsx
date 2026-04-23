@@ -39,7 +39,6 @@ export function AdminTeachersPage() {
       <PageHeader
         eyebrow="Users Database"
         title="O'qituvchilar"
-        description="Barcha foydalanuvchilar ro'yxati va ularning faolligi."
       />
 
       <Card className="overflow-hidden border-border/70 bg-white/90 shadow-xl dark:border-white/5 dark:bg-[#0a0c10] dark:shadow-2xl">

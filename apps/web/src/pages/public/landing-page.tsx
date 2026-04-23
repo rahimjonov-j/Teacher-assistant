@@ -1,8 +1,9 @@
-import { ArrowRight, Bot, FileText, LineChart, ShieldCheck, Zap } from 'lucide-react'
+import { ArrowRight, Bot, CheckCircle2, FileText, LineChart, ShieldCheck, Sparkles, Zap } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { SiteFooter } from '@/components/shared/site-footer'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
+import heroImage from '@/assets/hero.png'
 
 const features = [
   {
@@ -13,7 +14,7 @@ const features = [
   {
     icon: Bot,
     title: 'Web + Telegram',
-    description: 'Bir xil hisob, bir xil imkoniyatlar — brauzerda ham, Telegramda ham.',
+    description: 'Bir xil hisob, bir xil imkoniyatlar - brauzerda ham, Telegramda ham.',
   },
   {
     icon: LineChart,
@@ -30,55 +31,90 @@ const features = [
 export function LandingPage() {
   return (
     <div className="flex min-h-[calc(100vh-80px)] flex-col">
-      {/* Hero Section */}
-      <section className="relative overflow-hidden pt-12 pb-24 md:pt-24 md:pb-40">
+      <section className="relative overflow-hidden px-4 pb-20 pt-10 md:pb-28 md:pt-20">
         <div className="absolute inset-0 -z-10">
-          <div className="absolute left-1/2 top-0 h-[600px] w-[800px] -translate-x-1/2 rounded-full bg-primary/10 blur-[120px]" />
-          <div className="absolute right-0 top-1/2 h-[400px] w-[400px] rounded-full bg-indigo-500/10 blur-[100px]" />
+          <div className="absolute left-[10%] top-0 h-[520px] w-[520px] rounded-full bg-sky-400/15 blur-[120px]" />
+          <div className="absolute right-0 top-1/3 h-[460px] w-[460px] rounded-full bg-amber-300/20 blur-[120px]" />
         </div>
 
-        <div className="container relative text-center">
-          <div className="animate-in mx-auto flex max-w-fit items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-2 text-[10px] font-extrabold uppercase tracking-[0.2em] text-primary">
-            <span className="flex h-2 w-2 rounded-full bg-primary animate-pulse" />
-            Yangi: AI Dars Rejalashtiruvchi 2.0
+        <div className="container relative grid items-center gap-10 lg:grid-cols-[1.02fr_0.98fr]">
+          <div className="text-center lg:text-left">
+            <div className="animate-in mx-auto flex max-w-fit items-center gap-2 rounded-full bg-white/80 px-4 py-2 text-[10px] font-extrabold uppercase tracking-[0.18em] text-primary shadow-sm ring-1 ring-primary/10 backdrop-blur lg:mx-0">
+              <span className="flex h-2 w-2 rounded-full bg-primary animate-pulse" />
+              AI yordamida dars tayyorlash
+            </div>
+
+            <h1 className="animate-in mt-7 text-4xl font-black tracking-[-0.05em] text-foreground sm:text-6xl lg:text-7xl">
+              Dars materiali tayyorlashni{' '}
+              <span className="bg-gradient-to-r from-primary via-sky-500 to-cyan-500 bg-clip-text text-transparent">
+                bir necha daqiqaga
+              </span>{' '}
+              qisqartiring
+            </h1>
+
+            <p className="animate-in mx-auto mt-6 max-w-2xl text-base font-medium leading-8 text-muted-foreground sm:text-xl lg:mx-0">
+              Test, dars rejasi, speaking savollari va yozma ish feedbackini bitta joyda yarating.
+              O'qituvchi vaqtini hujjatga emas, o'quvchiga sarflashi kerak.
+            </p>
+
+            <div className="animate-in mt-9 flex flex-col items-center gap-3 sm:flex-row lg:justify-start">
+              <Button asChild size="lg" variant="gradient" className="h-16 w-full rounded-[22px] px-9 text-lg font-black shadow-xl shadow-primary/20 sm:w-auto">
+                <Link to="/register">
+                  Bepul material yaratish
+                  <ArrowRight className="h-5 w-5" />
+                </Link>
+              </Button>
+              <div className="flex items-center gap-2 text-sm font-bold text-muted-foreground">
+                <CheckCircle2 className="h-5 w-5 text-primary" />
+                Karta talab qilinmaydi
+              </div>
+            </div>
+
+            <div className="mt-8 grid grid-cols-3 gap-2 text-left sm:max-w-xl">
+              {['50 kredit', 'PDF eksport', 'Telegram bot'].map((item) => (
+                <div key={item} className="rounded-2xl bg-white/65 p-3 text-sm font-black shadow-sm ring-1 ring-white/70 backdrop-blur dark:bg-white/5 dark:ring-white/10">
+                  {item}
+                </div>
+              ))}
+            </div>
           </div>
 
-          <h1 className="animate-in mt-8 text-5xl font-black tracking-tighter sm:text-7xl lg:text-8xl">
-            O'qituvchilar uchun <br />
-              <span className="bg-gradient-to-r from-primary via-sky-500 to-primary bg-clip-text text-transparent">
-              Aqlli Yordamchi
-            </span>
-          </h1>
+          <div className="animate-in relative">
+            <div className="absolute -left-5 top-10 z-10 rounded-3xl bg-white/90 p-4 shadow-2xl ring-1 ring-slate-200/70 backdrop-blur dark:bg-slate-950/85 dark:ring-white/10">
+              <div className="flex items-center gap-3">
+                <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+                  <Sparkles className="h-5 w-5" />
+                </div>
+                <div>
+                  <div className="text-sm font-black">10 soniyada draft</div>
+                  <div className="text-xs font-medium text-muted-foreground">Mavzudan tayyor reja</div>
+                </div>
+              </div>
+            </div>
 
-          <p className="animate-in mx-auto mt-8 max-w-2xl text-lg font-medium leading-relaxed text-muted-foreground/80 sm:text-xl">
-            Dars rejalarini 10 soniyada tuzing, testlar tayyorlang va o'quvchilarga professional
-            fikr-mulohaza bildiring. Vaqtingizni eng muhim narsaga — ta'limga sarflang.
-          </p>
+            <div className="relative overflow-hidden rounded-[36px] bg-gradient-to-br from-white via-sky-50 to-amber-50 p-3 shadow-2xl shadow-slate-900/10 ring-1 ring-white/80 dark:from-slate-900 dark:via-slate-950 dark:to-slate-900 dark:ring-white/10">
+              <img
+                src={heroImage}
+                alt="Teacher Assistant ilovasi oynasi"
+                className="h-[360px] w-full rounded-[28px] object-cover sm:h-[480px]"
+              />
+            </div>
 
-          <div className="animate-in mt-12 flex flex-col items-center justify-center gap-4 sm:flex-row">
-            <Button asChild size="lg" variant="gradient" className="h-16 px-10 rounded-[20px] text-lg font-black shadow-lg">
-              <Link to="/register">
-                Bepul boshlash
-                <ArrowRight className="h-5 w-5" />
-              </Link>
-            </Button>
-            <Button asChild size="lg" variant="outline" className="h-16 px-10 rounded-[20px] text-lg font-bold">
-              <Link to="/login">
-                Kirish
-              </Link>
-            </Button>
+            <div className="absolute -bottom-5 right-3 rounded-3xl bg-slate-950 px-5 py-4 text-white shadow-2xl dark:bg-white dark:text-slate-950">
+              <div className="text-[10px] font-black uppercase tracking-[0.18em] opacity-60">Bugungi natija</div>
+              <div className="mt-1 text-2xl font-black">3 material</div>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Features Section */}
       <section className="container pb-24">
         <div className="mb-12 text-center">
           <h2 className="text-3xl font-black tracking-tight sm:text-4xl">
             Nima uchun <span className="text-primary">Teacher Assistant?</span>
           </h2>
           <p className="mt-4 text-base font-medium text-muted-foreground/70">
-            Hamma narsani bir joyda — tez, qulay va professional.
+            Hamma narsani bir joyda - tez, qulay va professional.
           </p>
         </div>
         <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
@@ -98,7 +134,6 @@ export function LandingPage() {
         </div>
       </section>
 
-      {/* CTA Section */}
       <section className="container pb-24">
         <div className="relative overflow-hidden rounded-[32px] bg-gradient-to-tr from-primary to-sky-500 p-10 text-center text-white shadow-2xl shadow-primary/25 md:p-16">
           <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-white/10 blur-3xl" />
@@ -108,7 +143,7 @@ export function LandingPage() {
               <Zap className="h-8 w-8 fill-white" />
             </div>
             <h2 className="text-3xl font-black tracking-tight sm:text-4xl">
-              Bugun boshlang — bepul!
+              Birinchi materialingizni bugun yarating
             </h2>
             <p className="mx-auto mt-4 max-w-xl text-base font-medium opacity-80">
               Ro'yxatdan o'ting va darhol 50 ta bepul kredit oling. Hech qanday bank kartasi talab qilinmaydi.

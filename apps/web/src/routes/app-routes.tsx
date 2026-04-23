@@ -15,6 +15,9 @@ const PricingPage = lazy(async () => ({
 const LoginPage = lazy(async () => ({
   default: (await import('@/pages/public/login-page')).LoginPage,
 }))
+const ResetPasswordPage = lazy(async () => ({
+  default: (await import('@/pages/public/reset-password-page')).ResetPasswordPage,
+}))
 const RegisterPage = lazy(async () => ({
   default: (await import('@/pages/public/register-page')).RegisterPage,
 }))
@@ -141,6 +144,14 @@ export function AppRoutes() {
           element={
             <LazyRoute label="Tariflar yuklanmoqda">
               <PricingPage />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path="/reset-password"
+          element={
+            <LazyRoute label="Parolni yangilash sahifasi yuklanmoqda">
+              <ResetPasswordPage />
             </LazyRoute>
           }
         />

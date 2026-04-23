@@ -162,53 +162,52 @@ export function AdminUsageAnalyticsPage() {
       <PageHeader
         eyebrow="Detailed Logs"
         title="Usage Analytics"
-        description="So'rovlar, kredit sarfi va token yuklamasini kunlar bo'yicha kuzating."
       />
 
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        <Card className="border-border/70 bg-white/85 dark:border-white/5 dark:bg-[#0f1724]">
-          <CardContent className="p-6">
+      <div className="grid grid-cols-3 gap-2 md:grid-cols-2 md:gap-4 xl:grid-cols-4">
+        <Card className="border-none bg-slate-100/80 shadow-none dark:bg-white/[0.04]">
+          <CardContent className="p-3 sm:p-6">
             <div className="flex items-center justify-between gap-4">
               <div>
-                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">Jami so'rovlar</p>
-                <p className="mt-2 text-3xl font-black tracking-tight text-slate-900 dark:text-white">{totals.requests}</p>
+                <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-slate-500 sm:text-[10px] sm:tracking-[0.2em]">Jami so'rovlar</p>
+                <p className="mt-2 text-2xl font-black tracking-tight text-slate-900 dark:text-white sm:text-3xl">{totals.requests}</p>
               </div>
-              <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-sky-500/20 bg-sky-500/10 text-sky-300">
+              <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-sky-500/20 bg-sky-500/10 text-sky-300 max-sm:hidden">
                 <Activity className="h-5 w-5" />
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="border-border/70 bg-white/85 dark:border-white/5 dark:bg-[#0f1724]">
-          <CardContent className="p-6">
+        <Card className="border-none bg-slate-100/80 shadow-none dark:bg-white/[0.04]">
+          <CardContent className="p-3 sm:p-6">
             <div className="flex items-center justify-between gap-4">
               <div>
-                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">Sarflangan kredit</p>
-                <p className="mt-2 text-3xl font-black tracking-tight text-slate-900 dark:text-white">{totals.credits}</p>
+                <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-slate-500 sm:text-[10px] sm:tracking-[0.2em]">Sarflangan kredit</p>
+                <p className="mt-2 text-2xl font-black tracking-tight text-slate-900 dark:text-white sm:text-3xl">{totals.credits}</p>
               </div>
-              <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-cyan-500/20 bg-cyan-500/10 text-cyan-300">
+              <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-cyan-500/20 bg-cyan-500/10 text-cyan-300 max-sm:hidden">
                 <Zap className="h-5 w-5" />
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="border-border/70 bg-white/85 dark:border-white/5 dark:bg-[#0f1724]">
-          <CardContent className="p-6">
+        <Card className="border-none bg-slate-100/80 shadow-none dark:bg-white/[0.04]">
+          <CardContent className="p-3 sm:p-6">
             <div className="flex items-center justify-between gap-4">
               <div>
-                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">Jami tokenlar</p>
-                <p className="mt-2 text-3xl font-black tracking-tight text-slate-900 dark:text-white">{totals.tokens.toLocaleString('en-US')}</p>
+                <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-slate-500 sm:text-[10px] sm:tracking-[0.2em]">Jami tokenlar</p>
+                <p className="mt-2 text-xl font-black tracking-tight text-slate-900 dark:text-white sm:text-3xl">{totals.tokens.toLocaleString('en-US')}</p>
               </div>
-              <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-blue-500/20 bg-blue-500/10 text-blue-300">
+              <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-blue-500/20 bg-blue-500/10 text-blue-300 max-sm:hidden">
                 <Cpu className="h-5 w-5" />
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="border-border/70 bg-white/85 dark:border-white/5 dark:bg-[#0f1724]">
+        <Card className="border-border/70 bg-white/85 max-md:col-span-3 dark:border-white/5 dark:bg-[#0f1724] xl:col-span-1">
           <CardContent className="p-6">
             <div className="flex items-center justify-between gap-4">
               <div>
@@ -230,9 +229,6 @@ export function AdminUsageAnalyticsPage() {
             <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
               <div>
                 <h2 className="text-xl font-black tracking-tight text-slate-900 dark:text-white">So'nggi 14 kun dinamikasi</h2>
-                <p className="mt-2 text-sm font-medium text-slate-600 dark:text-slate-400">
-                  Barlar kunlik so'rovlar sonini, chiziq esa token yuklamasini ko'rsatadi.
-                </p>
               </div>
               <div className="grid gap-3 sm:grid-cols-2">
                 <div className="rounded-2xl border border-slate-200/80 bg-slate-50/80 p-4 dark:border-white/5 dark:bg-white/[0.03]">

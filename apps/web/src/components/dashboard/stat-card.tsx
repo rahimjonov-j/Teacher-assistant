@@ -19,17 +19,17 @@ export const StatCard = memo(function StatCard({
   return (
     <Card className="relative overflow-hidden bg-card/85">
       <div className="absolute right-[-10%] top-[-20%] h-32 w-32 rounded-full bg-primary/6 blur-3xl" />
-      <CardContent className="p-6">
+      <CardContent className="p-3 sm:p-6">
         <div className="flex items-start justify-between gap-3">
           <div className="space-y-1">
-            <p className="text-sm font-semibold uppercase tracking-wider text-muted-foreground/70">{label}</p>
-            <p className="text-3xl font-black tracking-tight text-foreground">{value}</p>
+            <p className="text-[9px] font-semibold uppercase tracking-[0.08em] text-muted-foreground/70 sm:text-sm sm:tracking-wider">{label}</p>
+            <p className="text-xl font-black tracking-tight text-foreground sm:text-3xl">{value}</p>
           </div>
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-primary/10 bg-primary/10 text-primary shadow-sm">
+          <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-primary/10 bg-primary/10 text-primary shadow-sm max-sm:hidden">
             <Icon className="h-6 w-6" />
           </div>
         </div>
-        <div className="mt-6 flex items-center gap-2">
+        <div className="mt-6 flex items-center gap-2 max-sm:hidden">
           <div className="h-1.5 w-1.5 rounded-full bg-primary/50 animate-pulse" />
           <p className="text-xs font-medium text-muted-foreground/60">{hint}</p>
         </div>

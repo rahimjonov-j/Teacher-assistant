@@ -30,7 +30,6 @@ export function AdminActivityPage() {
       <PageHeader
         eyebrow="Faollik jurnali"
         title="So'nggi amallar"
-        description="Yaqin faollik ro'yxati."
       />
 
       <div className="grid gap-4">

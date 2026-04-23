@@ -18,7 +18,6 @@ export function AdminFeatureAnalyticsPage() {
       <PageHeader
         eyebrow="Funksiya analitikasi"
         title="Funksiya kesimi"
-        description="Har bir vosita bo'yicha qisqa holat."
       />
 
       <div className="grid gap-4 lg:grid-cols-2">
@@ -31,7 +30,6 @@ export function AdminFeatureAnalyticsPage() {
                   <h2 className="font-semibold">{feature.label}</h2>
                   <Badge variant="outline">{feature.creditCost} kredit</Badge>
                 </div>
-                <p className="text-sm text-muted-foreground">{feature.description}</p>
                 <div className="grid gap-3 sm:grid-cols-2">
                   <div className="rounded-2xl bg-secondary p-4">
                     <div className="text-sm text-muted-foreground">So'rovlar</div>

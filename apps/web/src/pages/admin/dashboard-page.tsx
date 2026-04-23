@@ -178,7 +178,6 @@ export function AdminDashboardPage() {
       <PageHeader
         eyebrow="Admin analytics"
         title="Platforma holati"
-        description="So'nggi faollik, eng ko'p ishlatilayotgan vositalar va tizim yuklamasini bitta joyda ko'ring."
       />
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -212,34 +211,32 @@ export function AdminDashboardPage() {
         <Card className="border-border/70 bg-white/85 dark:border-white/5 dark:bg-[#0f1724]">
           <CardContent className="p-5 sm:p-8">
             <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
-              <div>
-                <div className="flex items-center gap-3">
-                  <h2 className="text-xl font-black tracking-tight text-slate-900 dark:text-white">Faollik dinamikasi</h2>
-                  <Badge variant="outline" className="border-border/70 text-slate-500 dark:border-white/10 dark:text-slate-400">
-                    14 kun
-                  </Badge>
-                </div>
+              <div className="flex items-center gap-3">
+                <h2 className="text-xl font-black tracking-tight text-slate-900 dark:text-white">Faollik dinamikasi</h2>
+                <Badge variant="outline" className="border-border/70 text-slate-500 dark:border-white/10 dark:text-slate-400">
+                  14 kun
+                </Badge>
               </div>
 
-              <div className="grid grid-cols-2 gap-2 sm:gap-3 md:grid-cols-3 lg:min-w-[360px]">
-                <div className="rounded-xl border border-slate-200/80 bg-slate-50/80 p-3 dark:border-white/5 dark:bg-white/[0.03]">
+              <div className="grid grid-cols-3 gap-2 sm:gap-3 lg:min-w-[360px]">
+                <div className="rounded-2xl bg-slate-100/80 p-2.5 dark:bg-white/[0.04] sm:p-3">
                   <div className="flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-[0.12em] text-slate-500">
-                    <Clock3 className="h-3.5 w-3.5" />
+                    <Clock3 className="h-3.5 w-3.5 max-sm:hidden" />
                     Faol kunlar
                   </div>
                   <div className="mt-2 text-xl font-black text-slate-900 dark:text-white">{trendSummary.activeDays}</div>
                 </div>
-                <div className="rounded-xl border border-slate-200/80 bg-slate-50/80 p-3 dark:border-white/5 dark:bg-white/[0.03]">
+                <div className="rounded-2xl bg-slate-100/80 p-2.5 dark:bg-white/[0.04] sm:p-3">
                   <div className="flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-[0.12em] text-slate-500">
-                    <TrendingUp className="h-3.5 w-3.5" />
+                    <TrendingUp className="h-3.5 w-3.5 max-sm:hidden" />
                     Pik kun
                   </div>
                   <div className="mt-2 text-lg font-black leading-tight text-slate-900 dark:text-white">{trendSummary.peakDayLabel}</div>
                   <div className="text-[11px] font-medium text-sky-300">{trendSummary.peakDayRequests} ta so'rov</div>
                 </div>
-                <div className="rounded-xl border border-slate-200/80 bg-slate-50/80 p-3 dark:border-white/5 dark:bg-white/[0.03]">
+                <div className="rounded-2xl bg-slate-100/80 p-2.5 dark:bg-white/[0.04] sm:p-3">
                   <div className="flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-[0.12em] text-slate-500">
-                    <Zap className="h-3.5 w-3.5" />
+                    <Zap className="h-3.5 w-3.5 max-sm:hidden" />
                     O'rtacha
                   </div>
                   <div className="mt-2 text-xl font-black text-slate-900 dark:text-white">{trendSummary.averagePerDay}</div>
@@ -307,9 +304,6 @@ export function AdminDashboardPage() {
             <div className="flex items-start justify-between gap-4">
               <div>
                 <h2 className="text-xl font-black tracking-tight text-slate-900 dark:text-white">Eng ko'p ishlatilgan vositalar</h2>
-                <p className="mt-2 text-sm font-medium text-slate-600 dark:text-slate-400">
-                  Qaysi funksiya platformada asosiy yukni olayotganini ko'rsatadi.
-                </p>
               </div>
               {topFeature ? (
                 <Badge variant="outline" className="border-sky-500/20 bg-sky-500/10 text-sky-300">
@@ -376,9 +370,6 @@ export function AdminDashboardPage() {
             <div className="flex items-center justify-between gap-4">
               <div>
                 <h2 className="text-xl font-black tracking-tight text-slate-900 dark:text-white">Eng faol o'qituvchilar</h2>
-                <p className="mt-2 text-sm font-medium text-slate-600 dark:text-slate-400">
-                  Hozirgi davrda eng ko'p material yaratgan foydalanuvchilar.
-                </p>
               </div>
               {topTeacher ? (
                 <Badge variant="outline" className="border-sky-500/20 bg-sky-500/10 text-sky-300">
@@ -419,9 +410,6 @@ export function AdminDashboardPage() {
             <div className="flex items-center justify-between gap-4">
               <div>
                 <h2 className="text-xl font-black tracking-tight text-slate-900 dark:text-white">So'nggi faollik</h2>
-                <p className="mt-2 text-sm font-medium text-slate-600 dark:text-slate-400">
-                  Yaqinda platformada yaratilgan materiallar oqimi.
-                </p>
               </div>
               <Badge variant="outline" className="border-cyan-500/20 bg-cyan-500/10 text-cyan-300">
                 LIVE
@@ -453,7 +441,7 @@ export function AdminDashboardPage() {
 
             <Button
               variant="outline"
-              className="mt-8 h-12 w-full rounded-2xl border-white/10 bg-white/5 text-slate-300 hover:text-white"
+              className="mt-8 h-12 w-full rounded-2xl border-slate-200 bg-white text-slate-800 hover:bg-slate-50 hover:text-slate-950 dark:border-white/10 dark:bg-white/5 dark:text-slate-200 dark:hover:bg-white/10 dark:hover:text-white"
               asChild
             >
               <Link to="/admin/activity">Batafsil tarixni ko'rish</Link>

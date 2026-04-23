@@ -13,6 +13,22 @@ import { formatCurrencyUzs, formatDate } from '@/lib/format'
 import { sortPlans, type PlanConfig } from '@/lib/plans'
 import { cn } from '@/lib/utils'
 
+const subscriptionTone = {
+  active: 'border-emerald-300/60 bg-emerald-50/90 ring-2 ring-emerald-200/70 dark:border-emerald-500/25 dark:bg-emerald-950/20 dark:ring-emerald-500/15',
+  trialing: 'border-sky-300/60 bg-sky-50/90 ring-2 ring-sky-200/70 dark:border-sky-500/25 dark:bg-sky-950/20 dark:ring-sky-500/15',
+  past_due: 'border-amber-300/70 bg-amber-50/90 ring-2 ring-amber-200/70 dark:border-amber-500/30 dark:bg-amber-950/20 dark:ring-amber-500/15',
+  canceled: 'border-rose-300/70 bg-rose-50/90 ring-2 ring-rose-200/70 dark:border-rose-500/30 dark:bg-rose-950/20 dark:ring-rose-500/15',
+  expired: 'border-slate-300/70 bg-slate-50/90 ring-2 ring-slate-200/70 dark:border-slate-600/40 dark:bg-slate-900/60 dark:ring-slate-700/30',
+} as const
+
+const statusLabel = {
+  active: 'Aktiv',
+  trialing: 'Sinov',
+  past_due: "To'lov kutilmoqda",
+  canceled: 'Bekor qilingan',
+  expired: 'Tugagan',
+} as const
+
 export function BillingPage() {
   const dashboardQuery = useQuery({
     queryKey: ['dashboard'],
@@ -105,17 +121,17 @@ export function BillingPage() {
               <Card
                 key={plan.key}
                 className={cn(
-                  'relative overflow-hidden bg-card/85',
-                  isCurrent ? 'border-primary/40 ring-2 ring-primary/20' : 'border-border/40',
+                  'relative overflow-hidden border-border/40 bg-card/85 transition-colors',
+                  isCurrent && subscription ? subscriptionTone[subscription.status] : 'hover:border-primary/30',
                 )}
               >
-                {isCurrent ? <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-primary to-sky-500" /> : null}
+                {isCurrent ? <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-emerald-400 to-sky-500" /> : null}
                 <CardContent className="space-y-5 p-6">
                   <div className="flex items-center justify-between gap-3">
                     <h3 className="text-lg font-black tracking-tight">{plan.name}</h3>
                     {isCurrent ? (
-                      <Badge className="border-primary/20 bg-primary/10 text-[9px] font-black uppercase tracking-widest text-primary">
-                        Joriy
+                      <Badge className="border-emerald-500/20 bg-emerald-500/10 text-[9px] font-black uppercase tracking-widest text-emerald-700 dark:text-emerald-300">
+                        {subscription ? statusLabel[subscription.status] : 'Joriy'}
                       </Badge>
                     ) : null}
                   </div>
@@ -138,12 +154,12 @@ export function BillingPage() {
                     <Button asChild className="w-full rounded-2xl font-bold" variant="outline">
                       <a href={upgradeLink} target="_blank" rel="noreferrer">
                         <MessageCircleMore className="mr-2 h-4 w-4" />
-                        So'rov yuborish
+                        Sotib olish
                       </a>
                     </Button>
                   ) : (
                     <Button asChild className="w-full rounded-2xl font-bold" variant="outline">
-                      <Link to="/app/settings">Qanday olish</Link>
+                      <Link to="/app/settings">Sotib olish</Link>
                     </Button>
                   )}
                 </CardContent>

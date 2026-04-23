@@ -245,7 +245,6 @@ export function AdminSubscriptionsPage() {
       <PageHeader
         eyebrow="Obunalarni kuzatish"
         title="Obunalar"
-        description="Tariflar, aktiv foydalanuvchilar va token oqimini bitta tushunarli sahifada boshqaring."
       />
 
       <Card className="overflow-hidden border-white/70 bg-white/85 dark:border-white/10 dark:bg-[#0d1422]/90">
@@ -267,10 +266,6 @@ export function AdminSubscriptionsPage() {
                   <h2 className="text-2xl font-black tracking-tight sm:text-3xl">
                     Tariflar ko‘rinishi endi aniqroq va boshqarish uchun qulayroq.
                   </h2>
-                  <p className="max-w-2xl text-sm leading-relaxed text-muted-foreground sm:text-[15px]">
-                    Bu yerda qilingan o‘zgarishlar public pricing sahifasida, teacher billing oynasida va
-                    Telegram botdagi plan javoblarida bir xil ko‘rinadi.
-                  </p>
                 </div>
 
                 <div className="grid gap-3 sm:grid-cols-3">
@@ -307,7 +302,6 @@ export function AdminSubscriptionsPage() {
                   </div>
                   <div>
                     <div className="text-sm font-bold tracking-tight">Token oqimi</div>
-                    <div className="text-xs text-muted-foreground">Joriy ishlatilish va qolgan zaxira</div>
                   </div>
                 </div>
 
@@ -353,9 +347,6 @@ export function AdminSubscriptionsPage() {
         <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <h2 className="text-2xl font-black tracking-tight">Tarif sozlamalari</h2>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Har bir plan uchun narx, positioning va foydalanuvchiga ko'rinadigan matn shu yerdan yangilanadi.
-            </p>
           </div>
           <div className="rounded-2xl border border-border/60 bg-white/70 px-4 py-2 text-xs font-semibold text-muted-foreground dark:bg-slate-950/30">
             Planlar tartibi: Trial, Basic, Pro, Premium
@@ -468,7 +459,6 @@ export function AdminSubscriptionsPage() {
 
                             <div className="space-y-1.5">
                               <h3 className="text-xl font-black tracking-tight">{plan.name}</h3>
-                              <p className="text-xs font-medium text-muted-foreground">{meta.audience}</p>
                             </div>
                           </div>
 
@@ -486,10 +476,6 @@ export function AdminSubscriptionsPage() {
                           </div>
                           <div className="mt-1 text-3xl font-black tracking-tight">{formatUzs(plan.priceMonthlyUzs)}</div>
                         </div>
-
-                        <p className="min-h-[72px] text-sm leading-relaxed text-muted-foreground">
-                          {plan.description}
-                        </p>
 
                         <div className="grid grid-cols-2 gap-2">
                           <div className="rounded-[20px] border border-border/60 bg-background/70 p-3.5 dark:bg-slate-950/35">
