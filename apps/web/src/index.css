@@ -105,7 +105,7 @@
   }
 
   .app-shell {
-    @apply mx-auto min-h-screen max-w-7xl px-0 pb-32 pt-4 sm:px-6 sm:pb-28 sm:pt-6 lg:px-8;
+    @apply mx-auto min-h-screen max-w-7xl px-4 pb-32 pt-4 sm:px-6 sm:pb-28 sm:pt-6 lg:px-8;
   }
 
   .telegram-loader-line {
@@ -165,6 +165,13 @@
 
   .app-shell [class*="shadow-"] {
     box-shadow: none !important;
+  }
+
+  .app-shell .mobile-card {
+    border: 1px solid hsl(var(--border)) !important;
+    border-radius: 24px !important;
+    background: hsl(var(--card)) !important;
+    box-shadow: 0 14px 36px -30px rgba(15, 23, 42, 0.45) !important;
   }
 
   .app-shell {

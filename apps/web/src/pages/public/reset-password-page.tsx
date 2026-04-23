@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { Link, useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
-import { GraduationCap, Loader2, MailCheck } from 'lucide-react'
+import { Eye, EyeOff, GraduationCap, Loader2, MailCheck } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -36,6 +36,8 @@ export function ResetPasswordPage() {
   const navigate = useNavigate()
   const [resetEmailSent, setResetEmailSent] = useState(false)
   const [hasRecoverySession, setHasRecoverySession] = useState(() => isRecoveryUrl())
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const requestForm = useForm<RequestValues>({
     resolver: zodResolver(requestSchema),
   })
@@ -122,24 +124,44 @@ export function ResetPasswordPage() {
             <form onSubmit={onUpdatePassword} className="space-y-5">
               <div className="space-y-2">
                 <Label htmlFor="password" className="ml-1 text-xs font-bold uppercase tracking-widest text-muted-foreground/60">Yangi parol</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  className="h-14 rounded-2xl bg-white/50 dark:bg-black/20"
-                  {...updateForm.register('password')}
-                />
+                <div className="relative">
+                  <Input
+                    id="password"
+                    type={showPassword ? 'text' : 'password'}
+                    className="h-14 rounded-2xl bg-white/50 pr-12 dark:bg-black/20"
+                    {...updateForm.register('password')}
+                  />
+                  <button
+                    type="button"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground transition-colors hover:text-foreground"
+                    aria-label={showPassword ? 'Parolni yashirish' : "Parolni ko'rsatish"}
+                    onClick={() => setShowPassword((value) => !value)}
+                  >
+                    {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                  </button>
+                </div>
                 {updateForm.formState.errors.password && (
                   <p className="ml-1 text-[10px] font-bold text-destructive">{updateForm.formState.errors.password.message}</p>
                 )}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="confirmPassword" className="ml-1 text-xs font-bold uppercase tracking-widest text-muted-foreground/60">Parolni tasdiqlang</Label>
-                <Input
-                  id="confirmPassword"
-                  type="password"
-                  className="h-14 rounded-2xl bg-white/50 dark:bg-black/20"
-                  {...updateForm.register('confirmPassword')}
-                />
+                <div className="relative">
+                  <Input
+                    id="confirmPassword"
+                    type={showConfirmPassword ? 'text' : 'password'}
+                    className="h-14 rounded-2xl bg-white/50 pr-12 dark:bg-black/20"
+                    {...updateForm.register('confirmPassword')}
+                  />
+                  <button
+                    type="button"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground transition-colors hover:text-foreground"
+                    aria-label={showConfirmPassword ? 'Parolni yashirish' : "Parolni ko'rsatish"}
+                    onClick={() => setShowConfirmPassword((value) => !value)}
+                  >
+                    {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                  </button>
+                </div>
                 {updateForm.formState.errors.confirmPassword && (
                   <p className="ml-1 text-[10px] font-bold text-destructive">{updateForm.formState.errors.confirmPassword.message}</p>
                 )}

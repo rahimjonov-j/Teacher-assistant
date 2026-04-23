@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { FEATURE_DEFINITIONS, PLAN_DEFINITIONS, type TeacherDashboardPayload } from '@teacher-assistant/shared'
 import { Link } from 'react-router-dom'
-import { Zap, MessageCircleMore, CheckCircle2 } from 'lucide-react'
+import { Zap, ShoppingBag, CheckCircle2 } from 'lucide-react'
 import { CardLoader } from '@/components/shared/loading-state'
 import { PageHeader } from '@/components/shared/page-header'
 import { Badge } from '@/components/ui/badge'
@@ -57,13 +57,13 @@ export function BillingPage() {
   }
 
   return (
-    <div className="space-y-8 px-4 animate-in pb-12 sm:px-0 sm:space-y-10">
+    <div className="space-y-8 animate-in pb-12 sm:space-y-10">
       <PageHeader
         eyebrow="Moliyaviy holat"
         title="Obuna va Tariflar"
       />
 
-      <Card className="overflow-hidden border-none bg-gradient-to-tr from-primary to-sky-500 text-white shadow-2xl shadow-primary/20">
+      <Card className="mobile-card overflow-hidden border-none bg-gradient-to-tr from-primary to-sky-500 text-white shadow-2xl shadow-primary/20">
         <CardContent className="p-5 sm:p-8">
           <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
             <div className="min-w-0">
@@ -120,7 +120,7 @@ export function BillingPage() {
               <Card
                 key={plan.key}
                 className={cn(
-                  'relative min-w-0 overflow-hidden border-border/40 bg-card/85 transition-colors',
+                  'mobile-card relative min-w-0 overflow-hidden border-border/40 bg-card/85 transition-colors',
                   isCurrent && subscription ? subscriptionTone[subscription.status] : 'hover:border-primary/30',
                 )}
               >
@@ -152,7 +152,7 @@ export function BillingPage() {
                   ) : upgradeLink ? (
                     <Button asChild className="w-full rounded-2xl font-bold" variant="outline">
                       <a href={upgradeLink} target="_blank" rel="noreferrer">
-                        <MessageCircleMore className="mr-2 h-4 w-4" />
+                        <ShoppingBag className="mr-2 h-4 w-4" />
                         Sotib olish
                       </a>
                     </Button>
@@ -168,7 +168,7 @@ export function BillingPage() {
         </div>
       </section>
 
-      <Card className="border-none bg-card/85 shadow-xl backdrop-blur-xl">
+      <Card className="mobile-card border-none bg-card/85 shadow-xl backdrop-blur-xl">
         <CardContent className="space-y-5 p-5 sm:p-8">
           <h2 className="text-xl font-black tracking-tight">Funksiyalar kredit narxi</h2>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">

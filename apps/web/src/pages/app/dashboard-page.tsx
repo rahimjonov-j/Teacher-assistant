@@ -43,7 +43,7 @@ export function DashboardPage() {
     : 0
 
   return (
-    <div className="space-y-8 px-4 animate-in sm:px-0 sm:space-y-10">
+    <div className="space-y-8 animate-in sm:space-y-10">
       <section className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div className="space-y-2">
           <h1 className="text-3xl font-black tracking-tight sm:text-5xl lg:text-6xl">
@@ -53,7 +53,7 @@ export function DashboardPage() {
           <p className="text-base font-medium text-muted-foreground/70 sm:text-lg">Bugun qanday material tayyorlaymiz?</p>
         </div>
 
-        <Card className="w-full border-none bg-gradient-to-tr from-primary to-sky-500 text-white shadow-2xl shadow-primary/20 sm:max-w-sm">
+        <Card className="mobile-card w-full border-none bg-gradient-to-tr from-primary to-sky-500 text-white shadow-2xl shadow-primary/20 sm:max-w-sm">
           <CardContent className="p-5 sm:p-8">
             <div className="flex items-center justify-between gap-4">
               <div className="space-y-1">
@@ -105,13 +105,13 @@ export function DashboardPage() {
             <Link to="/app/generator">Hammasini ko'rish</Link>
           </Button>
         </div>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-4">
           {data.quickActions.map((feature, i) => (
             <Link key={feature.key} to={`/app/generator?feature=${feature.key}`}>
-              <Card className="h-full cursor-pointer overflow-hidden bg-card/85">
-                <CardContent className="p-4 sm:p-6">
+              <Card className="mobile-card h-full cursor-pointer overflow-hidden bg-card/85">
+                <CardContent className="p-3 sm:p-6">
                   <div className={cn(
-                    'mb-4 flex h-11 w-11 items-center justify-center rounded-2xl border text-primary shadow-sm sm:h-12 sm:w-12',
+                    'mb-3 flex h-10 w-10 items-center justify-center rounded-2xl border text-primary shadow-sm sm:mb-4 sm:h-12 sm:w-12',
                     i % 2 === 0 ? 'border-primary/10 bg-primary/10' : 'border-sky-500/15 bg-sky-500/10 text-sky-600 dark:text-sky-400',
                   )}>
                     {(() => {
@@ -119,7 +119,7 @@ export function DashboardPage() {
                       return <Icon className="h-6 w-6" />
                     })()}
                   </div>
-                  <h3 className="font-black tracking-tight">{feature.label}</h3>
+                  <h3 className="break-words text-sm font-black leading-5 tracking-tight sm:text-base">{feature.label}</h3>
                   <p className="mt-1 text-xs font-medium text-muted-foreground/60">{feature.creditCost} kredit</p>
                 </CardContent>
               </Card>
@@ -139,7 +139,7 @@ export function DashboardPage() {
           <div className="grid gap-4">
             {data.recentContent.slice(0, 3).map((item) => (
               <Link key={item.id} to={`/app/history/${item.id}`}>
-                <Card className="bg-card/85">
+                <Card className="mobile-card bg-card/85">
                   <CardContent className="flex items-center justify-between p-4 sm:p-6">
                     <div className="flex items-center gap-4">
                       <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-secondary/50 text-muted-foreground">
