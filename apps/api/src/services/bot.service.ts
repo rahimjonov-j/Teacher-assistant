@@ -45,13 +45,14 @@ export async function bootstrapTelegramBot() {
 
   await instance.telegram.setMyCommands(TELEGRAM_MENU_COMMANDS)
 
-  if (env.TELEGRAM_WEBHOOK_URL) {
-    const webhookUrl = resolveWebhookUrl(env.TELEGRAM_WEBHOOK_URL)
+  const webhookUrl = getUsableWebhookUrl(env.TELEGRAM_WEBHOOK_URL)
+  if (webhookUrl) {
     await instance.telegram.setWebhook(webhookUrl)
     console.log(`Telegram webhook configured: ${webhookUrl}`)
     return
   }
 
+  await instance.telegram.deleteWebhook()
   await instance.launch({ dropPendingUpdates: true })
   console.log('Telegram bot launched in long-polling mode')
 }
@@ -422,4 +423,26 @@ function resolveWebhookUrl(rawUrl: string) {
   }
 
   return new URL('/api/telegram/webhook', parsed).toString()
+}
+
+function getUsableWebhookUrl(rawUrl: string | undefined) {
+  if (!rawUrl) {
+    return null
+  }
+
+  try {
+    const webhookUrl = resolveWebhookUrl(rawUrl)
+    const parsed = new URL(webhookUrl)
+    const blockedHosts = new Set(['api', 'localhost', '127.0.0.1', '0.0.0.0'])
+
+    if (blockedHosts.has(parsed.hostname) || parsed.hostname.endsWith('.local')) {
+      console.warn(`Telegram webhook skipped because hostname is not publicly reachable: ${parsed.hostname}`)
+      return null
+    }
+
+    return webhookUrl
+  } catch (error) {
+    console.warn('Telegram webhook skipped because URL is invalid.', error)
+    return null
+  }
 }

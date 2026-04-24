@@ -17,6 +17,10 @@ function pickFirstNonEmpty(...values: Array<string | undefined>) {
   return ''
 }
 
+function normalizeTelegramBotUsername(value: string) {
+  return value.replace(/^@+/, '').trim()
+}
+
 export const env = {
   apiUrl: pickFirstNonEmpty(
     import.meta.env.VITE_API_URL,
@@ -33,8 +37,10 @@ export const env = {
     import.meta.env.SUPABASE_ANON_KEY,
     __APP_ENV__?.SUPABASE_ANON_KEY,
   ),
-  telegramBotUsername: pickFirstNonEmpty(
-    import.meta.env.VITE_TELEGRAM_BOT_USERNAME,
-    __APP_ENV__?.TELEGRAM_BOT_USERNAME,
+  telegramBotUsername: normalizeTelegramBotUsername(
+    pickFirstNonEmpty(
+      import.meta.env.VITE_TELEGRAM_BOT_USERNAME,
+      __APP_ENV__?.TELEGRAM_BOT_USERNAME,
+    ),
   ),
 }
