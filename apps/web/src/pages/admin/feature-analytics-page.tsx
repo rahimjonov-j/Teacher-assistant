@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
 import { useI18n } from '@/hooks/use-i18n'
 import { apiRequest } from '@/lib/api'
+import { getFeatureLabel } from '@/lib/format'
 
 export function AdminFeatureAnalyticsPage() {
   const { t } = useI18n()
@@ -29,20 +30,20 @@ export function AdminFeatureAnalyticsPage() {
             <Card key={feature.key}>
               <CardContent className="space-y-4 p-5">
                 <div className="flex items-center justify-between gap-3">
-                  <h2 className="font-semibold">{feature.label}</h2>
-                  <Badge variant="outline">{feature.creditCost} kredit</Badge>
+                  <h2 className="font-semibold">{getFeatureLabel(feature.key)}</h2>
+                  <Badge variant="outline">{feature.creditCost} {t('admin.features.creditCost')}</Badge>
                 </div>
                 <div className="grid gap-3 sm:grid-cols-2">
                   <div className="rounded-2xl bg-secondary p-4">
-                    <div className="text-sm text-muted-foreground">So'rovlar</div>
+                    <div className="text-sm text-muted-foreground">{t('admin.features.requestCount')}</div>
                     <div className="mt-2 text-2xl font-semibold">{stats?.totalRequests ?? 0}</div>
                   </div>
                   <div className="rounded-2xl bg-secondary p-4">
-                    <div className="text-sm text-muted-foreground">Sarflangan kredit</div>
+                    <div className="text-sm text-muted-foreground">{t('admin.features.consumedCredits')}</div>
                     <div className="mt-2 text-2xl font-semibold">{stats?.creditsConsumed ?? 0}</div>
                   </div>
                   <div className="rounded-2xl bg-secondary p-4 sm:col-span-2">
-                    <div className="text-sm text-muted-foreground">Jami tokenlar</div>
+                    <div className="text-sm text-muted-foreground">{t('admin.features.totalTokens')}</div>
                     <div className="mt-2 text-2xl font-semibold">{(stats?.totalTokens ?? 0).toLocaleString('en-US')}</div>
                   </div>
                 </div>

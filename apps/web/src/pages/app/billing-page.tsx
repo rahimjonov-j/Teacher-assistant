@@ -8,12 +8,13 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { useI18n } from '@/hooks/use-i18n'
 import { apiRequest } from '@/lib/api'
+import { planDescriptions } from '@/lib/i18n'
 import { env } from '@/lib/env'
-import { formatCurrencyUzs, formatDate } from '@/lib/format'
+import { formatCurrencyUzs, formatDate, getFeatureLabel, getPlanName } from '@/lib/format'
 import { sortPlans, type PlanConfig } from '@/lib/plans'
 
 export function BillingPage() {
-  const { t } = useI18n()
+  const { language, t } = useI18n()
   const dashboardQuery = useQuery({
     queryKey: ['dashboard'],
     queryFn: () => apiRequest<TeacherDashboardPayload>('/teacher/dashboard'),
@@ -45,7 +46,9 @@ export function BillingPage() {
           <div className="flex items-center justify-between gap-4">
             <div>
               <div className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">{t('billing.currentPlan')}</div>
-              <div className="mt-1 text-2xl font-black">{subscription?.planName ?? t('billing.noSubscription')}</div>
+              <div className="mt-1 text-2xl font-black">
+                {subscription?.planKey ? getPlanName(subscription.planKey) : t('billing.noSubscription')}
+              </div>
             </div>
             <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-secondary">
               <Zap className="h-5 w-5" />
@@ -76,8 +79,8 @@ export function BillingPage() {
               <CardContent className="space-y-4 p-5">
                 <div className="flex items-start justify-between gap-4">
                   <div>
-                    <div className="text-lg font-black">{plan.name}</div>
-                    <p className="mt-1 text-sm leading-6 text-muted-foreground">{plan.description}</p>
+                    <div className="text-lg font-black">{getPlanName(plan.key)}</div>
+                    <p className="mt-1 text-sm leading-6 text-muted-foreground">{planDescriptions[language][plan.key] ?? plan.description}</p>
                   </div>
                   {isCurrent ? <Badge variant="gradient">{t('billing.currentPlanButton')}</Badge> : null}
                 </div>
@@ -123,7 +126,7 @@ export function BillingPage() {
           <div className="space-y-2">
             {FEATURE_DEFINITIONS.map((feature) => (
               <div key={feature.key} className="flex items-center justify-between rounded-2xl border border-border px-4 py-3 text-sm">
-                <span className="font-semibold">{feature.label}</span>
+                <span className="font-semibold">{getFeatureLabel(feature.key)}</span>
                 <span className="text-muted-foreground">{feature.creditCost} {t('billing.credits')}</span>
               </div>
             ))}

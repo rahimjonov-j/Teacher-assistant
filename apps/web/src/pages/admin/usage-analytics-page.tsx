@@ -171,7 +171,7 @@ export function AdminUsageAnalyticsPage() {
           <CardContent className="p-3 sm:p-6">
             <div className="flex items-center justify-between gap-4">
               <div>
-                <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-slate-500 sm:text-[10px] sm:tracking-[0.2em]">Jami so'rovlar</p>
+                <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-slate-500 sm:text-[10px] sm:tracking-[0.2em]">{t('admin.usage.totalRequests')}</p>
                 <p className="mt-2 text-2xl font-black tracking-tight text-slate-900 dark:text-white sm:text-3xl">{totals.requests}</p>
               </div>
               <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-sky-500/20 bg-sky-500/10 text-sky-300 max-sm:hidden">
@@ -185,7 +185,7 @@ export function AdminUsageAnalyticsPage() {
           <CardContent className="p-3 sm:p-6">
             <div className="flex items-center justify-between gap-4">
               <div>
-                <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-slate-500 sm:text-[10px] sm:tracking-[0.2em]">Sarflangan kredit</p>
+                <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-slate-500 sm:text-[10px] sm:tracking-[0.2em]">{t('admin.usage.totalCredits')}</p>
                 <p className="mt-2 text-2xl font-black tracking-tight text-slate-900 dark:text-white sm:text-3xl">{totals.credits}</p>
               </div>
               <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-cyan-500/20 bg-cyan-500/10 text-cyan-300 max-sm:hidden">
@@ -199,7 +199,7 @@ export function AdminUsageAnalyticsPage() {
           <CardContent className="p-3 sm:p-6">
             <div className="flex items-center justify-between gap-4">
               <div>
-                <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-slate-500 sm:text-[10px] sm:tracking-[0.2em]">Jami tokenlar</p>
+                <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-slate-500 sm:text-[10px] sm:tracking-[0.2em]">{t('admin.usage.totalTokens')}</p>
                 <p className="mt-2 text-xl font-black tracking-tight text-slate-900 dark:text-white sm:text-3xl">{totals.tokens.toLocaleString('en-US')}</p>
               </div>
               <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-blue-500/20 bg-blue-500/10 text-blue-300 max-sm:hidden">
@@ -213,9 +213,9 @@ export function AdminUsageAnalyticsPage() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between gap-4">
               <div>
-                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">Eng faol kanal</p>
+                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">{t('admin.usage.topChannel')}</p>
                 <p className="mt-2 text-2xl font-black tracking-tight text-slate-900 dark:text-white">{sourceStats[0]?.[0] ?? '-'}</p>
-                <p className="mt-1 text-xs font-medium text-slate-500 dark:text-slate-400">{sourceStats[0]?.[1] ?? 0} ta so'rov</p>
+                <p className="mt-1 text-xs font-medium text-slate-500 dark:text-slate-400">{sourceStats[0]?.[1] ?? 0} {t('admin.usage.requestsCount')}</p>
               </div>
               <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-indigo-500/20 bg-indigo-500/10 text-indigo-300">
                 <Bot className="h-5 w-5" />
@@ -230,20 +230,20 @@ export function AdminUsageAnalyticsPage() {
           <CardContent className="p-5 sm:p-8">
             <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
               <div>
-                <h2 className="text-xl font-black tracking-tight text-slate-900 dark:text-white">So'nggi 14 kun dinamikasi</h2>
+                <h2 className="text-xl font-black tracking-tight text-slate-900 dark:text-white">{t('admin.usage.activity14Days')}</h2>
               </div>
               <div className="grid gap-3 sm:grid-cols-2">
                 <div className="rounded-2xl border border-slate-200/80 bg-slate-50/80 p-4 dark:border-white/5 dark:bg-white/[0.03]">
-                  <div className="text-[10px] font-bold uppercase tracking-[0.14em] text-slate-500">Pik kun</div>
+                  <div className="text-[10px] font-bold uppercase tracking-[0.14em] text-slate-500">{t('admin.dashboard.peakDay')}</div>
                   <div className="mt-2 text-lg font-black text-slate-900 dark:text-white">{peakDay?.label ?? '-'}</div>
-                  <div className="text-xs font-medium text-sky-300">{peakDay?.totalRequests ?? 0} ta so'rov</div>
+                  <div className="text-xs font-medium text-sky-300">{peakDay?.totalRequests ?? 0} {t('admin.usage.requestsCount')}</div>
                 </div>
                 <div className="rounded-2xl border border-slate-200/80 bg-slate-50/80 p-4 dark:border-white/5 dark:bg-white/[0.03]">
-                  <div className="text-[10px] font-bold uppercase tracking-[0.14em] text-slate-500">Top funksiya</div>
+                  <div className="text-[10px] font-bold uppercase tracking-[0.14em] text-slate-500">{t('admin.usage.topFeature')}</div>
                   <div className="mt-2 text-lg font-black text-slate-900 dark:text-white">
                     {topFeature ? getFeatureLabel(topFeature[0] as UsageRow['featureKey']) : '-'}
                   </div>
-                  <div className="text-xs font-medium text-cyan-300">{topFeature?.[1] ?? 0} ta so'rov</div>
+                  <div className="text-xs font-medium text-cyan-300">{topFeature?.[1] ?? 0} {t('admin.usage.requestsCount')}</div>
                 </div>
               </div>
             </div>
@@ -296,18 +296,18 @@ export function AdminUsageAnalyticsPage() {
 
         <Card className="border-border/70 bg-white/85 dark:border-white/5 dark:bg-[#0f1724]">
           <CardContent className="p-5 sm:p-8">
-            <h2 className="text-xl font-black tracking-tight text-slate-900 dark:text-white">Qisqa xulosa</h2>
+            <h2 className="text-xl font-black tracking-tight text-slate-900 dark:text-white">{t('admin.usage.summary')}</h2>
             <div className="mt-6 space-y-4">
               <div className="rounded-2xl border border-slate-200/80 bg-slate-50/80 p-4 dark:border-white/5 dark:bg-white/[0.03]">
-                <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">O'rtacha yuklama</div>
+                <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">{t('admin.usage.averageLoad')}</div>
                 <div className="mt-2 text-2xl font-black text-slate-900 dark:text-white">
                   {chartData.length > 0 ? (totals.requests / chartData.length).toFixed(1) : '0.0'}
                 </div>
-                <div className="text-sm font-medium text-slate-500 dark:text-slate-400">kuniga so'rov</div>
+                <div className="text-sm font-medium text-slate-500 dark:text-slate-400">{t('admin.usage.requestsPerDay')}</div>
               </div>
 
               <div className="rounded-2xl border border-slate-200/80 bg-slate-50/80 p-4 dark:border-white/5 dark:bg-white/[0.03]">
-                <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">Manba bo'yicha</div>
+                <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">{t('admin.usage.bySource')}</div>
                 <div className="mt-4 space-y-3">
                   {sourceStats.map(([source, count]) => (
                     <div key={source}>
@@ -327,11 +327,11 @@ export function AdminUsageAnalyticsPage() {
               </div>
 
               <div className="rounded-2xl border border-slate-200/80 bg-slate-50/80 p-4 dark:border-white/5 dark:bg-white/[0.03]">
-                <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">Kuzatuv</div>
+                <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">{t('admin.usage.insight')}</div>
                 <div className="mt-3 text-sm font-medium leading-relaxed text-slate-700 dark:text-slate-300">
                   {topFeature
-                    ? `${getFeatureLabel(topFeature[0] as UsageRow['featureKey'])} hozircha eng ko'p ishlatilmoqda. Bu funksiya operatsion yuklamaning asosiy qismini berayotgan bo'lishi mumkin.`
-                    : "Hozircha yetarli ma'lumot yo'q."}
+                    ? t('admin.usage.insightTemplate').replace('{feature}', getFeatureLabel(topFeature[0] as UsageRow['featureKey']))
+                    : t('admin.usage.noInsight')}
                 </div>
               </div>
             </div>
@@ -345,13 +345,13 @@ export function AdminUsageAnalyticsPage() {
             <table className="w-full text-left text-sm">
               <thead className="border-b border-slate-200/80 bg-slate-50/90 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 dark:border-white/5 dark:bg-white/[0.02]">
                 <tr>
-                  <th className="px-8 py-5">Teacher</th>
-                  <th className="px-8 py-5">Feature</th>
-                  <th className="px-8 py-5">Model</th>
-                  <th className="px-8 py-5">Credits</th>
-                  <th className="px-8 py-5">Tokens</th>
-                  <th className="px-8 py-5">Source</th>
-                  <th className="px-8 py-5">Time</th>
+                  <th className="px-8 py-5">{t('admin.usage.teacher')}</th>
+                  <th className="px-8 py-5">{t('admin.usage.feature')}</th>
+                  <th className="px-8 py-5">{t('admin.usage.model')}</th>
+                  <th className="px-8 py-5">{t('admin.usage.credits')}</th>
+                  <th className="px-8 py-5">{t('admin.usage.tokens')}</th>
+                  <th className="px-8 py-5">{t('admin.usage.source')}</th>
+                  <th className="px-8 py-5">{t('admin.usage.time')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-200/80 text-slate-700 dark:divide-white/5 dark:text-slate-300">

@@ -56,19 +56,19 @@ function AdminTrendTooltip({
   const point = payload[0]?.payload
 
   return (
-    <div className="w-[min(220px,calc(100vw-2.5rem))] rounded-2xl border border-white/10 bg-[#09111d]/95 p-4 shadow-2xl backdrop-blur-xl">
+      <div className="w-[min(220px,calc(100vw-2.5rem))] rounded-2xl border border-white/10 bg-[#09111d]/95 p-4 shadow-2xl backdrop-blur-xl">
       <div className="text-xs font-bold uppercase tracking-[0.18em] text-slate-400">{point.longLabel}</div>
       <div className="mt-3 space-y-2 text-sm">
         <div className="flex items-center justify-between gap-4">
-          <span className="text-slate-400">So'rovlar</span>
+          <span className="text-slate-400">Requests</span>
           <span className="font-black text-white">{point.totalRequests}</span>
         </div>
         <div className="flex items-center justify-between gap-4">
-          <span className="text-slate-400">Kredit</span>
+          <span className="text-slate-400">Credits</span>
           <span className="font-black text-sky-300">{point.creditsConsumed}</span>
         </div>
         <div className="flex items-center justify-between gap-4">
-          <span className="text-slate-400">Tokenlar</span>
+          <span className="text-slate-400">Tokens</span>
           <span className="font-black text-cyan-300">{point.totalTokens.toLocaleString('en-US')}</span>
         </div>
       </div>
@@ -90,19 +90,19 @@ function AdminFeatureTooltip({
   const point = payload[0]?.payload
 
   return (
-    <div className="w-[min(220px,calc(100vw-2.5rem))] rounded-2xl border border-white/10 bg-[#09111d]/95 p-4 shadow-2xl backdrop-blur-xl">
+      <div className="w-[min(220px,calc(100vw-2.5rem))] rounded-2xl border border-white/10 bg-[#09111d]/95 p-4 shadow-2xl backdrop-blur-xl">
       <div className="text-xs font-bold uppercase tracking-[0.18em] text-slate-400">{point.label}</div>
       <div className="mt-3 space-y-2 text-sm">
         <div className="flex items-center justify-between gap-4">
-          <span className="text-slate-400">Ulashuv</span>
+          <span className="text-slate-400">Share</span>
           <span className="font-black text-white">{point.share}%</span>
         </div>
         <div className="flex items-center justify-between gap-4">
-          <span className="text-slate-400">So'rovlar</span>
+          <span className="text-slate-400">Requests</span>
           <span className="font-black text-sky-300">{point.totalRequests}</span>
         </div>
         <div className="flex items-center justify-between gap-4">
-          <span className="text-slate-400">Tokenlar</span>
+          <span className="text-slate-400">Tokens</span>
           <span className="font-black text-cyan-300">{point.totalTokens.toLocaleString('en-US')}</span>
         </div>
       </div>
@@ -201,8 +201,8 @@ export function AdminDashboardPage() {
                 </div>
               </div>
               <div className="mt-4 flex items-center gap-2">
-                <span className="text-xs font-bold text-sky-400">{kpi.delta || 'Realtime'}</span>
-                <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500">joriy holat</span>
+                <span className="text-xs font-bold text-sky-400">{kpi.delta || t('admin.dashboard.realtime')}</span>
+                <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500">{t('admin.dashboard.currentState')}</span>
               </div>
             </CardContent>
           </Card>
@@ -214,9 +214,9 @@ export function AdminDashboardPage() {
           <CardContent className="p-5 sm:p-8">
             <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
               <div className="flex items-center gap-3">
-                <h2 className="text-xl font-black tracking-tight text-slate-900 dark:text-white">Faollik dinamikasi</h2>
+                <h2 className="text-xl font-black tracking-tight text-slate-900 dark:text-white">{t('admin.dashboard.activityTrend')}</h2>
                 <Badge variant="outline" className="border-border/70 text-slate-500 dark:border-white/10 dark:text-slate-400">
-                  14 kun
+                  {t('admin.dashboard.days14')}
                 </Badge>
               </div>
 
@@ -224,25 +224,25 @@ export function AdminDashboardPage() {
                 <div className="rounded-2xl bg-slate-100/80 p-2.5 dark:bg-white/[0.04] sm:p-3">
                   <div className="flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-[0.12em] text-slate-500">
                     <Clock3 className="h-3.5 w-3.5 max-sm:hidden" />
-                    Faol kunlar
+                    {t('admin.dashboard.activeDays')}
                   </div>
                   <div className="mt-2 text-xl font-black text-slate-900 dark:text-white">{trendSummary.activeDays}</div>
                 </div>
                 <div className="rounded-2xl bg-slate-100/80 p-2.5 dark:bg-white/[0.04] sm:p-3">
                   <div className="flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-[0.12em] text-slate-500">
                     <TrendingUp className="h-3.5 w-3.5 max-sm:hidden" />
-                    Pik kun
+                    {t('admin.dashboard.peakDay')}
                   </div>
                   <div className="mt-2 text-lg font-black leading-tight text-slate-900 dark:text-white">{trendSummary.peakDayLabel}</div>
-                  <div className="text-[11px] font-medium text-sky-300">{trendSummary.peakDayRequests} ta so'rov</div>
+                  <div className="text-[11px] font-medium text-sky-300">{trendSummary.peakDayRequests} {t('admin.dashboard.requestsCount')}</div>
                 </div>
                 <div className="rounded-2xl bg-slate-100/80 p-2.5 dark:bg-white/[0.04] sm:p-3">
                   <div className="flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-[0.12em] text-slate-500">
                     <Zap className="h-3.5 w-3.5 max-sm:hidden" />
-                    O'rtacha
+                    {t('admin.dashboard.average')}
                   </div>
                   <div className="mt-2 text-xl font-black text-slate-900 dark:text-white">{trendSummary.averagePerDay}</div>
-                  <div className="text-[11px] font-medium text-slate-500 dark:text-slate-400">kuniga so'rov</div>
+                  <div className="text-[11px] font-medium text-slate-500 dark:text-slate-400">{t('admin.dashboard.requestsPerDay')}</div>
                 </div>
               </div>
             </div>
@@ -288,14 +288,14 @@ export function AdminDashboardPage() {
 
             <div className="mt-6 grid gap-3 sm:grid-cols-2">
               <div className="rounded-2xl border border-slate-200/80 bg-slate-50/80 p-4 dark:border-white/5 dark:bg-white/[0.02]">
-                <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">14 kunlik jami</div>
+                <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">{t('admin.dashboard.total14Days')}</div>
                 <div className="mt-2 text-2xl font-black text-slate-900 dark:text-white">{trendSummary.totalRequests}</div>
-                <div className="text-sm font-medium text-slate-500 dark:text-slate-400">so'rov yuborilgan</div>
+                <div className="text-sm font-medium text-slate-500 dark:text-slate-400">{t('admin.dashboard.requestsSent')}</div>
               </div>
               <div className="rounded-2xl border border-slate-200/80 bg-slate-50/80 p-4 dark:border-white/5 dark:bg-white/[0.02]">
-                <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">Token yuklamasi</div>
+                <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">{t('admin.dashboard.tokenLoad')}</div>
                 <div className="mt-2 text-2xl font-black text-slate-900 dark:text-white">{trendSummary.totalTokens.toLocaleString('en-US')}</div>
-                <div className="text-sm font-medium text-slate-500 dark:text-slate-400">jami token qayta ishlangan</div>
+                <div className="text-sm font-medium text-slate-500 dark:text-slate-400">{t('admin.dashboard.totalProcessedTokens')}</div>
               </div>
             </div>
           </CardContent>
@@ -305,7 +305,7 @@ export function AdminDashboardPage() {
           <CardContent className="p-5 sm:p-8">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <h2 className="text-xl font-black tracking-tight text-slate-900 dark:text-white">Eng ko'p ishlatilgan vositalar</h2>
+                <h2 className="text-xl font-black tracking-tight text-slate-900 dark:text-white">{t('admin.dashboard.topTools')}</h2>
               </div>
               {topFeature ? (
                 <Badge variant="outline" className="border-sky-500/20 bg-sky-500/10 text-sky-300">
@@ -334,10 +334,10 @@ export function AdminDashboardPage() {
               </ResponsiveContainer>
 
               <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center text-center">
-                <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">Top ulashuv</div>
+                <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">{t('admin.dashboard.topShare')}</div>
                 <div className="mt-1 text-3xl font-black text-slate-900 dark:text-white">{topFeature?.share ?? 0}%</div>
                 <div className="mt-1 max-w-[140px] text-xs font-medium text-slate-500 dark:text-slate-400">
-                  {topFeature?.label ?? 'Hozircha ma\'lumot yo\'q'}
+                  {topFeature?.label ?? t('admin.dashboard.noDataYet')}
                 </div>
               </div>
             </div>
@@ -371,11 +371,11 @@ export function AdminDashboardPage() {
           <CardContent className="p-5 sm:p-8">
             <div className="flex items-center justify-between gap-4">
               <div>
-                <h2 className="text-xl font-black tracking-tight text-slate-900 dark:text-white">Eng faol o'qituvchilar</h2>
+                <h2 className="text-xl font-black tracking-tight text-slate-900 dark:text-white">{t('admin.dashboard.topTeachers')}</h2>
               </div>
               {topTeacher ? (
                 <Badge variant="outline" className="border-sky-500/20 bg-sky-500/10 text-sky-300">
-                  Yetakchi: {topTeacher.totalRequests}
+                  {t('admin.dashboard.leader')}: {topTeacher.totalRequests}
                 </Badge>
               ) : null}
             </div>
@@ -398,8 +398,8 @@ export function AdminDashboardPage() {
                     </div>
                   </div>
                   <div className="text-left sm:text-right">
-                    <div className="text-sm font-black text-sky-300">{teacher.totalRequests} so'rov</div>
-                    <div className="text-[11px] font-medium text-slate-500 dark:text-slate-400">{teacher.totalTokens.toLocaleString('en-US')} token</div>
+                    <div className="text-sm font-black text-sky-300">{teacher.totalRequests} {t('admin.dashboard.requestsCount')}</div>
+                    <div className="text-[11px] font-medium text-slate-500 dark:text-slate-400">{teacher.totalTokens.toLocaleString('en-US')} {t('admin.dashboard.tokens')}</div>
                   </div>
                 </div>
               ))}
@@ -411,10 +411,10 @@ export function AdminDashboardPage() {
           <CardContent className="p-5 sm:p-8">
             <div className="flex items-center justify-between gap-4">
               <div>
-                <h2 className="text-xl font-black tracking-tight text-slate-900 dark:text-white">So'nggi faollik</h2>
+                <h2 className="text-xl font-black tracking-tight text-slate-900 dark:text-white">{t('admin.dashboard.recentActivity')}</h2>
               </div>
               <Badge variant="outline" className="border-cyan-500/20 bg-cyan-500/10 text-cyan-300">
-                LIVE
+                {t('admin.dashboard.live')}
               </Badge>
             </div>
 
@@ -423,13 +423,13 @@ export function AdminDashboardPage() {
                 <div key={activity.id} className="rounded-2xl border border-slate-200/80 bg-slate-50/80 p-4 dark:border-white/5 dark:bg-white/[0.02]">
                   <div className="flex items-start justify-between gap-4">
                     <div>
-                      <div className="text-sm font-bold text-slate-900 dark:text-white">{activity.teacherName || "Noma'lum foydalanuvchi"}</div>
+                      <div className="text-sm font-bold text-slate-900 dark:text-white">{activity.teacherName || t('admin.dashboard.unknownUser')}</div>
                       <div className="mt-2 flex flex-wrap items-center gap-2 text-[10px] font-bold uppercase tracking-[0.18em] text-slate-500">
                         <span className="rounded-full bg-sky-500/10 px-2 py-1 text-sky-300">
                           {getFeatureLabel(activity.featureKey)}
                         </span>
-                        <span>{activity.creditsConsumed} kredit</span>
-                        <span>{activity.totalTokens.toLocaleString('en-US')} token</span>
+                        <span>{activity.creditsConsumed} {t('admin.dashboard.creditUnit')}</span>
+                        <span>{activity.totalTokens.toLocaleString('en-US')} {t('admin.dashboard.tokens')}</span>
                       </div>
                     </div>
                     <div className="flex items-center gap-2 text-xs font-medium text-slate-500 dark:text-slate-400">
@@ -446,7 +446,7 @@ export function AdminDashboardPage() {
               className="mt-8 h-12 w-full rounded-2xl border-slate-200 bg-white text-slate-800 hover:bg-slate-50 hover:text-slate-950 dark:border-white/10 dark:bg-white/5 dark:text-slate-200 dark:hover:bg-white/10 dark:hover:text-white"
               asChild
             >
-              <Link to="/admin/activity">Batafsil tarixni ko'rish</Link>
+              <Link to="/admin/activity">{t('admin.dashboard.viewFullHistory')}</Link>
             </Button>
           </CardContent>
         </Card>

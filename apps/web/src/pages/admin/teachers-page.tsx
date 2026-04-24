@@ -76,7 +76,7 @@ export function AdminTeachersPage() {
                         "h-6 px-3 border-none text-[10px]",
                         teacher.role === 'admin' ? "bg-sky-500 text-white" : "bg-white/5 text-slate-400"
                       )}>
-                        {teacher.role === 'admin' ? 'Admin' : t('admin.teachers.teacher')}
+                        {teacher.role === 'admin' ? t('admin.teachers.admin') : t('admin.teachers.teacher')}
                       </Badge>
                     </td>
                     <td className="px-8 py-6">

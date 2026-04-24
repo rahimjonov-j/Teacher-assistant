@@ -18,12 +18,14 @@ import { Select } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { useI18n } from '@/hooks/use-i18n'
 import { ApiRequestError, apiRequest } from '@/lib/api'
+import { featureDescriptions, featureHelperTexts, featureInputLabels } from '@/lib/i18n'
+import { getFeatureLabel } from '@/lib/format'
 
 const generatorFeatures = FEATURE_DEFINITIONS.filter((feature) => feature.key !== 'pdf_export')
 
 export function GeneratorPage() {
   const navigate = useNavigate()
-  const { t } = useI18n()
+  const { language, t } = useI18n()
   const [searchParams, setSearchParams] = useSearchParams()
   const initialFeature = (searchParams.get('feature') as FeatureKey) ?? 'quiz'
   const [featureKey, setFeatureKey] = useState<FeatureKey>(initialFeature)
@@ -69,8 +71,8 @@ export function GeneratorPage() {
       <Card>
         <CardContent className="space-y-4 p-5">
           <div>
-            <div className="text-lg font-black tracking-tight">{activeFeature.label}</div>
-            <p className="mt-1 text-sm leading-6 text-muted-foreground">{activeFeature.description}</p>
+            <div className="text-lg font-black tracking-tight">{getFeatureLabel(activeFeature.key)}</div>
+            <p className="mt-1 text-sm leading-6 text-muted-foreground">{featureDescriptions[language][activeFeature.key]}</p>
           </div>
 
           <div className="space-y-2">
@@ -86,20 +88,25 @@ export function GeneratorPage() {
             >
               {generatorFeatures.map((feature) => (
                 <option key={feature.key} value={feature.key}>
-                  {feature.label}
+                  {getFeatureLabel(feature.key)}
                 </option>
               ))}
             </Select>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="topic">{activeFeature.inputLabel}</Label>
-            <Input id="topic" value={topic} onChange={(event) => setTopic(event.target.value)} placeholder={activeFeature.helperText} />
+            <Label htmlFor="topic">{featureInputLabels[language][activeFeature.key]}</Label>
+            <Input id="topic" value={topic} onChange={(event) => setTopic(event.target.value)} placeholder={featureHelperTexts[language][activeFeature.key]} />
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="level">{t('generator.classLevel')}</Label>
-            <Input id="level" value={gradeOrLevel} onChange={(event) => setGradeOrLevel(event.target.value)} placeholder="7-sinf" />
+            <Input
+              id="level"
+              value={gradeOrLevel}
+              onChange={(event) => setGradeOrLevel(event.target.value)}
+              placeholder={t('generator.levelPlaceholder')}
+            />
           </div>
 
           <div className="space-y-2">

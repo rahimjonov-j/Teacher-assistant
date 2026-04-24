@@ -45,7 +45,7 @@ export function AdminActivityPage() {
                   <Badge>{row.source}</Badge>
                 </div>
                 <div className="mt-2 text-sm text-muted-foreground">
-                  {row.creditsConsumed} kredit | {row.totalTokens.toLocaleString('en-US')} token |{' '}
+                  {row.creditsConsumed} {t('admin.activity.creditUnit')} | {row.totalTokens.toLocaleString('en-US')} {t('admin.activity.tokenUnit')} |{' '}
                   {row.modelName}
                 </div>
               </div>

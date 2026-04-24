@@ -17,7 +17,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { useI18n } from '@/hooks/use-i18n'
 import { apiRequest } from '@/lib/api'
-import { formatRelativeDate, getFeatureLabel } from '@/lib/format'
+import { formatRelativeDate, getFeatureLabel, getPlanName } from '@/lib/format'
 
 const featureIcons: Record<FeatureKey, typeof FileText> = {
   quiz: FileText,
@@ -48,10 +48,10 @@ export function DashboardPage() {
             <div>
               <div className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">{t('dashboard.welcome')}</div>
               <h1 className="mt-2 text-2xl font-black tracking-tight">
-                {data.profile.fullName?.split(' ')[0] ?? 'Teacher'}
+                {data.profile.fullName?.split(' ')[0] ?? t('dashboard.teacherFallback')}
               </h1>
               <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                {data.profile.schoolName ?? 'School profile not completed yet'}
+                {data.profile.schoolName ?? t('dashboard.schoolFallback')}
               </p>
             </div>
             <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-secondary">
@@ -63,7 +63,9 @@ export function DashboardPage() {
             <div className="flex items-center justify-between gap-4">
               <div>
                 <div className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">{t('dashboard.currentPlan')}</div>
-                <div className="mt-1 text-lg font-black">{data.subscription?.planName ?? t('billing.noSubscription')}</div>
+                <div className="mt-1 text-lg font-black">
+                  {data.subscription?.planKey ? getPlanName(data.subscription.planKey) : t('billing.noSubscription')}
+                </div>
               </div>
               <div className="text-right">
                 <div className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">{t('dashboard.creditsLeft')}</div>
@@ -110,8 +112,10 @@ export function DashboardPage() {
                     <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-secondary">
                       <Icon className="h-5 w-5" />
                     </div>
-                    <div className="mt-4 text-sm font-black leading-5">{feature.label}</div>
-                    <div className="mt-1 text-xs text-muted-foreground">{feature.creditCost} credit</div>
+                    <div className="mt-4 text-sm font-black leading-5">{getFeatureLabel(feature.key)}</div>
+                    <div className="mt-1 text-xs text-muted-foreground">
+                      {feature.creditCost} {t('billing.creditUnit')}
+                    </div>
                   </div>
                 </Link>
               )
