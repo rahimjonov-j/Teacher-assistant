@@ -1,15 +1,15 @@
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { Link, useNavigate, useParams } from 'react-router-dom'
 import type { GeneratedContentRecord } from '@teacher-assistant/shared'
-import { toast } from 'sonner'
 import { ArrowLeft, Copy, FileDown, Loader2 } from 'lucide-react'
+import ReactMarkdown from 'react-markdown'
+import { Link, useNavigate, useParams } from 'react-router-dom'
+import { toast } from 'sonner'
 import { CardLoader } from '@/components/shared/loading-state'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { ApiRequestError, apiRequest } from '@/lib/api'
 import { formatDate, getFeatureLabel } from '@/lib/format'
-import ReactMarkdown from 'react-markdown'
 
 export function ContentDetailPage() {
   const navigate = useNavigate()
@@ -28,16 +28,16 @@ export function ContentDetailPage() {
       }),
     onSuccess: (data) => {
       window.open(data.pdfUrl, '_blank', 'noopener,noreferrer')
-      toast.success('PDF eksport yakunlandi.')
+      toast.success('PDF export completed.')
     },
     onError: (error) => {
       if (error instanceof ApiRequestError && error.statusCode === 402) {
-        toast.error("Kredit tugagan. Obuna sahifasiga yo'naltirildingiz.")
+        toast.error('Credits finished. Redirecting to plans.')
         navigate('/app/billing')
         return
       }
 
-      toast.error(error instanceof Error ? error.message : "PDF eksport qilib bo'lmadi.")
+      toast.error(error instanceof Error ? error.message : 'PDF export failed.')
     },
   })
 
@@ -48,64 +48,52 @@ export function ContentDetailPage() {
   }
 
   return (
-    <div className="mx-auto max-w-4xl space-y-8 animate-in pb-12">
-      <div className="flex items-center justify-between gap-4">
-        <Button asChild variant="ghost" className="rounded-xl font-bold text-muted-foreground hover:text-foreground">
-          <Link to="/app/history">
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Tarixga qaytish
-          </Link>
-        </Button>
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            className="rounded-xl h-9 font-bold border-border/40"
-            onClick={() => {
-              navigator.clipboard.writeText(item.outputMarkdown)
-              toast.success('Nusxalandi!')
-            }}
-          >
-            <Copy className="mr-2 h-4 w-4" />
-            Nusxa olish
-          </Button>
-          {item.pdfUrl ? (
-            <Button asChild variant="outline" size="sm" className="rounded-xl h-9 font-bold border-border/40">
-              <a href={item.pdfUrl} target="_blank" rel="noreferrer">
-                <FileDown className="mr-2 h-4 w-4" />
-                PDF
-              </a>
-            </Button>
-          ) : (
+    <div className="space-y-4 animate-in pb-8">
+      <Button asChild variant="ghost" size="sm" className="w-fit">
+        <Link to="/app/messenger">
+          <ArrowLeft className="h-4 w-4" />
+          Back
+        </Link>
+      </Button>
+
+      <Card>
+        <CardContent className="space-y-4 p-5">
+          <div className="flex flex-wrap items-center gap-2">
+            <Badge variant="outline">{getFeatureLabel(item.featureKey)}</Badge>
+            <span className="text-xs text-muted-foreground">{formatDate(item.createdAt)}</span>
+            <span className="text-xs text-muted-foreground">{item.creditsConsumed} credits</span>
+          </div>
+
+          <div className="text-2xl font-black tracking-tight">{item.title}</div>
+
+          <div className="flex gap-2">
             <Button
               variant="outline"
               size="sm"
-              className="rounded-xl h-9 font-bold border-border/40"
-              onClick={() => exportMutation.mutate()}
-              disabled={exportMutation.isPending}
+              onClick={() => {
+                navigator.clipboard.writeText(item.outputMarkdown)
+                toast.success('Copied')
+              }}
             >
-              {exportMutation.isPending ? (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              ) : (
-                <FileDown className="mr-2 h-4 w-4" />
-              )}
-              PDF Eksport
+              <Copy className="h-4 w-4" />
+              Copy
             </Button>
-          )}
-        </div>
-      </div>
-
-      <Card className="overflow-hidden border-none bg-card/60 shadow-xl backdrop-blur-xl">
-        <CardContent className="p-8">
-          <div className="mb-6 flex flex-wrap items-center gap-3">
-            <Badge variant="outline" className="rounded-xl px-3 py-1 text-[10px] font-bold uppercase tracking-widest">
-              {getFeatureLabel(item.featureKey)}
-            </Badge>
-            <span className="text-xs font-medium text-muted-foreground/60">{formatDate(item.createdAt)}</span>
-            <span className="text-xs font-medium text-muted-foreground/60">{item.creditsConsumed} kredit</span>
+            {item.pdfUrl ? (
+              <Button asChild variant="outline" size="sm">
+                <a href={item.pdfUrl} target="_blank" rel="noreferrer">
+                  <FileDown className="h-4 w-4" />
+                  PDF
+                </a>
+              </Button>
+            ) : (
+              <Button variant="outline" size="sm" onClick={() => exportMutation.mutate()} disabled={exportMutation.isPending}>
+                {exportMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <FileDown className="h-4 w-4" />}
+                Export PDF
+              </Button>
+            )}
           </div>
-          <h1 className="mb-8 text-3xl font-black tracking-tight">{item.title}</h1>
-          <div className="prose dark:prose-invert max-w-none">
+
+          <div className="markdown-body">
             <ReactMarkdown>{item.outputMarkdown}</ReactMarkdown>
           </div>
         </CardContent>

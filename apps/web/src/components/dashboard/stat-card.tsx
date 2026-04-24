@@ -17,21 +17,20 @@ export const StatCard = memo(function StatCard({
   icon: Icon = ArrowUpRight,
 }: StatCardProps) {
   return (
-    <Card className="relative overflow-hidden bg-card/85">
-      <div className="absolute right-[-10%] top-[-20%] h-32 w-32 rounded-full bg-primary/6 blur-3xl" />
-      <CardContent className="p-3 sm:p-6">
+    <Card className="h-full">
+      <CardContent className="p-4">
         <div className="flex items-start justify-between gap-3">
           <div className="space-y-1">
-            <p className="text-[9px] font-semibold uppercase tracking-[0.08em] text-muted-foreground/70 sm:text-sm sm:tracking-wider">{label}</p>
-            <p className="text-xl font-black tracking-tight text-foreground sm:text-3xl">{value}</p>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">{label}</p>
+            <p className="text-xl font-black tracking-tight text-foreground">{value}</p>
           </div>
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-primary/10 bg-primary/10 text-primary shadow-sm max-sm:hidden">
-            <Icon className="h-6 w-6" />
+          <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-secondary text-foreground">
+            <Icon className="h-5 w-5" />
           </div>
         </div>
-        <div className="mt-6 flex items-center gap-2 max-sm:hidden">
-          <div className="h-1.5 w-1.5 rounded-full bg-primary/50 animate-pulse" />
-          <p className="text-xs font-medium text-muted-foreground/60">{hint}</p>
+        <div className="mt-5 flex items-center gap-2">
+          <div className="h-1.5 w-1.5 rounded-full bg-foreground/30" />
+          <p className="text-xs font-medium text-muted-foreground">{hint}</p>
         </div>
       </CardContent>
     </Card>

@@ -1,7 +1,14 @@
 import { useQuery } from '@tanstack/react-query'
-import { Link } from 'react-router-dom'
 import type { FeatureKey, TeacherDashboardPayload } from '@teacher-assistant/shared'
-import { Zap, Activity, Star, History, ChevronRight, FileText, MessageSquareText } from 'lucide-react'
+import {
+  ArrowRight,
+  Clock3,
+  FileText,
+  MessageSquareText,
+  Sparkles,
+  Wallet,
+} from 'lucide-react'
+import { Link } from 'react-router-dom'
 import { StatCard } from '@/components/dashboard/stat-card'
 import { EmptyState } from '@/components/shared/empty-state'
 import { CardLoader } from '@/components/shared/loading-state'
@@ -10,7 +17,6 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { apiRequest } from '@/lib/api'
 import { formatRelativeDate, getFeatureLabel } from '@/lib/format'
-import { cn } from '@/lib/utils'
 
 const featureIcons: Record<FeatureKey, typeof FileText> = {
   quiz: FileText,
@@ -32,145 +38,129 @@ export function DashboardPage() {
     return <CardLoader />
   }
 
-  const creditsPercent = data.subscription
-    ? Math.min(
-        100,
-        Math.max(
-          0,
-          (data.subscription.creditsRemaining / Math.max(data.subscription.creditsTotal, 1)) * 100,
-        ),
-      )
-    : 0
-
   return (
-    <div className="space-y-8 animate-in sm:space-y-10">
-      <section className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-        <div className="space-y-2">
-          <h1 className="text-3xl font-black tracking-tight sm:text-5xl lg:text-6xl">
-            Assalomu alaykum,{' '}
-            <span className="text-primary">{data.profile.fullName?.split(' ')[0] || "Ustoz"}!</span>
-          </h1>
-          <p className="text-base font-medium text-muted-foreground/70 sm:text-lg">Bugun qanday material tayyorlaymiz?</p>
-        </div>
+    <div className="space-y-5 animate-in">
+      <Card>
+        <CardContent className="space-y-4 p-5">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <div className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">Welcome</div>
+              <h1 className="mt-2 text-2xl font-black tracking-tight">
+                {data.profile.fullName?.split(' ')[0] ?? 'Teacher'}
+              </h1>
+              <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                {data.profile.schoolName ?? 'School profile not completed yet'}
+              </p>
+            </div>
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-secondary">
+              <Sparkles className="h-5 w-5" />
+            </div>
+          </div>
 
-        <Card className="mobile-card w-full border-none bg-gradient-to-tr from-primary to-sky-500 text-white shadow-2xl shadow-primary/20 sm:max-w-sm">
-          <CardContent className="p-5 sm:p-8">
+          <div className="rounded-2xl bg-secondary p-4">
             <div className="flex items-center justify-between gap-4">
-              <div className="space-y-1">
-                <p className="text-[10px] font-black uppercase tracking-[0.2em] opacity-70">Qolgan kreditlar</p>
-                <p className="text-3xl font-black tracking-tight sm:text-4xl">{data.subscription?.creditsRemaining ?? 0}</p>
+              <div>
+                <div className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">Current plan</div>
+                <div className="mt-1 text-lg font-black">{data.subscription?.planName ?? 'No active plan'}</div>
               </div>
-              <div className="h-12 w-12 rounded-2xl bg-white/20 p-3 backdrop-blur-sm sm:h-14 sm:w-14">
-                <Zap className="h-full w-full fill-white" />
-              </div>
-            </div>
-            <div className="mt-6 space-y-2">
-              <div className="h-2 w-full overflow-hidden rounded-full bg-white/20">
-                <div className="h-full bg-white transition-[width] duration-500" style={{ width: `${creditsPercent}%` }} />
-              </div>
-              <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-wider opacity-70">
-                <span>{data.subscription?.creditsUsed ?? 0} sarflandi</span>
-                <span>{data.subscription?.planName ?? "Obuna yo'q"}</span>
+              <div className="text-right">
+                <div className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">Credits left</div>
+                <div className="mt-1 text-lg font-black">{data.subscription?.creditsRemaining ?? 0}</div>
               </div>
             </div>
-          </CardContent>
-        </Card>
-      </section>
+          </div>
+        </CardContent>
+      </Card>
 
-      <div className="grid grid-cols-3 gap-2 sm:gap-4">
-        <StatCard 
-          label="Bu oydagi so'rovlar" 
-          value={data.usageSummary.totalRequestsThisMonth} 
-          hint="Faollik yuqori"
-          icon={Activity}
+      <div className="grid grid-cols-2 gap-3">
+        <StatCard
+          label="Requests"
+          value={data.usageSummary.totalRequestsThisMonth}
+          hint="This month"
+          icon={Clock3}
         />
-        <StatCard 
-          label="Eng ko'p ishlatilgan" 
-          value={data.usageSummary.mostUsedFeature ? getFeatureLabel(data.usageSummary.mostUsedFeature) : '---'} 
-          hint="Sizning sevimli vositangiz"
-          icon={Star}
-        />
-        <StatCard 
-          label="Saqlangan ishlar" 
-          value={data.recentContent.length} 
-          hint="Oxirgi 30 kun"
-          icon={History}
+        <StatCard
+          label="Stored"
+          value={data.recentContent.length}
+          hint="Recent outputs"
+          icon={Wallet}
         />
       </div>
 
-      <section className="space-y-6">
-        <div className="flex items-center justify-between gap-3">
-          <h2 className="text-2xl font-black tracking-tight">Tezkor amallar</h2>
-          <Button asChild variant="ghost" className="font-bold text-primary">
-            <Link to="/app/generator">Hammasini ko'rish</Link>
-          </Button>
-        </div>
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-4">
-          {data.quickActions.map((feature, i) => (
-            <Link key={feature.key} to={`/app/generator?feature=${feature.key}`}>
-              <Card className="mobile-card h-full cursor-pointer overflow-hidden bg-card/85">
-                <CardContent className="p-3 sm:p-6">
-                  <div className={cn(
-                    'mb-3 flex h-10 w-10 items-center justify-center rounded-2xl border text-primary shadow-sm sm:mb-4 sm:h-12 sm:w-12',
-                    i % 2 === 0 ? 'border-primary/10 bg-primary/10' : 'border-sky-500/15 bg-sky-500/10 text-sky-600 dark:text-sky-400',
-                  )}>
-                    {(() => {
-                      const Icon = featureIcons[feature.key]
-                      return <Icon className="h-6 w-6" />
-                    })()}
-                  </div>
-                  <h3 className="break-words text-sm font-black leading-5 tracking-tight sm:text-base">{feature.label}</h3>
-                  <p className="mt-1 text-xs font-medium text-muted-foreground/60">{feature.creditCost} kredit</p>
-                </CardContent>
-              </Card>
-            </Link>
-          ))}
-        </div>
-      </section>
-
-      {data.recentContent.length > 0 ? (
-        <section className="space-y-6 pb-12">
-          <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-black tracking-tight">Oxirgi materiallar</h2>
-            <Button asChild variant="ghost" className="font-bold text-primary">
-              <Link to="/app/history">Tarixga o'tish</Link>
+      <Card>
+        <CardContent className="p-5">
+          <div className="mb-4 flex items-center justify-between">
+            <div>
+              <div className="text-lg font-black tracking-tight">AI shortcuts</div>
+              <p className="text-sm text-muted-foreground">Start the main tools in one tap.</p>
+            </div>
+            <Button asChild variant="ghost" size="sm">
+              <Link to="/app/generator">Open</Link>
             </Button>
           </div>
-          <div className="grid gap-4">
-            {data.recentContent.slice(0, 3).map((item) => (
-              <Link key={item.id} to={`/app/history/${item.id}`}>
-                <Card className="mobile-card bg-card/85">
-                  <CardContent className="flex items-center justify-between p-4 sm:p-6">
-                    <div className="flex items-center gap-4">
-                      <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-secondary/50 text-muted-foreground">
-                        <History className="h-6 w-6" />
-                      </div>
-                      <div>
-                        <h3 className="font-bold tracking-tight">{item.title}</h3>
-                        <div className="mt-1 flex items-center gap-2 text-xs font-medium text-muted-foreground/60">
-                          <Badge variant="outline" className="h-5 px-1.5 text-[9px]">{getFeatureLabel(item.featureKey)}</Badge>
-                          <span>{formatRelativeDate(item.createdAt)}</span>
-                        </div>
+          <div className="grid grid-cols-2 gap-3">
+            {data.quickActions.map((feature) => {
+              const Icon = featureIcons[feature.key]
+
+              return (
+                <Link key={feature.key} to={`/app/generator?feature=${feature.key}`}>
+                  <div className="rounded-2xl border border-border bg-card p-4 transition-colors hover:bg-secondary">
+                    <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-secondary">
+                      <Icon className="h-5 w-5" />
+                    </div>
+                    <div className="mt-4 text-sm font-black leading-5">{feature.label}</div>
+                    <div className="mt-1 text-xs text-muted-foreground">{feature.creditCost} credit</div>
+                  </div>
+                </Link>
+              )
+            })}
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardContent className="p-5">
+          <div className="mb-4 flex items-center justify-between">
+            <div>
+              <div className="text-lg font-black tracking-tight">Recent activities</div>
+              <p className="text-sm text-muted-foreground">Latest generated materials.</p>
+            </div>
+            <Button asChild variant="ghost" size="sm">
+              <Link to="/app/messenger">View all</Link>
+            </Button>
+          </div>
+
+          {data.recentContent.length > 0 ? (
+            <div className="space-y-3">
+              {data.recentContent.slice(0, 4).map((item) => (
+                <Link key={item.id} to={`/app/history/${item.id}`} className="block rounded-2xl border border-border p-4 transition-colors hover:bg-secondary">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <div className="truncate text-sm font-black">{item.title}</div>
+                      <div className="mt-2 flex items-center gap-2">
+                        <Badge variant="outline">{getFeatureLabel(item.featureKey)}</Badge>
+                        <span className="text-xs text-muted-foreground">{formatRelativeDate(item.createdAt)}</span>
                       </div>
                     </div>
-                    <ChevronRight className="h-5 w-5 text-muted-foreground/40" />
-                  </CardContent>
-                </Card>
-              </Link>
-            ))}
-          </div>
-        </section>
-      ) : (
-        <EmptyState 
-          title="Hali material yo'q" 
-          description="Yaratilgan natijalar shu yerda chiqadi."
-          action={
-            <Button asChild variant="gradient" className="rounded-xl font-bold">
-              <Link to="/app/generator">Birinchi materialni yarating</Link>
-            </Button>
-          }
-        />
-      )}
+                    <ArrowRight className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
+                  </div>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <EmptyState
+              title="No activity yet"
+              description="Your generated materials will appear here."
+              icon={Sparkles}
+              action={
+                <Button asChild>
+                  <Link to="/app/generator">Create first item</Link>
+                </Button>
+              }
+            />
+          )}
+        </CardContent>
+      </Card>
     </div>
   )
 }

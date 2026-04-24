@@ -3,21 +3,20 @@ import { useMutation } from '@tanstack/react-query'
 import {
   FEATURE_DEFINITIONS,
   TELEGRAM_FEATURE_COMMAND_MAP,
-  type GeneratorResponse,
   type FeatureKey,
+  type GeneratorResponse,
 } from '@teacher-assistant/shared'
-import { useSearchParams, Link, useNavigate } from 'react-router-dom'
+import { Copy, FileText, Loader2, Sparkles } from 'lucide-react'
+import ReactMarkdown from 'react-markdown'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { toast } from 'sonner'
-import { Sparkles, Loader2, Copy, FileText } from 'lucide-react'
-import { PageHeader } from '@/components/shared/page-header'
-import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { ApiRequestError, apiRequest } from '@/lib/api'
-import ReactMarkdown from 'react-markdown'
 
 const generatorFeatures = FEATURE_DEFINITIONS.filter((feature) => feature.key !== 'pdf_export')
 
@@ -47,16 +46,16 @@ export function GeneratorPage() {
         }),
       }),
     onSuccess: () => {
-      toast.success('Material tayyorlandi!')
+      toast.success('Material created.')
     },
     onError: (error) => {
       if (error instanceof ApiRequestError && error.statusCode === 402) {
-        toast.error("Kredit tugagan. Obuna sahifasiga yo'naltirildingiz.")
+        toast.error('Credits finished. Redirecting to plans.')
         navigate('/app/billing')
         return
       }
 
-      toast.error(error instanceof Error ? error.message : "Xatolik yuz berdi.")
+      toast.error(error instanceof Error ? error.message : 'Something went wrong.')
     },
   })
 
@@ -64,159 +63,111 @@ export function GeneratorPage() {
   const activeTelegramCommand = TELEGRAM_FEATURE_COMMAND_MAP[featureKey]
 
   return (
-    <div className="space-y-10 animate-in">
-      <PageHeader
-        eyebrow="AI Generator"
-        title={activeFeature.label}
-        description={activeFeature.description}
-      />
+    <div className="space-y-4 animate-in pb-8">
+      <Card>
+        <CardContent className="space-y-4 p-5">
+          <div>
+            <div className="text-lg font-black tracking-tight">{activeFeature.label}</div>
+            <p className="mt-1 text-sm leading-6 text-muted-foreground">{activeFeature.description}</p>
+          </div>
 
-      <div className="grid gap-8 lg:grid-cols-[400px_1fr]">
-        <aside className="space-y-6">
-          <Card className="border-none bg-card/60 shadow-xl backdrop-blur-xl">
-            <CardContent className="p-6 space-y-6">
-              <div className="space-y-2">
-                <Label htmlFor="feature" className="text-xs font-bold uppercase tracking-widest text-muted-foreground/60 ml-1">Funksiya</Label>
-                <Select 
-                  id="feature" 
-                  value={featureKey} 
-                  onChange={(e) => {
-                    const val = e.target.value as FeatureKey
-                    setFeatureKey(val)
-                    setSearchParams({ feature: val })
-                  }}
-                  className="h-12 rounded-xl"
-                >
-                  {generatorFeatures.map((f) => (
-                    <option key={f.key} value={f.key}>{f.label}</option>
-                  ))}
-                </Select>
+          <div className="space-y-2">
+            <Label htmlFor="feature">Tool</Label>
+            <Select
+              id="feature"
+              value={featureKey}
+              onChange={(event) => {
+                const value = event.target.value as FeatureKey
+                setFeatureKey(value)
+                setSearchParams({ feature: value })
+              }}
+            >
+              {generatorFeatures.map((feature) => (
+                <option key={feature.key} value={feature.key}>
+                  {feature.label}
+                </option>
+              ))}
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="topic">{activeFeature.inputLabel}</Label>
+            <Input id="topic" value={topic} onChange={(event) => setTopic(event.target.value)} placeholder={activeFeature.helperText} />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="level">Class / level</Label>
+            <Input id="level" value={gradeOrLevel} onChange={(event) => setGradeOrLevel(event.target.value)} placeholder="7-sinf" />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="instructions">Additional instructions</Label>
+            <Textarea
+              id="instructions"
+              value={additionalInstructions}
+              onChange={(event) => setAdditionalInstructions(event.target.value)}
+              className="min-h-[110px]"
+              placeholder="Optional"
+            />
+          </div>
+
+          <div className="rounded-2xl bg-secondary p-4">
+            <div className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">Telegram command</div>
+            <div className="mt-2 text-base font-black">{activeTelegramCommand.usage}</div>
+            <div className="mt-1 text-sm text-muted-foreground">{activeTelegramCommand.description}</div>
+          </div>
+
+          <Button className="h-14 w-full" onClick={() => mutation.mutate()} disabled={mutation.isPending || !topic}>
+            {mutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+            Generate
+          </Button>
+        </CardContent>
+      </Card>
+
+      {mutation.isPending ? (
+        <Card>
+          <CardContent className="space-y-3 p-5">
+            <div className="h-4 w-2/5 animate-pulse rounded-full bg-muted" />
+            <div className="h-4 w-full animate-pulse rounded-full bg-muted" />
+            <div className="h-4 w-4/5 animate-pulse rounded-full bg-muted" />
+            <div className="h-48 animate-pulse rounded-2xl bg-muted" />
+          </CardContent>
+        </Card>
+      ) : null}
+
+      {result ? (
+        <Card>
+          <CardContent className="space-y-4 p-5">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <div className="text-lg font-black tracking-tight">{result.title}</div>
+                <p className="mt-1 text-sm text-muted-foreground">Your generated content is ready.</p>
               </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="topic" className="text-xs font-bold uppercase tracking-widest text-muted-foreground/60 ml-1">{activeFeature.inputLabel}</Label>
-                <Input
-                  id="topic"
-                  value={topic}
-                  onChange={(e) => setTopic(e.target.value)}
-                  placeholder={activeFeature.helperText}
-                  className="h-14 rounded-2xl bg-white/50 dark:bg-black/20"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="level" className="text-xs font-bold uppercase tracking-widest text-muted-foreground/60 ml-1">Sinf yoki Daraja</Label>
-                <Input
-                  id="level"
-                  value={gradeOrLevel}
-                  onChange={(e) => setGradeOrLevel(e.target.value)}
-                  placeholder="Masalan: 7-sinf"
-                  className="h-12 rounded-xl bg-white/50 dark:bg-black/20"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="instructions" className="text-xs font-bold uppercase tracking-widest text-muted-foreground/60 ml-1">Qo'shimcha shartlar</Label>
-                <Textarea
-                  id="instructions"
-                  value={additionalInstructions}
-                  onChange={(e) => setAdditionalInstructions(e.target.value)}
-                  placeholder="Ixtiyoriy..."
-                  className="min-h-[100px] rounded-2xl bg-white/50 dark:bg-black/20"
-                />
-              </div>
-
-              <div className="rounded-xl bg-primary/10 p-4 text-[11px] font-bold text-primary uppercase tracking-widest text-center">
-                Sarflanadigan kredit: {activeFeature.creditCost}
-              </div>
-
-              <div className="rounded-2xl border border-border/40 bg-background/70 p-4">
-                <div className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60">
-                  Telegram mos command
-                </div>
-                <div className="mt-2 text-base font-black text-foreground">{activeTelegramCommand.usage}</div>
-                <div className="mt-1 text-xs font-medium leading-relaxed text-muted-foreground">
-                  {activeTelegramCommand.description}
-                </div>
-              </div>
-
               <Button
-                className="h-16 w-full rounded-[24px] text-lg font-black shadow-lg shadow-primary/20"
-                disabled={mutation.isPending || !topic}
-                onClick={() => mutation.mutate()}
-                variant="gradient"
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  navigator.clipboard.writeText(result.outputMarkdown)
+                  toast.success('Copied')
+                }}
               >
-                {mutation.isPending ? (
-                  <div className="flex items-center gap-2">
-                    <Loader2 className="h-5 w-5 animate-spin" />
-                    Tayyorlanmoqda...
-                  </div>
-                ) : (
-                  <div className="flex items-center gap-2">
-                    <Sparkles className="h-5 w-5" />
-                    Yaratish
-                  </div>
-                )}
+                <Copy className="h-4 w-4" />
               </Button>
-            </CardContent>
-          </Card>
-        </aside>
-
-        <section className="min-h-[600px] space-y-6">
-          {!result && !mutation.isPending && (
-            <div className="flex h-full min-h-[500px] flex-col items-center justify-center text-center opacity-40">
-              <div className="mb-6 rounded-[40px] bg-secondary/50 p-12">
-                <Sparkles className="h-16 w-16 text-primary" />
-              </div>
-              <h2 className="text-2xl font-black tracking-tight">Tayyor material yo'q</h2>
-              <p className="mt-2 text-sm font-medium text-muted-foreground">Chap tarafdagi formani to'ldiring.</p>
             </div>
-          )}
 
-          {mutation.isPending && (
-            <div className="space-y-6 animate-in">
-              <div className="h-8 w-1/3 animate-pulse rounded-full bg-muted/60" />
-              <Card className="border-none bg-card/40">
-                <CardContent className="space-y-4 p-8">
-                  <div className="h-4 w-full animate-pulse rounded-full bg-muted/40" />
-                  <div className="h-4 w-5/6 animate-pulse rounded-full bg-muted/40" />
-                  <div className="h-32 w-full animate-pulse rounded-3xl bg-muted/20" />
-                </CardContent>
-              </Card>
+            <div className="markdown-body">
+              <ReactMarkdown>{result.outputMarkdown}</ReactMarkdown>
             </div>
-          )}
 
-          {result && (
-            <div className="animate-in space-y-6">
-              <div className="flex items-center justify-between gap-4">
-                <h2 className="text-2xl font-black tracking-tight">{result.title}</h2>
-                <div className="flex items-center gap-2">
-                  <Button variant="outline" size="sm" className="rounded-xl font-bold h-9 border-border/40" onClick={() => {
-                    navigator.clipboard.writeText(result.outputMarkdown)
-                    toast.success('Nusxalandi')
-                  }}>
-                    <Copy className="h-4 w-4 mr-2" />
-                    Nusxa
-                  </Button>
-                  <Button asChild variant="outline" size="sm" className="rounded-xl font-bold h-9 border-border/40">
-                    <Link to={`/app/history/${result.id}`}>
-                      <FileText className="h-4 w-4 mr-2" />
-                      Batafsil
-                    </Link>
-                  </Button>
-                </div>
-              </div>
-              <Card className="border-none bg-card/60 shadow-xl overflow-hidden">
-                <CardContent className="p-8">
-                  <div className="markdown-body prose dark:prose-invert max-w-none">
-                    <ReactMarkdown>{result.outputMarkdown}</ReactMarkdown>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          )}
-        </section>
-      </div>
+            <Button asChild variant="outline" className="w-full">
+              <Link to={`/app/history/${result.id}`}>
+                <FileText className="h-4 w-4" />
+                Open detail
+              </Link>
+            </Button>
+          </CardContent>
+        </Card>
+      ) : null}
     </div>
   )
 }

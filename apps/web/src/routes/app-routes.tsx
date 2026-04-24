@@ -1,17 +1,11 @@
 import { Suspense, lazy, type ReactNode } from 'react'
 import { Navigate, Outlet, Route, Routes } from 'react-router-dom'
 import { AdminLayout } from '@/components/layout/admin-layout'
-import { FullScreenLoader } from '@/components/shared/loading-state'
 import { PublicLayout } from '@/components/layout/public-layout'
 import { TeacherLayout } from '@/components/layout/teacher-layout'
+import { FullScreenLoader } from '@/components/shared/loading-state'
 import { useAuth } from '@/hooks/use-auth'
 
-const LandingPage = lazy(async () => ({
-  default: (await import('@/pages/public/landing-page')).LandingPage,
-}))
-const PricingPage = lazy(async () => ({
-  default: (await import('@/pages/public/pricing-page')).PricingPage,
-}))
 const LoginPage = lazy(async () => ({
   default: (await import('@/pages/public/login-page')).LoginPage,
 }))
@@ -24,11 +18,20 @@ const RegisterPage = lazy(async () => ({
 const DashboardPage = lazy(async () => ({
   default: (await import('@/pages/app/dashboard-page')).DashboardPage,
 }))
+const MessengerPage = lazy(async () => ({
+  default: (await import('@/pages/app/messenger-page')).MessengerPage,
+}))
+const CalendarPage = lazy(async () => ({
+  default: (await import('@/pages/app/calendar-page')).CalendarPage,
+}))
+const DatabasePage = lazy(async () => ({
+  default: (await import('@/pages/app/database-page')).DatabasePage,
+}))
+const AttendancePage = lazy(async () => ({
+  default: (await import('@/pages/app/attendance-page')).AttendancePage,
+}))
 const GeneratorPage = lazy(async () => ({
   default: (await import('@/pages/app/generator-page')).GeneratorPage,
-}))
-const HistoryPage = lazy(async () => ({
-  default: (await import('@/pages/app/history-page')).HistoryPage,
 }))
 const ContentDetailPage = lazy(async () => ({
   default: (await import('@/pages/app/content-detail-page')).ContentDetailPage,
@@ -106,7 +109,7 @@ function GuestGate() {
       return <FullScreenLoader label="Yo'naltirilmoqda" />
     }
 
-    return <Navigate to={profile?.role === 'admin' ? '/admin/dashboard' : '/app/dashboard'} replace />
+    return <Navigate to={profile.role === 'admin' ? '/admin/dashboard' : '/app/dashboard'} replace />
   }
 
   return <Outlet />
@@ -127,11 +130,7 @@ function HomeGate() {
     return <Navigate to={profile.role === 'admin' ? '/admin/dashboard' : '/app/dashboard'} replace />
   }
 
-  return (
-    <LazyRoute label="Bosh sahifa yuklanmoqda">
-      <LandingPage />
-    </LazyRoute>
-  )
+  return <Navigate to="/login" replace />
 }
 
 export function AppRoutes() {
@@ -139,14 +138,7 @@ export function AppRoutes() {
     <Routes>
       <Route element={<PublicLayout />}>
         <Route path="/" element={<HomeGate />} />
-        <Route
-          path="/pricing"
-          element={
-            <LazyRoute label="Tariflar yuklanmoqda">
-              <PricingPage />
-            </LazyRoute>
-          }
-        />
+        <Route path="/pricing" element={<Navigate to="/login" replace />} />
         <Route
           path="/reset-password"
           element={
@@ -187,6 +179,38 @@ export function AppRoutes() {
             }
           />
           <Route
+            path="/app/messenger"
+            element={
+              <LazyRoute label="Messenger yuklanmoqda">
+                <MessengerPage />
+              </LazyRoute>
+            }
+          />
+          <Route
+            path="/app/calendar"
+            element={
+              <LazyRoute label="Calendar yuklanmoqda">
+                <CalendarPage />
+              </LazyRoute>
+            }
+          />
+          <Route
+            path="/app/database"
+            element={
+              <LazyRoute label="Database yuklanmoqda">
+                <DatabasePage />
+              </LazyRoute>
+            }
+          />
+          <Route
+            path="/app/attendance"
+            element={
+              <LazyRoute label="Attendance yuklanmoqda">
+                <AttendancePage />
+              </LazyRoute>
+            }
+          />
+          <Route
             path="/app/generator"
             element={
               <LazyRoute label="Generator yuklanmoqda">
@@ -194,14 +218,7 @@ export function AppRoutes() {
               </LazyRoute>
             }
           />
-          <Route
-            path="/app/history"
-            element={
-              <LazyRoute label="Tarix yuklanmoqda">
-                <HistoryPage />
-              </LazyRoute>
-            }
-          />
+          <Route path="/app/history" element={<Navigate to="/app/messenger" replace />} />
           <Route
             path="/app/history/:id"
             element={

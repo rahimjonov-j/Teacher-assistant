@@ -1,31 +1,61 @@
 import { useMemo, useState } from 'react'
 import { useMutation } from '@tanstack/react-query'
 import { TELEGRAM_COMMAND_DEFINITIONS } from '@teacher-assistant/shared'
+import {
+  Bell,
+  Bot,
+  ChevronRight,
+  Globe,
+  HelpCircle,
+  Info,
+  Loader2,
+  Lock,
+  LogOut,
+  Save,
+  Shield,
+  UserCircle2,
+} from 'lucide-react'
 import { toast } from 'sonner'
-import { Loader2, LogOut, Save, Bot } from 'lucide-react'
-import { PageHeader } from '@/components/shared/page-header'
-import { ThemeToggle } from '@/components/shared/theme-toggle'
+import { useAuth } from '@/hooks/use-auth'
+import { apiRequest } from '@/lib/api'
+import { env } from '@/lib/env'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { apiRequest } from '@/lib/api'
-import { env } from '@/lib/env'
-import { useAuth } from '@/hooks/use-auth'
 
 interface LinkCodeResponse {
   linkCode: string
   expiresAt: string
 }
 
+type SectionKey = 'profile' | 'account' | 'notifications' | 'privacy' | 'language' | 'help' | 'about'
+
+const settingsSections: Array<{
+  key: SectionKey
+  title: string
+  subtitle: string
+  icon: typeof UserCircle2
+}> = [
+  { key: 'profile', title: 'Profile', subtitle: 'Name, school and class focus', icon: UserCircle2 },
+  { key: 'account', title: 'Account', subtitle: 'Telegram connection and access', icon: Shield },
+  { key: 'notifications', title: 'Notifications', subtitle: 'Command and message preferences', icon: Bell },
+  { key: 'privacy', title: 'Privacy', subtitle: 'Session and linked account info', icon: Lock },
+  { key: 'language', title: 'Language', subtitle: 'Interface locale and timezone', icon: Globe },
+  { key: 'help', title: 'Help & Support', subtitle: 'How to use Telegram commands', icon: HelpCircle },
+  { key: 'about', title: 'About', subtitle: 'Platform and version information', icon: Info },
+]
+
 export function SettingsPage() {
   const { profile, refreshProfile, logout } = useAuth()
+  const [activeSection, setActiveSection] = useState<SectionKey>('profile')
   const [fullName, setFullName] = useState(profile?.fullName ?? '')
   const [schoolName, setSchoolName] = useState(profile?.schoolName ?? '')
   const [gradeFocus, setGradeFocus] = useState(profile?.gradeFocus ?? '')
   const [timezone, setTimezone] = useState(profile?.timezone ?? '')
   const [telegramHandle, setTelegramHandle] = useState(profile?.telegramHandle ?? '')
   const [linkData, setLinkData] = useState<LinkCodeResponse | null>(null)
+
   const profileSnapshot = useMemo(
     () => ({
       fullName: profile?.fullName ?? '',
@@ -51,10 +81,10 @@ export function SettingsPage() {
       }),
     onSuccess: async () => {
       await refreshProfile()
-      toast.success('Sozlamalar yangilandi.')
+      toast.success('Settings updated.')
     },
     onError: (error) => {
-      toast.error(error instanceof Error ? error.message : "Sozlamalarni yangilab bo'lmadi.")
+      toast.error(error instanceof Error ? error.message : 'Settings update failed.')
     },
   })
 
@@ -62,10 +92,10 @@ export function SettingsPage() {
     mutationFn: () => apiRequest<LinkCodeResponse>('/teacher/telegram/link-code', { method: 'POST' }),
     onSuccess: (data) => {
       setLinkData(data)
-      toast.success('Telegram ulash kodi yaratildi.')
+      toast.success('Telegram link code created.')
     },
     onError: (error) => {
-      toast.error(error instanceof Error ? error.message : "Kod yaratib bo'lmadi.")
+      toast.error(error instanceof Error ? error.message : 'Link code could not be created.')
     },
   })
 
@@ -74,165 +104,173 @@ export function SettingsPage() {
     : null
 
   return (
-    <div className="mx-auto max-w-2xl space-y-8 animate-in pb-12">
-      <PageHeader
-        eyebrow="Sozlamalar"
-        title="Profil va Xavfsizlik"
-      />
-
-      {/* Profile Card */}
-      <Card className="border-none bg-card/60 shadow-xl backdrop-blur-xl">
-        <CardContent className="space-y-6 p-8">
-          <h2 className="text-lg font-black tracking-tight">Profil ma'lumotlari</h2>
-          <div className="grid gap-5 sm:grid-cols-2">
-            <div className="space-y-2">
-              <Label htmlFor="fullName" className="text-xs font-bold uppercase tracking-widest text-muted-foreground/60 ml-1">F.I.SH</Label>
-                <Input
-                  id="fullName"
-                  value={fullName || profileSnapshot.fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  placeholder="Ali Valiyev"
-                  className="h-12 rounded-2xl"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="schoolName" className="text-xs font-bold uppercase tracking-widest text-muted-foreground/60 ml-1">Maktab</Label>
-                <Input
-                  id="schoolName"
-                  value={schoolName || profileSnapshot.schoolName}
-                  onChange={(e) => setSchoolName(e.target.value)}
-                  placeholder="21-maktab"
-                  className="h-12 rounded-2xl"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="gradeFocus" className="text-xs font-bold uppercase tracking-widest text-muted-foreground/60 ml-1">Asosiy sinf</Label>
-                <Input
-                  id="gradeFocus"
-                  value={gradeFocus || profileSnapshot.gradeFocus}
-                  onChange={(e) => setGradeFocus(e.target.value)}
-                  placeholder="7-sinf"
-                  className="h-12 rounded-2xl"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="timezone" className="text-xs font-bold uppercase tracking-widest text-muted-foreground/60 ml-1">Vaqt zonasi</Label>
-                <Input
-                  id="timezone"
-                  value={timezone || profileSnapshot.timezone}
-                  onChange={(e) => setTimezone(e.target.value)}
-                  placeholder="Asia/Tashkent"
-                  className="h-12 rounded-2xl"
-              />
-            </div>
-            <div className="space-y-2 sm:col-span-2">
-              <Label htmlFor="telegramHandle" className="text-xs font-bold uppercase tracking-widest text-muted-foreground/60 ml-1">Telegram username</Label>
-                <Input
-                  id="telegramHandle"
-                  value={telegramHandle || profileSnapshot.telegramHandle}
-                  onChange={(e) => setTelegramHandle(e.target.value)}
-                  placeholder="@username"
-                  className="h-12 rounded-2xl"
-              />
-            </div>
+    <div className="space-y-4 animate-in pb-8">
+      <Card>
+        <CardContent className="p-3">
+          <div className="space-y-2">
+            {settingsSections.map((section) => (
+              <button
+                key={section.key}
+                type="button"
+                onClick={() => setActiveSection(section.key)}
+                className="flex w-full items-center justify-between rounded-2xl px-3 py-3 text-left transition-colors hover:bg-secondary"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-secondary">
+                    <section.icon className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <div className="text-sm font-black">{section.title}</div>
+                    <div className="mt-1 text-xs leading-5 text-muted-foreground">{section.subtitle}</div>
+                  </div>
+                </div>
+                <ChevronRight className="h-4 w-4 text-muted-foreground" />
+              </button>
+            ))}
           </div>
-          <Button
-            onClick={() => saveMutation.mutate()}
-            disabled={saveMutation.isPending}
-            variant="gradient"
-            className="h-12 w-full rounded-2xl font-bold"
-          >
-            {saveMutation.isPending ? (
-              <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Saqlanmoqda...</>
-            ) : (
-              <><Save className="mr-2 h-4 w-4" /> Saqlash</>
-            )}
-          </Button>
         </CardContent>
       </Card>
 
-      {/* Telegram Card */}
-      <Card className="border-none bg-card/60 shadow-xl backdrop-blur-xl">
-        <CardContent className="space-y-5 p-8">
-          <div>
-            <h2 className="text-lg font-black tracking-tight">Telegram ulanishi</h2>
-            <p className="mt-1 text-sm font-medium text-muted-foreground/70">Botdan foydalanish uchun hisobingizni ulang.</p>
-          </div>
-          <div className="rounded-2xl bg-secondary/50 p-4">
-            <div className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60">
-              Telegram komandalar
+      {activeSection === 'profile' ? (
+        <Card>
+          <CardContent className="space-y-4 p-5">
+            <div className="text-lg font-black tracking-tight">Profile</div>
+            <div className="space-y-2">
+              <Label htmlFor="fullName">Full name</Label>
+              <Input id="fullName" value={fullName || profileSnapshot.fullName} onChange={(event) => setFullName(event.target.value)} />
             </div>
-            <div className="mt-3 grid gap-2 sm:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="schoolName">School</Label>
+              <Input id="schoolName" value={schoolName || profileSnapshot.schoolName} onChange={(event) => setSchoolName(event.target.value)} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="gradeFocus">Grade / class</Label>
+              <Input id="gradeFocus" value={gradeFocus || profileSnapshot.gradeFocus} onChange={(event) => setGradeFocus(event.target.value)} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="timezone">Timezone</Label>
+              <Input id="timezone" value={timezone || profileSnapshot.timezone} onChange={(event) => setTimezone(event.target.value)} />
+            </div>
+            <Button onClick={() => saveMutation.mutate()} disabled={saveMutation.isPending} className="w-full">
+              {saveMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+              Save profile
+            </Button>
+          </CardContent>
+        </Card>
+      ) : null}
+
+      {activeSection === 'account' ? (
+        <Card>
+          <CardContent className="space-y-4 p-5">
+            <div className="text-lg font-black tracking-tight">Account</div>
+            <div className="space-y-2">
+              <Label htmlFor="telegramHandle">Telegram username</Label>
+              <Input
+                id="telegramHandle"
+                value={telegramHandle || profileSnapshot.telegramHandle}
+                onChange={(event) => setTelegramHandle(event.target.value)}
+                placeholder="@username"
+              />
+            </div>
+            <Button variant="outline" onClick={() => linkMutation.mutate()} disabled={linkMutation.isPending} className="w-full">
+              {linkMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Bot className="h-4 w-4" />}
+              Create Telegram link code
+            </Button>
+
+            {linkData ? (
+              <div className="rounded-2xl border border-border p-4">
+                <div className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">One-time code</div>
+                <div className="mt-3 text-2xl font-black tracking-[0.22em]">{linkData.linkCode}</div>
+                <div className="mt-2 text-xs text-muted-foreground">Expires at: {linkData.expiresAt}</div>
+                {deepLink ? (
+                  <Button asChild className="mt-4 w-full">
+                    <a href={deepLink} target="_blank" rel="noreferrer">
+                      Open Telegram bot
+                    </a>
+                  </Button>
+                ) : null}
+              </div>
+            ) : null}
+          </CardContent>
+        </Card>
+      ) : null}
+
+      {activeSection === 'notifications' ? (
+        <Card>
+          <CardContent className="space-y-4 p-5">
+            <div className="text-lg font-black tracking-tight">Notifications</div>
+            <p className="text-sm leading-6 text-muted-foreground">
+              Telegram commands are the primary notification surface right now. Use the command list below as your quick access menu.
+            </p>
+            <div className="grid gap-2">
               {TELEGRAM_COMMAND_DEFINITIONS.map((command) => (
-                <div key={command.command} className="rounded-xl border border-border/40 bg-background/70 px-3 py-2">
-                  <div className="text-sm font-black text-foreground">{command.usage}</div>
-                  <div className="mt-1 text-xs font-medium leading-relaxed text-muted-foreground">
-                    {command.description}
-                  </div>
+                <div key={command.command} className="rounded-2xl border border-border px-3 py-3">
+                  <div className="text-sm font-black">{command.usage}</div>
+                  <div className="mt-1 text-xs text-muted-foreground">{command.description}</div>
                 </div>
               ))}
             </div>
-          </div>
-          <Button
-            variant="outline"
-            className="h-12 w-full rounded-2xl font-bold border-border/40"
-            onClick={() => linkMutation.mutate()}
-            disabled={linkMutation.isPending}
-          >
-            {linkMutation.isPending ? (
-              <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Yaratilmoqda...</>
-            ) : (
-              <><Bot className="mr-2 h-4 w-4" /> Ulash kodini yaratish</>
-            )}
-          </Button>
+          </CardContent>
+        </Card>
+      ) : null}
 
-          {linkData && (
-            <div className="space-y-4 rounded-2xl border border-border/40 bg-background p-5">
-              <div>
-                <div className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60">Bir martalik kod</div>
-                <div className="mt-3 text-3xl font-black tracking-[0.3em]">{linkData.linkCode}</div>
-              </div>
-              <div className="text-xs font-medium text-muted-foreground/60">Amal qilish muddati: {linkData.expiresAt}</div>
-              {deepLink && (
-                <Button asChild className="w-full rounded-2xl font-bold" variant="gradient">
-                  <a href={deepLink} target="_blank" rel="noreferrer">
-                    <Bot className="mr-2 h-4 w-4" />
-                    Telegram botni ochish
-                  </a>
-                </Button>
-              )}
+      {activeSection === 'privacy' ? (
+        <Card>
+          <CardContent className="space-y-3 p-5">
+            <div className="text-lg font-black tracking-tight">Privacy</div>
+            <div className="rounded-2xl border border-border px-4 py-3 text-sm text-muted-foreground">
+              Email: <span className="font-semibold text-foreground">{profile?.email ?? 'Not available'}</span>
             </div>
-          )}
-        </CardContent>
-      </Card>
+            <div className="rounded-2xl border border-border px-4 py-3 text-sm text-muted-foreground">
+              Telegram handle: <span className="font-semibold text-foreground">{profile?.telegramHandle ?? 'Not linked'}</span>
+            </div>
+          </CardContent>
+        </Card>
+      ) : null}
 
-      <Card className="border-none bg-card/60 shadow-xl backdrop-blur-xl">
-        <CardContent className="flex items-center justify-between gap-4 p-6">
-          <div>
-            <h3 className="font-bold">Ko'rinish rejimi</h3>
-            <p className="mt-1 text-sm text-muted-foreground/70">Light/dark rejimini shu yerdan almashtiring.</p>
-          </div>
-          <ThemeToggle />
-        </CardContent>
-      </Card>
+      {activeSection === 'language' ? (
+        <Card>
+          <CardContent className="space-y-3 p-5">
+            <div className="text-lg font-black tracking-tight">Language</div>
+            <div className="rounded-2xl border border-border px-4 py-3 text-sm text-muted-foreground">
+              Interface language follows the current app copy.
+            </div>
+            <div className="rounded-2xl border border-border px-4 py-3 text-sm text-muted-foreground">
+              Timezone: <span className="font-semibold text-foreground">{profile?.timezone ?? 'Asia/Tashkent'}</span>
+            </div>
+          </CardContent>
+        </Card>
+      ) : null}
 
-      {/* Danger Zone */}
-      <Card className="border-destructive/20 bg-destructive/5">
-        <CardContent className="flex items-center justify-between p-6">
-          <div>
-            <h3 className="font-bold">Tizimdan chiqish</h3>
-            <p className="mt-1 text-sm text-muted-foreground/70">Barcha sessiyalardan chiqiladi.</p>
-          </div>
-          <Button
-            variant="destructive"
-            className="rounded-2xl font-bold"
-            onClick={() => logout()}
-          >
-            <LogOut className="mr-2 h-4 w-4" />
-            Chiqish
-          </Button>
-        </CardContent>
-      </Card>
+      {activeSection === 'help' ? (
+        <Card>
+          <CardContent className="space-y-3 p-5">
+            <div className="text-lg font-black tracking-tight">Help & Support</div>
+            <div className="rounded-2xl border border-border px-4 py-3 text-sm leading-6 text-muted-foreground">
+              Use Telegram for fast commands, Dashboard for shortcuts, and Messenger to review generated materials.
+            </div>
+          </CardContent>
+        </Card>
+      ) : null}
+
+      {activeSection === 'about' ? (
+        <Card>
+          <CardContent className="space-y-3 p-5">
+            <div className="text-lg font-black tracking-tight">About</div>
+            <div className="rounded-2xl border border-border px-4 py-3 text-sm text-muted-foreground">
+              Teacher Assistant platform
+            </div>
+            <div className="rounded-2xl border border-border px-4 py-3 text-sm text-muted-foreground">
+              Built for tests, lesson plans, writing analysis and speaking prompts.
+            </div>
+          </CardContent>
+        </Card>
+      ) : null}
+
+      <Button variant="outline" className="h-12 w-full" onClick={() => logout()}>
+        <LogOut className="h-4 w-4" />
+        Logout
+      </Button>
     </div>
   )
 }
