@@ -1,8 +1,8 @@
 import { useEffect, useRef } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 
-const EDGE_THRESHOLD_PX = 28
-const MIN_SWIPE_DISTANCE_PX = 84
+const EDGE_THRESHOLD_PX = 44
+const MIN_SWIPE_DISTANCE_PX = 72
 const MAX_VERTICAL_DRIFT_PX = 72
 
 function isInteractiveTarget(target: EventTarget | null) {
@@ -15,6 +15,30 @@ function isInteractiveTarget(target: EventTarget | null) {
   }
 
   return Boolean(target.closest('input, textarea, select, button, a, [role="button"]'))
+}
+
+function getFallbackPath(pathname: string) {
+  if (pathname.startsWith('/app/history/')) {
+    return '/app/messenger'
+  }
+
+  if (pathname === '/app/generator' || pathname === '/app/billing' || pathname === '/app/settings') {
+    return '/app/dashboard'
+  }
+
+  if (pathname.startsWith('/admin/') && pathname !== '/admin/dashboard') {
+    return '/admin/dashboard'
+  }
+
+  if (pathname === '/register' || pathname === '/reset-password') {
+    return '/login'
+  }
+
+  if (pathname === '/login') {
+    return '/'
+  }
+
+  return null
 }
 
 export function useSwipeBack() {
@@ -44,8 +68,7 @@ export function useSwipeBack() {
         !eligible.current ||
         targetBlocked.current ||
         touchStartX.current === null ||
-        touchStartY.current === null ||
-        location.key === 'default'
+        touchStartY.current === null
       ) {
         resetGesture()
         return
@@ -56,7 +79,13 @@ export function useSwipeBack() {
       const deltaY = Math.abs(touch.clientY - touchStartY.current)
 
       if (deltaX >= MIN_SWIPE_DISTANCE_PX && deltaY <= MAX_VERTICAL_DRIFT_PX) {
-        navigate(-1)
+        const fallbackPath = getFallbackPath(location.pathname)
+
+        if (location.key === 'default' && fallbackPath) {
+          navigate(fallbackPath)
+        } else if (location.key !== 'default') {
+          navigate(-1)
+        }
       }
 
       resetGesture()
@@ -82,5 +111,5 @@ export function useSwipeBack() {
       window.removeEventListener('touchend', onTouchEnd)
       window.removeEventListener('touchcancel', onTouchCancel)
     }
-  }, [location.key, navigate])
+  }, [location.key, location.pathname, navigate])
 }

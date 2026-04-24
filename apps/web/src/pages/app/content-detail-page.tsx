@@ -1,4 +1,5 @@
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { useRef } from 'react'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import type { GeneratedContentRecord } from '@teacher-assistant/shared'
 import { ArrowLeft, Copy, FileDown } from 'lucide-react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
@@ -17,6 +18,8 @@ export function ContentDetailPage() {
   const navigate = useNavigate()
   const params = useParams()
   const { t } = useI18n()
+  const queryClient = useQueryClient()
+  const pdfWindowRef = useRef<Window | null>(null)
 
   const query = useQuery({
     queryKey: ['content-detail', params.id],
@@ -29,11 +32,37 @@ export function ContentDetailPage() {
       apiRequest<{ pdfUrl: string }>(`/teacher/history/${params.id}/export-pdf`, {
         method: 'POST',
       }),
-    onSuccess: (data) => {
-      window.open(data.pdfUrl, '_blank', 'noopener,noreferrer')
+    onSuccess: async (data) => {
+      queryClient.setQueryData<{ item: GeneratedContentRecord }>(['content-detail', params.id], (current) =>
+        current
+          ? {
+              item: {
+                ...current.item,
+                pdfUrl: data.pdfUrl,
+              },
+            }
+          : current,
+      )
+      await queryClient.invalidateQueries({ queryKey: ['dashboard'] })
+      await queryClient.invalidateQueries({ queryKey: ['messenger-history'] })
+      await queryClient.invalidateQueries({ queryKey: ['database-history'] })
+      await queryClient.invalidateQueries({ queryKey: ['calendar-history'] })
+
+      if (pdfWindowRef.current && !pdfWindowRef.current.closed) {
+        pdfWindowRef.current.location.href = data.pdfUrl
+        pdfWindowRef.current = null
+      } else {
+        window.open(data.pdfUrl, '_blank', 'noopener,noreferrer')
+      }
+
       toast.success(t('detail.exportDone'))
     },
     onError: (error) => {
+      if (pdfWindowRef.current && !pdfWindowRef.current.closed) {
+        pdfWindowRef.current.close()
+        pdfWindowRef.current = null
+      }
+
       if (error instanceof ApiRequestError && error.statusCode === 402) {
         toast.error(t('detail.creditEnded'))
         navigate('/app/billing')
@@ -43,6 +72,16 @@ export function ContentDetailPage() {
       toast.error(error instanceof Error ? error.message : t('detail.exportFailed'))
     },
   })
+
+  const handleExportPdf = () => {
+    pdfWindowRef.current = window.open('about:blank', '_blank')
+    if (pdfWindowRef.current) {
+      pdfWindowRef.current.opener = null
+      pdfWindowRef.current.document.title = t('detail.exportPdf')
+      pdfWindowRef.current.document.body.textContent = t('common.loading')
+    }
+    exportMutation.mutate()
+  }
 
   const item = query.data?.item
 
@@ -89,7 +128,7 @@ export function ContentDetailPage() {
                 </a>
               </Button>
             ) : (
-              <Button variant="outline" size="sm" onClick={() => exportMutation.mutate()} disabled={exportMutation.isPending}>
+              <Button variant="outline" size="sm" onClick={handleExportPdf} disabled={exportMutation.isPending}>
                 {exportMutation.isPending ? <Spinner /> : <FileDown className="h-4 w-4" />}
                 {t('detail.exportPdf')}
               </Button>

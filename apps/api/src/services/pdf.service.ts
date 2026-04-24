@@ -7,13 +7,17 @@ import { subscriptionsRepository } from '../repositories/subscriptions.repositor
 import { usageRepository } from '../repositories/usage.repository.js'
 import { ApiError } from '../utils/api-error.js'
 
+let pdfBucketReady = false
+
 export const pdfService = {
   async exportContent(userId: string, contentId: string) {
     const content = await contentRepository.getById(contentId, userId)
-    const updatedSubscription = await subscriptionsRepository.consumeCredits(userId, 'pdf_export')
     const pdfBuffer = await renderPdfBuffer(content.title, content.outputMarkdown)
 
     const supabase = getSupabaseAdminClient()
+    await ensurePdfBucket(supabase)
+
+    const updatedSubscription = await subscriptionsRepository.consumeCredits(userId, 'pdf_export')
     const storagePath = `${userId}/${content.id}-${Date.now()}.pdf`
 
     const { error } = await supabase.storage
@@ -24,7 +28,7 @@ export const pdfService = {
       })
 
     if (error) {
-      throw new ApiError(500, 'Unable to upload exported PDF.')
+      throw new ApiError(500, `Unable to upload exported PDF: ${error.message}`)
     }
 
     const { data } = supabase.storage.from(env.PDF_STORAGE_BUCKET).getPublicUrl(storagePath)
@@ -57,6 +61,43 @@ export const pdfService = {
   },
 }
 
+async function ensurePdfBucket(supabase: ReturnType<typeof getSupabaseAdminClient>) {
+  if (pdfBucketReady) {
+    return
+  }
+
+  const { data, error } = await supabase.storage.getBucket(env.PDF_STORAGE_BUCKET)
+
+  if (error || !data) {
+    const { error: createError } = await supabase.storage.createBucket(env.PDF_STORAGE_BUCKET, {
+      public: true,
+      fileSizeLimit: '10MB',
+      allowedMimeTypes: ['application/pdf'],
+    })
+
+    if (createError) {
+      throw new ApiError(500, `Unable to prepare PDF storage bucket: ${createError.message}`)
+    }
+
+    pdfBucketReady = true
+    return
+  }
+
+  if (!data.public) {
+    const { error: updateError } = await supabase.storage.updateBucket(env.PDF_STORAGE_BUCKET, {
+      public: true,
+      fileSizeLimit: data.file_size_limit ?? '10MB',
+      allowedMimeTypes: data.allowed_mime_types ?? ['application/pdf'],
+    })
+
+    if (updateError) {
+      throw new ApiError(500, `Unable to publish PDF storage bucket: ${updateError.message}`)
+    }
+  }
+
+  pdfBucketReady = true
+}
+
 function renderPdfBuffer(title: string, markdown: string) {
   return new Promise<Buffer>((resolve, reject) => {
     const doc = new PDFDocument({
@@ -83,7 +124,7 @@ function renderPdfBuffer(title: string, markdown: string) {
         return
       }
 
-      const normalized = line.replace(/^#+\s*/, '').replace(/^\-\s*/, '• ')
+      const normalized = line.replace(/^#+\s*/, '').replace(/^\-\s*/, '- ')
       doc.text(normalized, { lineGap: 4 })
     })
 
