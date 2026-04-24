@@ -9,7 +9,7 @@ import {
   type FeatureKey,
   type PlanKey,
 } from '@teacher-assistant/shared'
-import { Telegraf } from 'telegraf'
+import { Markup, Telegraf } from 'telegraf'
 import { env, hasOpenAiConfig, hasTelegramConfig } from '../config/env.js'
 import { plansRepository } from '../repositories/plans.repository.js'
 import { telegramRepository } from '../repositories/telegram.repository.js'
@@ -115,6 +115,13 @@ function registerHandlers(instance: Telegraf) {
       const lines = plans.map(
         (plan) => `${plan.name}: ${plan.monthlyCredits} token / ${formatUzs(plan.priceMonthlyUzs)}`,
       )
+      const plansKeyboard = buildPlansKeyboard(plans)
+
+      if (plansKeyboard) {
+        await context.reply(lines.join('\n'), plansKeyboard)
+        return
+      }
+
       await context.reply(lines.join('\n'))
     } catch {
       await context.reply("Tariflar ro'yxatini olishda xatolik bo'ldi.")
@@ -322,9 +329,8 @@ function helpMessage() {
 }
 
 function linkingHelpMessage() {
-  const quickLink = env.TELEGRAM_BOT_USERNAME
-    ? `https://t.me/${env.TELEGRAM_BOT_USERNAME}?start=YOUR_LINK_CODE`
-    : null
+  const botLink = getTelegramBotLink()
+  const quickLink = botLink ? `${botLink}?start=YOUR_LINK_CODE` : null
 
   const lines = [
     "Telegram hali ulanmagan.",
@@ -345,6 +351,37 @@ function isGreeting(text: string) {
 
 function formatUzs(value: number) {
   return `${uzsFormatter.format(value).replace(/[\u00A0\u202F]/g, ' ')} so'm`
+}
+
+function buildPlansKeyboard(
+  plans: Array<{ key: PlanKey; name: string; priceMonthlyUzs: number }>,
+) {
+  const botLink = getTelegramBotLink()
+  if (!botLink) {
+    return null
+  }
+
+  const buttons = plans
+    .filter((plan) => plan.key !== 'free_trial')
+    .map((plan) =>
+      [
+        Markup.button.url(
+          `${plan.name} sotib olish`,
+          `${botLink}?start=upgrade_${plan.key}`,
+        ),
+      ],
+    )
+
+  if (buttons.length === 0) {
+    return null
+  }
+
+  return Markup.inlineKeyboard(buttons)
+}
+
+function getTelegramBotLink() {
+  const username = env.TELEGRAM_BOT_USERNAME?.replace(/^@+/, '').trim()
+  return username ? `https://t.me/${username}` : null
 }
 
 function commandDirectoryLines() {
