@@ -120,44 +120,48 @@ export function BillingPage() {
               <Card
                 key={plan.key}
                 className={cn(
-                  'mobile-card relative min-w-0 overflow-hidden border-border/40 bg-card/85 transition-colors',
+                  'mobile-card relative flex h-full min-w-0 flex-col overflow-hidden border-border/40 bg-card/85 transition-colors',
                   isCurrent && subscription ? subscriptionTone[subscription.status] : 'hover:border-primary/30',
                 )}
               >
                 {isCurrent ? <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-emerald-400 to-sky-500" /> : null}
-                <CardContent className="min-w-0 space-y-4 p-5 sm:space-y-5 sm:p-6">
-                  <div className="flex items-center justify-between gap-3">
-                    <h3 className="min-w-0 break-words text-lg font-black tracking-tight">{plan.name}</h3>
-                    {isCurrent ? (
-                      <Badge className="shrink-0 border-emerald-500/20 bg-emerald-500/10 text-[9px] font-black uppercase tracking-widest text-emerald-700 dark:text-emerald-300">
-                        {subscription ? statusLabel[subscription.status] : 'Joriy'}
-                      </Badge>
-                    ) : null}
+                <CardContent className="flex h-full min-w-0 flex-1 flex-col p-5 sm:p-6">
+                  <div className="space-y-4 sm:space-y-5">
+                    <div className="flex items-center justify-between gap-3">
+                      <h3 className="min-w-0 break-words text-lg font-black tracking-tight">{plan.name}</h3>
+                      {isCurrent ? (
+                        <Badge className="shrink-0 border-emerald-500/20 bg-emerald-500/10 text-[9px] font-black uppercase tracking-widest text-emerald-700 dark:text-emerald-300">
+                          {subscription ? statusLabel[subscription.status] : 'Joriy'}
+                        </Badge>
+                      ) : null}
+                    </div>
+                    <div className="flex flex-wrap items-end gap-x-2 gap-y-1 min-w-0">
+                      <span className="break-words text-3xl font-black tracking-tight sm:text-4xl">
+                        {formatCurrencyUzs(plan.priceMonthlyUzs)}
+                      </span>
+                      <span className="whitespace-nowrap text-sm font-medium text-muted-foreground">/ oy</span>
+                    </div>
+                    <p className="text-sm font-medium leading-6 text-muted-foreground/70">{plan.description}</p>
+                    <ul className="space-y-2 text-sm font-medium">
+                      <li className="flex items-center gap-2 text-muted-foreground">
+                        <CheckCircle2 className="h-4 w-4 shrink-0 text-primary" />
+                        {plan.monthlyCredits} oylik token
+                      </li>
+                    </ul>
                   </div>
-                  <div className="min-w-0">
-                    <span className="break-words text-3xl font-black tracking-tight sm:text-4xl">{formatCurrencyUzs(plan.priceMonthlyUzs)}</span>
-                    <span className="text-sm font-medium text-muted-foreground">/oy</span>
-                  </div>
-                  <p className="text-sm font-medium leading-6 text-muted-foreground/70">{plan.description}</p>
-                  <ul className="space-y-2 text-sm font-medium">
-                    <li className="flex items-center gap-2 text-muted-foreground">
-                      <CheckCircle2 className="h-4 w-4 shrink-0 text-primary" />
-                      {plan.monthlyCredits} oylik token
-                    </li>
-                  </ul>
                   {isCurrent ? (
-                    <Button className="w-full rounded-2xl font-bold" disabled>
+                    <Button className="mt-auto w-full rounded-2xl font-bold" disabled>
                       Joriy tarif
                     </Button>
                   ) : upgradeLink ? (
-                    <Button asChild className="w-full rounded-2xl font-bold" variant="outline">
+                    <Button asChild className="mt-auto w-full rounded-2xl font-bold" variant="outline">
                       <a href={upgradeLink} target="_blank" rel="noreferrer">
                         <ShoppingBag className="mr-2 h-4 w-4" />
                         Sotib olish
                       </a>
                     </Button>
                   ) : (
-                    <Button asChild className="w-full rounded-2xl font-bold" variant="outline">
+                    <Button asChild className="mt-auto w-full rounded-2xl font-bold" variant="outline">
                       <Link to="/app/settings">Sotib olish</Link>
                     </Button>
                   )}

@@ -1,6 +1,10 @@
 import { format } from 'date-fns'
 import { FEATURE_MAP, PLAN_MAP, type FeatureKey, type PlanKey } from '@teacher-assistant/shared'
 
+const wholeNumberFormatterUzs = new Intl.NumberFormat('uz-UZ', {
+  maximumFractionDigits: 0,
+})
+
 export function formatDate(value: string | null | undefined) {
   if (!value) {
     return 'Belgilanmagan'
@@ -14,11 +18,9 @@ export function formatRelativeDate(value: string) {
 }
 
 export function formatCurrencyUzs(value: number) {
-  return new Intl.NumberFormat('uz-UZ', {
-    style: 'currency',
-    currency: 'UZS',
-    maximumFractionDigits: 0,
-  }).format(value)
+  const formattedValue = wholeNumberFormatterUzs.format(value).replace(/[\u00A0\u202F]/g, ' ')
+
+  return `${formattedValue} so'm`
 }
 
 export function getFeatureLabel(featureKey: FeatureKey) {
