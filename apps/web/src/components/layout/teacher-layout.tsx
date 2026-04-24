@@ -3,6 +3,7 @@ import {
   CalendarDays,
   ChevronRight,
   ClipboardCheck,
+  CreditCard,
   Database,
   LayoutDashboard,
   LogOut,
@@ -25,6 +26,7 @@ const navItems = [
   { to: '/app/database', label: 'Database', icon: Database },
   { to: '/app/attendance', label: 'Attendance', icon: ClipboardCheck },
   { to: '/app/settings', label: 'Settings', icon: Settings },
+  { to: '/app/billing', label: 'Plans', icon: CreditCard },
 ] as const
 
 const pageMeta: Array<{ pattern: string; title: string; actionTo?: string }> = [
@@ -116,7 +118,7 @@ export function TeacherLayout() {
                         <div className={cn('flex h-10 w-10 items-center justify-center rounded-2xl', isActive ? 'bg-background' : 'bg-secondary')}>
                           <item.icon className="h-5 w-5" />
                         </div>
-                        <span>{t(`teacher.nav.${item.label.toLowerCase()}`)}</span>
+                        <span>{item.label === 'Plans' ? t('teacher.menu.plans') : t(`teacher.nav.${item.label.toLowerCase()}`)}</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <ChevronRight className="h-4 w-4 text-muted-foreground" />
@@ -128,18 +130,6 @@ export function TeacherLayout() {
             </nav>
 
             <div className="mt-4 space-y-3 border-t border-border pt-4">
-              <Link
-                to="/app/billing"
-                onClick={() => setDrawerOpen(false)}
-                className="flex items-center justify-between gap-3 rounded-xl border border-border px-4 py-4 transition-colors hover:bg-secondary"
-              >
-                <div>
-                  <div className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">{t('teacher.menu.plans')}</div>
-                  <div className="mt-1 text-sm font-bold text-foreground">{t('teacher.menu.plansHint')}</div>
-                </div>
-                <ChevronRight className="h-5 w-5 shrink-0 text-muted-foreground" />
-              </Link>
-
               <Button
                 variant="outline"
                 className="h-12 w-full justify-start"

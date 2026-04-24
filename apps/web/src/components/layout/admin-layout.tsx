@@ -56,29 +56,31 @@ function lockBodyScroll(enabled: boolean) {
 }
 
 function AdminSidebarContent({
+  onClose,
   onNavigate,
   onLogout,
 }: {
+  onClose?: () => void
   onNavigate?: () => void
   onLogout: () => Promise<void>
 }) {
   const { t } = useI18n()
 
   return (
-    <div className="flex h-full min-h-0 flex-col bg-card">
-      <div className="border-b border-border px-5 py-5">
-        <Link to="/admin/dashboard" onClick={onNavigate} className="flex items-center gap-3">
-          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-foreground text-background">
-            <BarChart3 className="h-5 w-5" />
-          </div>
-          <div className="min-w-0">
-            <div className="truncate text-sm font-black tracking-tight">{t('admin.layout.controlPanel')}</div>
-            <div className="truncate text-xs text-muted-foreground">{t('admin.layout.systemAnalytics')}</div>
-          </div>
+    <div className="flex h-full min-h-0 flex-col bg-card px-4 pb-6 pt-5">
+      <div className="flex items-center justify-between px-2">
+        <Link to="/admin/dashboard" onClick={onNavigate} className="min-w-0">
+          <div className="truncate text-sm font-black tracking-tight">{t('admin.layout.controlPanel')}</div>
+          <div className="truncate text-xs text-muted-foreground">{t('admin.layout.systemAnalytics')}</div>
         </Link>
+        {onClose ? (
+          <Button variant="ghost" size="icon" className="rounded-full" onClick={onClose} aria-label="Close admin menu">
+            <X className="h-5 w-5" />
+          </Button>
+        ) : null}
       </div>
 
-      <nav className="min-h-0 flex-1 space-y-1 overflow-y-auto overscroll-contain px-3 py-4">
+      <nav className="mt-8 flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto overscroll-contain pr-1">
         {navItems.map((item) => (
           <NavLink
             key={item.to}
@@ -86,33 +88,43 @@ function AdminSidebarContent({
             onClick={onNavigate}
             className={({ isActive }) =>
               cn(
-                'flex items-center justify-between gap-3 rounded-xl px-3 py-3 text-sm font-semibold transition-colors',
-                isActive ? 'bg-foreground text-background' : 'text-muted-foreground hover:bg-secondary hover:text-foreground',
+                'flex items-center justify-between rounded-2xl px-4 py-3 text-sm font-semibold transition-colors',
+                isActive ? 'bg-secondary text-foreground' : 'text-muted-foreground hover:bg-secondary/70 hover:text-foreground',
               )
             }
           >
             {({ isActive }) => (
               <>
                 <div className="flex min-w-0 items-center gap-3">
-                  <div className={cn('flex h-10 w-10 shrink-0 items-center justify-center rounded-xl', isActive ? 'bg-background/10' : 'bg-secondary')}>
+                  <div className={cn('flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl', isActive ? 'bg-background' : 'bg-secondary')}>
                     <item.icon className="h-5 w-5" />
                   </div>
                   <span className="truncate">{t(item.labelKey)}</span>
                 </div>
-                <ChevronRight className="h-4 w-4 shrink-0 opacity-55" />
+                <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />
               </>
             )}
           </NavLink>
         ))}
       </nav>
 
-      <div className="space-y-3 border-t border-border p-4">
-        <Button asChild variant="outline" className="h-11 w-full justify-start">
-          <Link to="/app/dashboard" onClick={onNavigate}>
-            <ArrowRightLeft className="h-4 w-4" />
-            {t('admin.layout.teacherApp')}
-          </Link>
-        </Button>
+      <div className="mt-4 space-y-3 border-t border-border pt-4">
+        <Link
+          to="/app/dashboard"
+          onClick={onNavigate}
+          className="flex items-center justify-between gap-3 rounded-xl border border-border px-4 py-4 transition-colors hover:bg-secondary"
+        >
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-secondary">
+              <ArrowRightLeft className="h-5 w-5" />
+            </div>
+            <div>
+              <div className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">Switch</div>
+              <div className="mt-1 text-sm font-bold text-foreground">{t('admin.layout.teacherApp')}</div>
+            </div>
+          </div>
+          <ChevronRight className="h-5 w-5 shrink-0 text-muted-foreground" />
+        </Link>
 
         <div className="flex items-center gap-3">
           <ThemeToggle />
@@ -153,24 +165,19 @@ export function AdminLayout() {
       {drawerOpen ? (
         <div className="fixed inset-0 z-50 overflow-hidden bg-black/25 backdrop-blur-[1px] lg:hidden" onClick={() => setDrawerOpen(false)}>
           <aside
-            className="h-[100dvh] w-[86%] max-w-[312px] border-r border-border bg-card shadow-2xl"
+            className="h-[100dvh] w-[84%] max-w-[320px] rounded-r-2xl border-r border-border bg-card shadow-2xl"
             onClick={(event) => event.stopPropagation()}
           >
-            <div className="absolute left-[calc(min(86vw,312px)-3.75rem)] top-4">
-              <Button variant="ghost" size="icon" onClick={() => setDrawerOpen(false)} aria-label="Close admin menu">
-                <X className="h-5 w-5" />
-              </Button>
-            </div>
-            <AdminSidebarContent onNavigate={() => setDrawerOpen(false)} onLogout={handleLogout} />
+            <AdminSidebarContent onClose={() => setDrawerOpen(false)} onNavigate={() => setDrawerOpen(false)} onLogout={handleLogout} />
           </aside>
         </div>
       ) : null}
 
-      <aside className="fixed inset-y-0 left-0 z-30 hidden w-[292px] border-r border-border bg-card lg:block">
+      <aside className="fixed inset-y-4 left-4 z-30 hidden w-[320px] overflow-hidden rounded-2xl border border-border bg-card shadow-[0_20px_60px_-42px_rgba(0,0,0,0.25)] lg:block">
         <AdminSidebarContent onLogout={handleLogout} />
       </aside>
 
-      <main className="min-h-screen px-4 pb-8 pt-20 lg:pl-[320px] lg:pr-8 lg:pt-8">
+      <main className="min-h-screen px-4 pb-8 pt-20 lg:pl-[368px] lg:pr-8 lg:pt-8">
         <div className="mx-auto w-full max-w-[1160px]">
           <Outlet />
         </div>
