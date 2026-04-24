@@ -35,7 +35,7 @@ interface LinkCodeResponse {
   expiresAt: string
 }
 
-type SectionKey = 'profile' | 'account' | 'notifications' | 'privacy' | 'language' | 'help' | 'about'
+type SectionKey = 'profile' | 'account' | 'notifications' | 'privacy' | 'language' | 'theme' | 'help' | 'about'
 
 const settingsSections: Array<{
   key: SectionKey
@@ -46,6 +46,7 @@ const settingsSections: Array<{
   { key: 'notifications', icon: Bell },
   { key: 'privacy', icon: Lock },
   { key: 'language', icon: Globe },
+  { key: 'theme', icon: SunMedium },
   { key: 'help', icon: HelpCircle },
   { key: 'about', icon: Info },
 ]
@@ -183,9 +184,7 @@ export function SettingsPage() {
     if (sectionKey === 'notifications') {
       return (
         <div className="space-y-4 border-t border-border/70 px-4 pb-4 pt-4">
-          <p className="text-sm leading-6 text-muted-foreground">
-            {t('settings.notificationsHint')}
-          </p>
+          <p className="text-sm leading-6 text-muted-foreground">{t('settings.notificationsHint')}</p>
           <div className="grid gap-2">
             {TELEGRAM_COMMAND_DEFINITIONS.map((command) => (
               <div key={command.command} className="rounded-2xl border border-border px-3 py-3">
@@ -248,6 +247,13 @@ export function SettingsPage() {
           <div className="rounded-2xl border border-border px-4 py-3 text-sm text-muted-foreground">
             {t('settings.timezone')}: <span className="font-semibold text-foreground">{profile?.timezone ?? 'Asia/Tashkent'}</span>
           </div>
+        </div>
+      )
+    }
+
+    if (sectionKey === 'theme') {
+      return (
+        <div className="space-y-4 border-t border-border/70 px-4 pb-4 pt-4">
           <div className="rounded-2xl border border-border bg-secondary/30 px-4 py-3 text-sm text-muted-foreground">
             {t('settings.themeHint')}
           </div>
@@ -354,14 +360,6 @@ export function SettingsPage() {
                             <option value="uz">{t('common.uzbek')}</option>
                             <option value="en">{t('common.english')}</option>
                           </Select>
-                          <button
-                            type="button"
-                            onClick={() => setTheme(currentTheme === 'dark' ? 'light' : 'dark')}
-                            className="flex h-10 w-10 items-center justify-center rounded-xl border border-border bg-background text-foreground transition-colors hover:bg-secondary"
-                            aria-label={t('settings.theme')}
-                          >
-                            {currentTheme === 'dark' ? <Moon className="h-4 w-4" /> : <SunMedium className="h-4 w-4" />}
-                          </button>
                         </div>
                       ) : null}
 
@@ -370,10 +368,14 @@ export function SettingsPage() {
                   </button>
 
                   {section.key === 'language' ? (
-                    <div className="flex flex-wrap items-center gap-2 px-4 pb-3 text-xs font-semibold text-muted-foreground">
-                      <span>{currentLanguageLabel}</span>
-                      <span className="text-border">•</span>
-                      <span>{currentThemeLabel}</span>
+                    <div className="px-4 pb-3 text-xs font-semibold text-muted-foreground">
+                      {currentLanguageLabel}
+                    </div>
+                  ) : null}
+
+                  {section.key === 'theme' ? (
+                    <div className="px-4 pb-3 text-xs font-semibold text-muted-foreground">
+                      {currentThemeLabel}
                     </div>
                   ) : null}
 
