@@ -21,6 +21,7 @@ import { PageHeader } from '@/components/shared/page-header'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
+import { useI18n } from '@/hooks/use-i18n'
 import { apiRequest } from '@/lib/api'
 import { formatRelativeDate, getFeatureLabel } from '@/lib/format'
 import { cn } from '@/lib/utils'
@@ -112,6 +113,7 @@ function AdminFeatureTooltip({
 const featurePalette = ['#38bdf8', '#0ea5e9', '#0284c7', '#22d3ee'] as const
 
 export function AdminDashboardPage() {
+  const { t } = useI18n()
   const query = useQuery({
     queryKey: ['admin-overview'],
     queryFn: () => apiRequest<AdminOverviewPayload>('/admin/overview'),
@@ -176,8 +178,8 @@ export function AdminDashboardPage() {
   return (
     <div className="space-y-10 animate-in">
       <PageHeader
-        eyebrow="Admin analytics"
-        title="Platforma holati"
+        eyebrow={t('admin.dashboard.eyebrow')}
+        title={t('admin.dashboard.title')}
       />
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">

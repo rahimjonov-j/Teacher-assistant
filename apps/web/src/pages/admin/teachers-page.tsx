@@ -3,6 +3,7 @@ import { UserCircle2 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { PageHeader } from '@/components/shared/page-header'
 import { Card, CardContent } from '@/components/ui/card'
+import { useI18n } from '@/hooks/use-i18n'
 import { apiRequest } from '@/lib/api'
 import { formatDate, formatRelativeDate, getPlanName } from '@/lib/format'
 import { cn } from '@/lib/utils'
@@ -29,6 +30,7 @@ interface TeachersResponse {
 }
 
 export function AdminTeachersPage() {
+  const { t } = useI18n()
   const query = useQuery({
     queryKey: ['admin-teachers'],
     queryFn: () => apiRequest<TeachersResponse>('/admin/teachers'),
@@ -37,8 +39,8 @@ export function AdminTeachersPage() {
   return (
     <div className="space-y-10 animate-in">
       <PageHeader
-        eyebrow="Users Database"
-        title="O'qituvchilar"
+        eyebrow={t('admin.teachers.eyebrow')}
+        title={t('admin.teachers.title')}
       />
 
       <Card className="overflow-hidden border-border/70 bg-white/90 shadow-xl dark:border-white/5 dark:bg-[#0a0c10] dark:shadow-2xl">
@@ -47,12 +49,12 @@ export function AdminTeachersPage() {
             <table className="w-full text-left text-sm">
               <thead className="border-b border-slate-200/80 bg-slate-50/90 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 dark:border-white/5 dark:bg-white/[0.02]">
                 <tr>
-                  <th className="px-8 py-5">Foydalanuvchi</th>
-                  <th className="px-8 py-5">Status</th>
-                  <th className="px-8 py-5">Tarif</th>
-                  <th className="px-8 py-5">So'rovlar</th>
-                  <th className="px-8 py-5">Tokenlar</th>
-                  <th className="px-8 py-5">Oxirgi faollik</th>
+                  <th className="px-8 py-5">{t('admin.teachers.user')}</th>
+                  <th className="px-8 py-5">{t('admin.teachers.status')}</th>
+                  <th className="px-8 py-5">{t('admin.teachers.plan')}</th>
+                  <th className="px-8 py-5">{t('admin.teachers.requests')}</th>
+                  <th className="px-8 py-5">{t('admin.teachers.tokens')}</th>
+                  <th className="px-8 py-5">{t('admin.teachers.lastActivity')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-200/80 dark:divide-white/5">
@@ -64,7 +66,7 @@ export function AdminTeachersPage() {
                           <UserCircle2 className="h-5 w-5" />
                         </div>
                         <div>
-                          <div className="font-bold leading-none text-slate-900 dark:text-white">{teacher.fullName || "Noma'lum"}</div>
+                          <div className="font-bold leading-none text-slate-900 dark:text-white">{teacher.fullName || t('admin.teachers.unknown')}</div>
                           <div className="mt-1.5 text-[11px] font-medium text-slate-500">{teacher.email}</div>
                         </div>
                       </div>
@@ -74,31 +76,31 @@ export function AdminTeachersPage() {
                         "h-6 px-3 border-none text-[10px]",
                         teacher.role === 'admin' ? "bg-sky-500 text-white" : "bg-white/5 text-slate-400"
                       )}>
-                        {teacher.role === 'admin' ? 'Admin' : 'Teacher'}
+                        {teacher.role === 'admin' ? 'Admin' : t('admin.teachers.teacher')}
                       </Badge>
                     </td>
                     <td className="px-8 py-6">
                       {teacher.subscription ? (
                         <div>
                           <div className="font-bold text-slate-800 dark:text-slate-200">{getPlanName(teacher.subscription.planKey)}</div>
-                          <div className="mt-1 text-[11px] font-medium text-slate-500">{teacher.subscription.creditsRemaining} credits left</div>
+                          <div className="mt-1 text-[11px] font-medium text-slate-500">{teacher.subscription.creditsRemaining} {t('admin.teachers.creditsLeft')}</div>
                         </div>
                       ) : (
-                        <span className="text-slate-600">No Plan</span>
+                        <span className="text-slate-600">{t('admin.teachers.noPlan')}</span>
                       )}
                     </td>
                     <td className="px-8 py-6">
                       <div className="font-bold text-slate-900 dark:text-white">{teacher.totalRequests}</div>
-                      <div className="mt-1 text-[11px] font-medium text-slate-500">{teacher.creditsConsumed} consumed</div>
+                      <div className="mt-1 text-[11px] font-medium text-slate-500">{teacher.creditsConsumed} {t('admin.teachers.consumed')}</div>
                     </td>
                     <td className="px-8 py-6 font-medium text-slate-600 dark:text-slate-400">
                       {teacher.totalTokens.toLocaleString()}
                     </td>
                     <td className="px-8 py-6">
                       <div className="font-medium text-slate-800 dark:text-slate-200">
-                        {teacher.lastActiveAt ? formatRelativeDate(teacher.lastActiveAt) : "Hali yo'q"}
+                        {teacher.lastActiveAt ? formatRelativeDate(teacher.lastActiveAt) : t('admin.teachers.noActivity')}
                       </div>
-                      <div className="mt-1 text-[11px] font-medium text-slate-500">Joined: {formatDate(teacher.createdAt)}</div>
+                      <div className="mt-1 text-[11px] font-medium text-slate-500">{t('admin.teachers.joined')}: {formatDate(teacher.createdAt)}</div>
                     </td>
                   </tr>
                 ))}

@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { PageHeader } from '@/components/shared/page-header'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
+import { useI18n } from '@/hooks/use-i18n'
 import { apiRequest } from '@/lib/api'
 import { formatRelativeDate, getFeatureLabel } from '@/lib/format'
 
@@ -20,6 +21,7 @@ interface ActivityResponse {
 }
 
 export function AdminActivityPage() {
+  const { t } = useI18n()
   const query = useQuery({
     queryKey: ['admin-activity'],
     queryFn: () => apiRequest<ActivityResponse>('/admin/activity'),
@@ -28,8 +30,8 @@ export function AdminActivityPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        eyebrow="Faollik jurnali"
-        title="So'nggi amallar"
+        eyebrow={t('admin.activity.eyebrow')}
+        title={t('admin.activity.title')}
       />
 
       <div className="grid gap-4">

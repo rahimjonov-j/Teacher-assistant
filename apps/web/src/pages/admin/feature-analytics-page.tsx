@@ -3,9 +3,11 @@ import { FEATURE_DEFINITIONS, type AdminOverviewPayload } from '@teacher-assista
 import { PageHeader } from '@/components/shared/page-header'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
+import { useI18n } from '@/hooks/use-i18n'
 import { apiRequest } from '@/lib/api'
 
 export function AdminFeatureAnalyticsPage() {
+  const { t } = useI18n()
   const query = useQuery({
     queryKey: ['admin-overview', 'features'],
     queryFn: () => apiRequest<AdminOverviewPayload>('/admin/overview'),
@@ -16,8 +18,8 @@ export function AdminFeatureAnalyticsPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        eyebrow="Funksiya analitikasi"
-        title="Funksiya kesimi"
+        eyebrow={t('admin.features.eyebrow')}
+        title={t('admin.features.title')}
       />
 
       <div className="grid gap-4 lg:grid-cols-2">

@@ -15,6 +15,7 @@ import { Activity, Bot, Cpu, Zap } from 'lucide-react'
 import { PageHeader } from '@/components/shared/page-header'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { useI18n } from '@/hooks/use-i18n'
 import { apiRequest } from '@/lib/api'
 import { getFeatureLabel } from '@/lib/format'
 import { cn } from '@/lib/utils'
@@ -81,6 +82,7 @@ function UsageChartTooltip({
 }
 
 export function AdminUsageAnalyticsPage() {
+  const { t } = useI18n()
   const query = useQuery({
     queryKey: ['admin-usage'],
     queryFn: () => apiRequest<{ rows: UsageRow[] }>('/admin/usage'),
@@ -160,8 +162,8 @@ export function AdminUsageAnalyticsPage() {
   return (
     <div className="space-y-10 animate-in">
       <PageHeader
-        eyebrow="Detailed Logs"
-        title="Usage Analytics"
+        eyebrow={t('admin.usage.eyebrow')}
+        title={t('admin.usage.title')}
       />
 
       <div className="grid grid-cols-3 gap-2 md:grid-cols-2 md:gap-4 xl:grid-cols-4">

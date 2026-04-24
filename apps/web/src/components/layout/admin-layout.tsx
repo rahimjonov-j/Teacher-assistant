@@ -4,6 +4,7 @@ import { ThemeToggle } from '@/components/shared/theme-toggle'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { useAuth } from '@/hooks/use-auth'
+import { useI18n } from '@/hooks/use-i18n'
 import { cn } from '@/lib/utils'
 
 const navItems = [
@@ -17,6 +18,7 @@ const navItems = [
 
 export function AdminLayout() {
   const { logout } = useAuth()
+  const { t } = useI18n()
 
   return (
     <div className="app-shell selection:bg-sky-500/20 selection:text-sky-400">
@@ -27,14 +29,14 @@ export function AdminLayout() {
               <div className="flex flex-wrap items-center gap-3">
                 <Badge variant="gradient" className="h-6 border-none bg-sky-500 px-3 text-[10px] text-white max-sm:bg-secondary max-sm:text-foreground">ADMIN</Badge>
                 <div className="h-4 w-[1px] bg-slate-200 dark:bg-white/10 max-sm:hidden" />
-                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 max-sm:hidden">Control Panel</span>
+                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 max-sm:hidden">{t('admin.layout.controlPanel')}</span>
               </div>
               <div>
                 <Link to="/admin/dashboard" className="flex items-center gap-3 text-2xl font-black tracking-tight text-slate-900 dark:text-white sm:text-3xl">
                   <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-sky-500/20 bg-sky-500/10 max-sm:hidden">
                     <BarChart3 className="h-6 w-6 text-sky-400" />
                   </div>
-                  System Analytics
+                  {t('admin.layout.systemAnalytics')}
                 </Link>
               </div>
             </div>
@@ -43,7 +45,7 @@ export function AdminLayout() {
               <Button asChild variant="outline" className="h-11 rounded-2xl border-border/70 bg-white/80 text-slate-700 hover:bg-white dark:border-white/10 dark:bg-white/5 dark:text-slate-200 dark:hover:bg-white/10 max-sm:border-0 max-sm:bg-secondary max-sm:shadow-none max-sm:backdrop-blur-none">
                 <Link to="/app/dashboard">
                   <ArrowRightLeft className="h-4 w-4 text-sky-400" />
-                  Teacher App
+                  {t('admin.layout.teacherApp')}
                 </Link>
               </Button>
               <div className="mx-1 h-8 w-[1px] bg-slate-200 dark:bg-white/5 max-sm:hidden" />
@@ -83,7 +85,19 @@ export function AdminLayout() {
               }
             >
               <item.icon className="h-5 w-5 transition-transform duration-200 group-active:scale-90" />
-              <span className="sr-only">{item.label}</span>
+              <span className="sr-only">
+                {item.to === '/admin/dashboard'
+                  ? t('admin.layout.overview')
+                  : item.to === '/admin/teachers'
+                    ? t('admin.layout.users')
+                    : item.to === '/admin/analytics/usage'
+                      ? t('admin.layout.usage')
+                      : item.to === '/admin/analytics/features'
+                        ? t('admin.layout.features')
+                        : item.to === '/admin/subscriptions'
+                          ? t('admin.layout.subscriptions')
+                          : t('admin.layout.activity')}
+              </span>
             </NavLink>
           ))}
         </div>

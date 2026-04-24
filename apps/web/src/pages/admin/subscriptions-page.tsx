@@ -15,6 +15,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
+import { useI18n } from '@/hooks/use-i18n'
 import { apiRequest } from '@/lib/api'
 import { sortPlans, type PlanConfig, type PlanKey } from '@/lib/plans'
 import { cn } from '@/lib/utils'
@@ -115,6 +116,7 @@ function formatUzs(value: number) {
 }
 
 export function AdminSubscriptionsPage() {
+  const { t } = useI18n()
   const queryClient = useQueryClient()
   const [editingPlan, setEditingPlan] = useState<PlanFormState | null>(null)
 
@@ -243,8 +245,8 @@ export function AdminSubscriptionsPage() {
   return (
     <div className="space-y-8 animate-in">
       <PageHeader
-        eyebrow="Obunalarni kuzatish"
-        title="Obunalar"
+        eyebrow={t('admin.subscriptions.eyebrow')}
+        title={t('admin.subscriptions.title')}
       />
 
       <Card className="overflow-hidden border-white/70 bg-white/85 dark:border-white/10 dark:bg-[#0d1422]/90">
