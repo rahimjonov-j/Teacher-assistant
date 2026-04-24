@@ -24,7 +24,7 @@ const navItems = [
   { to: '/app/settings', label: 'Settings', icon: Settings },
 ] as const
 
-const pageMeta = [
+const pageMeta: Array<{ pattern: string; title: string; actionTo?: string }> = [
   { pattern: '/app/dashboard', title: 'Dashboard', actionTo: '/app/generator' },
   { pattern: '/app/messenger', title: 'Messenger', actionTo: '/app/generator' },
   { pattern: '/app/calendar', title: 'Calendar', actionTo: '/app/generator' },
@@ -86,11 +86,6 @@ export function TeacherLayout() {
                         <span>{item.label}</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        {'badge' in item && item.badge ? (
-                          <span className="min-w-6 rounded-full bg-foreground px-2 py-0.5 text-center text-[10px] font-bold text-background">
-                            {item.badge}
-                          </span>
-                        ) : null}
                         <ChevronRight className="h-4 w-4 text-muted-foreground" />
                       </div>
                     </>
