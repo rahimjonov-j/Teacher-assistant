@@ -28,11 +28,11 @@ export function CalendarPage() {
     queryFn: () => apiRequest<{ items: GeneratedContentRecord[] }>('/teacher/history?search=&feature='),
   })
 
-  const items = query.data?.items ?? []
+  const items = query.data?.items
 
   const itemsByDate = useMemo(() => {
     const map = new Map<string, GeneratedContentRecord[]>()
-    items.forEach((item) => {
+    ;(items ?? []).forEach((item) => {
       const key = item.createdAt.slice(0, 10)
       const existing = map.get(key) ?? []
       existing.push(item)

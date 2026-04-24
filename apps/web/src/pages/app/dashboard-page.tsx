@@ -41,8 +41,8 @@ export function DashboardPage() {
   }
 
   return (
-    <div className="space-y-5 animate-in">
-      <Card>
+    <div className="grid gap-5 animate-in lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
+      <Card className="lg:col-span-2">
         <CardContent className="space-y-4 p-5">
           <div className="flex items-start justify-between gap-4">
             <div>
@@ -102,7 +102,7 @@ export function DashboardPage() {
               <Link to="/app/generator">{t('common.open')}</Link>
             </Button>
           </div>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
             {data.quickActions.map((feature) => {
               const Icon = featureIcons[feature.key]
 
@@ -124,7 +124,7 @@ export function DashboardPage() {
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="lg:col-start-2 lg:row-span-2 lg:row-start-2">
         <CardContent className="p-5">
           <div className="mb-4 flex items-center justify-between">
             <div>

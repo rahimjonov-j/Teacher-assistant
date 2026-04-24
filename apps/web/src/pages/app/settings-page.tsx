@@ -9,7 +9,6 @@ import {
   HelpCircle,
   Info,
   Lock,
-  LogOut,
   Moon,
   Save,
   Shield,
@@ -52,7 +51,7 @@ const settingsSections: Array<{
 ]
 
 export function SettingsPage() {
-  const { profile, refreshProfile, logout } = useAuth()
+  const { profile, refreshProfile } = useAuth()
   const { language, setLanguage, t } = useI18n()
   const { resolvedTheme, setTheme } = useTheme()
   const [activeSection, setActiveSection] = useState<SectionKey | null>('profile')
@@ -110,9 +109,9 @@ export function SettingsPage() {
     ? `https://t.me/${env.telegramBotUsername}?start=link_${linkData.linkCode}`
     : null
 
-  const currentLanguageLabel = language === 'uz' ? t('common.uzbek') : t('common.english')
   const currentTheme = resolvedTheme === 'dark' ? 'dark' : 'light'
   const currentThemeLabel = currentTheme === 'dark' ? t('common.dark') : t('common.light')
+  const isDarkTheme = currentTheme === 'dark'
 
   const toggleSection = (section: SectionKey) => {
     setActiveSection((current) => (current === section ? null : section))
@@ -210,89 +209,8 @@ export function SettingsPage() {
       )
     }
 
-    if (sectionKey === 'language') {
-      return (
-        <div className="space-y-4 border-t border-border/70 px-4 pb-4 pt-4">
-          <div className="rounded-2xl border border-border bg-secondary/40 px-4 py-3 text-sm text-muted-foreground">
-            {t('settings.languageHint')}
-          </div>
-          <div className="grid gap-3 sm:grid-cols-2">
-            <button
-              type="button"
-              onClick={() => setLanguage('uz')}
-              className={cn(
-                'rounded-2xl border px-4 py-4 text-left transition-colors',
-                language === 'uz' ? 'border-foreground bg-foreground text-background' : 'border-border bg-background hover:bg-secondary',
-              )}
-            >
-              <div className="text-sm font-black">{t('common.uzbek')}</div>
-              <div className={cn('mt-1 text-xs', language === 'uz' ? 'text-background/80' : 'text-muted-foreground')}>
-                Uzbek interface
-              </div>
-            </button>
-            <button
-              type="button"
-              onClick={() => setLanguage('en')}
-              className={cn(
-                'rounded-2xl border px-4 py-4 text-left transition-colors',
-                language === 'en' ? 'border-foreground bg-foreground text-background' : 'border-border bg-background hover:bg-secondary',
-              )}
-            >
-              <div className="text-sm font-black">{t('common.english')}</div>
-              <div className={cn('mt-1 text-xs', language === 'en' ? 'text-background/80' : 'text-muted-foreground')}>
-                English interface
-              </div>
-            </button>
-          </div>
-          <div className="rounded-2xl border border-border px-4 py-3 text-sm text-muted-foreground">
-            {t('settings.timezone')}: <span className="font-semibold text-foreground">{profile?.timezone ?? 'Asia/Tashkent'}</span>
-          </div>
-        </div>
-      )
-    }
-
-    if (sectionKey === 'theme') {
-      return (
-        <div className="space-y-4 border-t border-border/70 px-4 pb-4 pt-4">
-          <div className="rounded-2xl border border-border bg-secondary/30 px-4 py-3 text-sm text-muted-foreground">
-            {t('settings.themeHint')}
-          </div>
-          <div className="grid gap-3 sm:grid-cols-2">
-            <button
-              type="button"
-              onClick={() => setTheme('light')}
-              className={cn(
-                'rounded-2xl border px-4 py-4 text-left transition-colors',
-                currentTheme === 'light' ? 'border-foreground bg-foreground text-background' : 'border-border bg-background hover:bg-secondary',
-              )}
-            >
-              <div className="flex items-center gap-2 text-sm font-black">
-                <SunMedium className="h-4 w-4" />
-                {t('common.light')}
-              </div>
-              <div className={cn('mt-1 text-xs', currentTheme === 'light' ? 'text-background/80' : 'text-muted-foreground')}>
-                Light interface
-              </div>
-            </button>
-            <button
-              type="button"
-              onClick={() => setTheme('dark')}
-              className={cn(
-                'rounded-2xl border px-4 py-4 text-left transition-colors',
-                currentTheme === 'dark' ? 'border-foreground bg-foreground text-background' : 'border-border bg-background hover:bg-secondary',
-              )}
-            >
-              <div className="flex items-center gap-2 text-sm font-black">
-                <Moon className="h-4 w-4" />
-                {t('common.dark')}
-              </div>
-              <div className={cn('mt-1 text-xs', currentTheme === 'dark' ? 'text-background/80' : 'text-muted-foreground')}>
-                Dark interface
-              </div>
-            </button>
-          </div>
-        </div>
-      )
+    if (sectionKey === 'language' || sectionKey === 'theme') {
+      return null
     }
 
     if (sectionKey === 'help') {
@@ -323,7 +241,8 @@ export function SettingsPage() {
         <CardContent className="p-3">
           <div className="space-y-2">
             {settingsSections.map((section) => {
-              const isActive = activeSection === section.key
+              const hasInlineControl = section.key === 'language' || section.key === 'theme'
+              const isActive = !hasInlineControl && activeSection === section.key
 
               return (
                 <div
@@ -335,7 +254,11 @@ export function SettingsPage() {
                 >
                   <button
                     type="button"
-                    onClick={() => toggleSection(section.key)}
+                    onClick={() => {
+                      if (!hasInlineControl) {
+                        toggleSection(section.key)
+                      }
+                    }}
                     className="flex w-full items-center justify-between gap-3 px-3 py-3 text-left"
                   >
                     <div className="flex min-w-0 items-center gap-3">
@@ -363,21 +286,40 @@ export function SettingsPage() {
                         </div>
                       ) : null}
 
-                      <ChevronRight className={cn('h-4 w-4 text-muted-foreground transition-transform', isActive && 'rotate-90')} />
+                      {section.key === 'theme' ? (
+                        <button
+                          type="button"
+                          onClick={(event) => {
+                            event.stopPropagation()
+                            setTheme(isDarkTheme ? 'light' : 'dark')
+                          }}
+                          className="flex items-center gap-2 rounded-full border border-border bg-background px-2 py-1.5"
+                          aria-label={t('settings.theme')}
+                        >
+                          <span
+                            className={cn(
+                              'relative inline-flex h-6 w-11 items-center rounded-full transition-colors',
+                              isDarkTheme ? 'bg-foreground' : 'bg-secondary',
+                            )}
+                          >
+                            <span
+                              className={cn(
+                                'absolute left-1 flex h-4 w-4 items-center justify-center rounded-full bg-background text-foreground shadow-sm transition-transform',
+                                isDarkTheme && 'translate-x-5',
+                              )}
+                            >
+                              {isDarkTheme ? <Moon className="h-3 w-3" /> : <SunMedium className="h-3 w-3" />}
+                            </span>
+                          </span>
+                          <span className="hidden text-xs font-semibold text-muted-foreground sm:inline">{currentThemeLabel}</span>
+                        </button>
+                      ) : null}
+
+                      {!hasInlineControl ? (
+                        <ChevronRight className={cn('h-4 w-4 text-muted-foreground transition-transform', isActive && 'rotate-90')} />
+                      ) : null}
                     </div>
                   </button>
-
-                  {section.key === 'language' ? (
-                    <div className="px-4 pb-3 text-xs font-semibold text-muted-foreground">
-                      {currentLanguageLabel}
-                    </div>
-                  ) : null}
-
-                  {section.key === 'theme' ? (
-                    <div className="px-4 pb-3 text-xs font-semibold text-muted-foreground">
-                      {currentThemeLabel}
-                    </div>
-                  ) : null}
 
                   {isActive ? renderSectionContent(section.key) : null}
                 </div>
@@ -387,10 +329,6 @@ export function SettingsPage() {
         </CardContent>
       </Card>
 
-      <Button variant="outline" className="h-12 w-full" onClick={() => logout()}>
-        <LogOut className="h-4 w-4" />
-        {t('common.logout')}
-      </Button>
     </div>
   )
 }

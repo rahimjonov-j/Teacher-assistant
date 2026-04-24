@@ -1,7 +1,19 @@
-import { Activity, ArrowRightLeft, BarChart3, CreditCard, Layers3, LineChart, LogOut, Users } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import {
+  Activity,
+  ArrowRightLeft,
+  BarChart3,
+  ChevronRight,
+  CreditCard,
+  Layers3,
+  LineChart,
+  LogOut,
+  Menu,
+  X,
+  Users,
+} from 'lucide-react'
 import { Link, NavLink, Outlet } from 'react-router-dom'
 import { ThemeToggle } from '@/components/shared/theme-toggle'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { useAuth } from '@/hooks/use-auth'
 import { useI18n } from '@/hooks/use-i18n'
@@ -16,140 +28,153 @@ const navItems = [
   { to: '/admin/activity', labelKey: 'admin.layout.activity', icon: Activity },
 ]
 
-export function AdminLayout() {
-  const { logout } = useAuth()
+function lockBodyScroll(enabled: boolean) {
+  if (!enabled) {
+    return undefined
+  }
+
+  const scrollY = window.scrollY
+  const originalBodyStyle = {
+    position: document.body.style.position,
+    top: document.body.style.top,
+    width: document.body.style.width,
+    overflow: document.body.style.overflow,
+  }
+
+  document.body.style.position = 'fixed'
+  document.body.style.top = `-${scrollY}px`
+  document.body.style.width = '100%'
+  document.body.style.overflow = 'hidden'
+
+  return () => {
+    document.body.style.position = originalBodyStyle.position
+    document.body.style.top = originalBodyStyle.top
+    document.body.style.width = originalBodyStyle.width
+    document.body.style.overflow = originalBodyStyle.overflow
+    window.scrollTo(0, scrollY)
+  }
+}
+
+function AdminSidebarContent({
+  onNavigate,
+  onLogout,
+}: {
+  onNavigate?: () => void
+  onLogout: () => Promise<void>
+}) {
   const { t } = useI18n()
 
   return (
-    <div className="min-h-screen bg-background selection:bg-sky-500/20 selection:text-sky-400">
-      <div className="mx-auto grid min-h-screen w-full max-w-[1440px] gap-6 px-4 py-4 lg:grid-cols-[280px_minmax(0,1fr)] lg:px-6 lg:py-6">
-        <aside className="sticky top-6 hidden h-[calc(100vh-3rem)] flex-col overflow-hidden rounded-[32px] border border-border/70 bg-white/92 p-4 shadow-xl lg:flex">
-          <div className="border-b border-border/70 px-3 pb-4 pt-2">
-            <div className="flex items-center gap-3">
-              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-foreground text-background">
-                <BarChart3 className="h-5 w-5" />
-              </div>
-              <div>
-                <div className="text-sm font-black tracking-tight">{t('admin.layout.controlPanel')}</div>
-                <div className="text-xs text-muted-foreground">{t('admin.layout.systemAnalytics')}</div>
-              </div>
-            </div>
+    <div className="flex h-full min-h-0 flex-col bg-card">
+      <div className="border-b border-border px-5 py-5">
+        <Link to="/admin/dashboard" onClick={onNavigate} className="flex items-center gap-3">
+          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-foreground text-background">
+            <BarChart3 className="h-5 w-5" />
           </div>
-          <nav className="mt-4 flex flex-1 flex-col gap-2">
-            {navItems.map((item) => (
-              <NavLink
-                key={item.to}
-                to={item.to}
-                className={({ isActive }) =>
-                  cn(
-                    'flex items-center gap-3 rounded-2xl px-3 py-3 text-sm font-semibold transition-colors',
-                    isActive ? 'bg-foreground text-background' : 'text-muted-foreground hover:bg-secondary hover:text-foreground',
-                  )
-                }
-              >
-                {({ isActive }) => (
-                  <>
-                    <div className={cn('flex h-10 w-10 items-center justify-center rounded-2xl', isActive ? 'bg-background/10' : 'bg-secondary')}>
-                      <item.icon className="h-5 w-5" />
-                    </div>
-                    <span>{t(item.labelKey)}</span>
-                  </>
-                )}
-              </NavLink>
-            ))}
-          </nav>
-
-          <div className="space-y-3 border-t border-border/70 px-2 pt-4">
-            <Button asChild variant="outline" className="w-full justify-start">
-              <Link to="/app/dashboard">
-                <ArrowRightLeft className="h-4 w-4" />
-                {t('admin.layout.teacherApp')}
-              </Link>
-            </Button>
-
-            <div className="flex items-center gap-3">
-              <ThemeToggle />
-              <Button
-                variant="outline"
-                className="flex-1 justify-start"
-                onClick={async () => {
-                  await logout()
-                }}
-              >
-                <LogOut className="h-4 w-4" />
-                {t('common.logout')}
-              </Button>
-            </div>
+          <div className="min-w-0">
+            <div className="truncate text-sm font-black tracking-tight">{t('admin.layout.controlPanel')}</div>
+            <div className="truncate text-xs text-muted-foreground">{t('admin.layout.systemAnalytics')}</div>
           </div>
-        </aside>
+        </Link>
+      </div>
 
-        <div className="min-w-0">
-          <header className="mb-6 overflow-hidden rounded-[32px] border border-border/70 bg-white/92 shadow-xl animate-in">
-            <div className="border-b border-border/70 px-5 py-6 sm:px-6">
-              <div className="flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between">
-                <div className="space-y-3">
-                  <div className="flex flex-wrap items-center gap-3">
-                    <Badge variant="gradient" className="h-6 border-none bg-foreground px-3 text-[10px] text-background">
-                      ADMIN
-                    </Badge>
-                    <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
-                      {t('admin.layout.controlPanel')}
-                    </span>
+      <nav className="min-h-0 flex-1 space-y-1 overflow-y-auto overscroll-contain px-3 py-4">
+        {navItems.map((item) => (
+          <NavLink
+            key={item.to}
+            to={item.to}
+            onClick={onNavigate}
+            className={({ isActive }) =>
+              cn(
+                'flex items-center justify-between gap-3 rounded-xl px-3 py-3 text-sm font-semibold transition-colors',
+                isActive ? 'bg-foreground text-background' : 'text-muted-foreground hover:bg-secondary hover:text-foreground',
+              )
+            }
+          >
+            {({ isActive }) => (
+              <>
+                <div className="flex min-w-0 items-center gap-3">
+                  <div className={cn('flex h-10 w-10 shrink-0 items-center justify-center rounded-xl', isActive ? 'bg-background/10' : 'bg-secondary')}>
+                    <item.icon className="h-5 w-5" />
                   </div>
-                  <Link to="/admin/dashboard" className="flex items-center gap-3 text-2xl font-black tracking-tight sm:text-3xl">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-border bg-secondary lg:hidden">
-                      <BarChart3 className="h-5 w-5" />
-                    </div>
-                    {t('admin.layout.systemAnalytics')}
-                  </Link>
+                  <span className="truncate">{t(item.labelKey)}</span>
                 </div>
+                <ChevronRight className="h-4 w-4 shrink-0 opacity-55" />
+              </>
+            )}
+          </NavLink>
+        ))}
+      </nav>
 
-                <div className="flex flex-wrap items-center gap-3">
-                  <Button asChild variant="outline" className="h-11 rounded-2xl">
-                    <Link to="/app/dashboard">
-                      <ArrowRightLeft className="h-4 w-4" />
-                      {t('admin.layout.teacherApp')}
-                    </Link>
-                  </Button>
-                  <ThemeToggle />
-                  <Button
-                    variant="outline"
-                    className="h-11 rounded-2xl"
-                    onClick={async () => {
-                      await logout()
-                    }}
-                  >
-                    <LogOut className="h-4 w-4" />
-                    {t('common.logout')}
-                  </Button>
-                </div>
-              </div>
-            </div>
+      <div className="space-y-3 border-t border-border p-4">
+        <Button asChild variant="outline" className="h-11 w-full justify-start">
+          <Link to="/app/dashboard" onClick={onNavigate}>
+            <ArrowRightLeft className="h-4 w-4" />
+            {t('admin.layout.teacherApp')}
+          </Link>
+        </Button>
 
-            <div className="flex flex-wrap gap-2 px-4 py-4 lg:hidden">
-              {navItems.map((item) => (
-                <NavLink
-                  key={item.to}
-                  to={item.to}
-                  className={({ isActive }) =>
-                    cn(
-                      'inline-flex items-center gap-2 rounded-2xl px-4 py-2.5 text-sm font-semibold transition-colors',
-                      isActive ? 'bg-foreground text-background' : 'bg-secondary text-foreground hover:bg-accent',
-                    )
-                  }
-                >
-                  <item.icon className="h-4 w-4" />
-                  <span>{t(item.labelKey)}</span>
-                </NavLink>
-              ))}
-            </div>
-          </header>
-
-          <main className="animate-in [animation-delay:150ms]">
-            <Outlet />
-          </main>
+        <div className="flex items-center gap-3">
+          <ThemeToggle />
+          <Button variant="outline" className="h-11 flex-1 justify-start" onClick={onLogout}>
+            <LogOut className="h-4 w-4" />
+            {t('common.logout')}
+          </Button>
         </div>
       </div>
+    </div>
+  )
+}
+
+export function AdminLayout() {
+  const { logout } = useAuth()
+  const [drawerOpen, setDrawerOpen] = useState(false)
+
+  useEffect(() => lockBodyScroll(drawerOpen), [drawerOpen])
+
+  const handleLogout = async () => {
+    setDrawerOpen(false)
+    await logout()
+  }
+
+  return (
+    <div className="min-h-screen bg-background selection:bg-sky-500/20 selection:text-sky-500">
+      <Button
+        type="button"
+        variant="outline"
+        size="icon"
+        className="fixed left-4 top-4 z-40 shadow-lg lg:hidden"
+        onClick={() => setDrawerOpen(true)}
+        aria-label="Admin menu"
+      >
+        <Menu className="h-5 w-5" />
+      </Button>
+
+      {drawerOpen ? (
+        <div className="fixed inset-0 z-50 overflow-hidden bg-black/25 backdrop-blur-[1px] lg:hidden" onClick={() => setDrawerOpen(false)}>
+          <aside
+            className="h-[100dvh] w-[86%] max-w-[312px] border-r border-border bg-card shadow-2xl"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="absolute left-[calc(min(86vw,312px)-3.75rem)] top-4">
+              <Button variant="ghost" size="icon" onClick={() => setDrawerOpen(false)} aria-label="Close admin menu">
+                <X className="h-5 w-5" />
+              </Button>
+            </div>
+            <AdminSidebarContent onNavigate={() => setDrawerOpen(false)} onLogout={handleLogout} />
+          </aside>
+        </div>
+      ) : null}
+
+      <aside className="fixed inset-y-0 left-0 z-30 hidden w-[292px] border-r border-border bg-card lg:block">
+        <AdminSidebarContent onLogout={handleLogout} />
+      </aside>
+
+      <main className="min-h-screen px-4 pb-8 pt-20 lg:pl-[320px] lg:pr-8 lg:pt-8">
+        <div className="mx-auto w-full max-w-[1160px]">
+          <Outlet />
+        </div>
+      </main>
     </div>
   )
 }

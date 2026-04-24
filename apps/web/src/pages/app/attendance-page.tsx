@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import type { TeacherDashboardPayload } from '@teacher-assistant/shared'
 import { CheckCircle2, Users } from 'lucide-react'
@@ -19,11 +19,10 @@ export function AttendancePage() {
   const [selectedDate, setSelectedDate] = useState(() => new Date().toISOString().slice(0, 10))
 
   const profile = dashboardQuery.data?.profile
-  const groups = useMemo(
-    () => (profile?.gradeFocus ? [profile.gradeFocus] : [t('attendance.noGroup')]),
-    [profile?.gradeFocus],
-  )
-  const [selectedGroup, setSelectedGroup] = useState(groups[0] ?? t('attendance.noGroup'))
+  const noGroupLabel = t('attendance.noGroup')
+  const groups = profile?.gradeFocus ? [profile.gradeFocus] : [noGroupLabel]
+  const [selectedGroup, setSelectedGroup] = useState<string | null>(null)
+  const activeGroup = selectedGroup ?? groups[0]
 
   if (!dashboardQuery.data) {
     return <CardLoader />
@@ -34,7 +33,7 @@ export function AttendancePage() {
       <Card>
         <CardContent className="space-y-4 p-5">
           <div className="text-lg font-black tracking-tight">{t('attendance.setup')}</div>
-          <Select value={selectedGroup} onChange={(event) => setSelectedGroup(event.target.value)}>
+          <Select value={activeGroup} onChange={(event) => setSelectedGroup(event.target.value)}>
             {groups.map((group) => (
               <option key={group} value={group}>
                 {group}
@@ -58,7 +57,7 @@ export function AttendancePage() {
           </div>
 
           <div className="rounded-2xl border border-dashed border-border p-4 text-sm leading-6 text-muted-foreground">
-            {t('attendance.connectHint')} <span className="font-semibold text-foreground">{selectedGroup}</span> {selectedDate}.
+            {t('attendance.connectHint')} <span className="font-semibold text-foreground">{activeGroup}</span> {selectedDate}.
           </div>
         </CardContent>
       </Card>

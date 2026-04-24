@@ -1,10 +1,11 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import {
   CalendarDays,
   ChevronRight,
   ClipboardCheck,
   Database,
   LayoutDashboard,
+  LogOut,
   Menu,
   MessageSquare,
   Settings,
@@ -12,6 +13,7 @@ import {
   X,
 } from 'lucide-react'
 import { Link, NavLink, Outlet, matchPath, useLocation } from 'react-router-dom'
+import { useAuth } from '@/hooks/use-auth'
 import { useI18n } from '@/hooks/use-i18n'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
@@ -41,6 +43,7 @@ const pageMeta: Array<{ pattern: string; title: string; actionTo?: string }> = [
 export function TeacherLayout() {
   const location = useLocation()
   const [drawerOpen, setDrawerOpen] = useState(false)
+  const { logout } = useAuth()
   const { t } = useI18n()
 
   const currentPage = useMemo(
@@ -48,13 +51,40 @@ export function TeacherLayout() {
     [location.pathname],
   )
 
+  useEffect(() => {
+    if (!drawerOpen) {
+      return
+    }
+
+    const scrollY = window.scrollY
+    const originalBodyStyle = {
+      position: document.body.style.position,
+      top: document.body.style.top,
+      width: document.body.style.width,
+      overflow: document.body.style.overflow,
+    }
+
+    document.body.style.position = 'fixed'
+    document.body.style.top = `-${scrollY}px`
+    document.body.style.width = '100%'
+    document.body.style.overflow = 'hidden'
+
+    return () => {
+      document.body.style.position = originalBodyStyle.position
+      document.body.style.top = originalBodyStyle.top
+      document.body.style.width = originalBodyStyle.width
+      document.body.style.overflow = originalBodyStyle.overflow
+      window.scrollTo(0, scrollY)
+    }
+  }, [drawerOpen])
+
   return (
     <div className="relative min-h-screen bg-background">
       {drawerOpen ? (
-        <div data-no-swipe-back className="fixed inset-0 z-50 bg-black/20 backdrop-blur-[1px]" onClick={() => setDrawerOpen(false)}>
+        <div data-no-swipe-back className="fixed inset-0 z-50 overflow-hidden bg-black/20 backdrop-blur-[1px]" onClick={() => setDrawerOpen(false)}>
           <aside
             data-no-swipe-back
-            className="flex h-full w-[84%] max-w-[320px] flex-col rounded-r-[32px] border-r border-border bg-card px-4 pb-6 pt-5"
+            className="flex h-[100dvh] w-[84%] max-w-[320px] flex-col rounded-r-2xl border-r border-border bg-card px-4 pb-6 pt-5 shadow-2xl"
             onClick={(event) => event.stopPropagation()}
           >
             <div className="flex items-center justify-between px-2">
@@ -67,7 +97,7 @@ export function TeacherLayout() {
               </Button>
             </div>
 
-            <nav className="mt-8 flex flex-1 flex-col gap-2">
+            <nav className="mt-8 flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto overscroll-contain pr-1">
               {navItems.map((item) => (
                 <NavLink
                   key={item.to}
@@ -97,10 +127,31 @@ export function TeacherLayout() {
               ))}
             </nav>
 
-            <Link to="/app/billing" onClick={() => setDrawerOpen(false)} className="rounded-2xl border border-border px-4 py-4">
-              <div className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">{t('teacher.menu.plans')}</div>
-              <div className="mt-1 text-sm font-bold text-foreground">{t('teacher.menu.plansHint')}</div>
-            </Link>
+            <div className="mt-4 space-y-3 border-t border-border pt-4">
+              <Link
+                to="/app/billing"
+                onClick={() => setDrawerOpen(false)}
+                className="flex items-center justify-between gap-3 rounded-xl border border-border px-4 py-4 transition-colors hover:bg-secondary"
+              >
+                <div>
+                  <div className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">{t('teacher.menu.plans')}</div>
+                  <div className="mt-1 text-sm font-bold text-foreground">{t('teacher.menu.plansHint')}</div>
+                </div>
+                <ChevronRight className="h-5 w-5 shrink-0 text-muted-foreground" />
+              </Link>
+
+              <Button
+                variant="outline"
+                className="h-12 w-full justify-start"
+                onClick={async () => {
+                  setDrawerOpen(false)
+                  await logout()
+                }}
+              >
+                <LogOut className="h-4 w-4" />
+                {t('common.logout')}
+              </Button>
+            </div>
           </aside>
         </div>
       ) : null}

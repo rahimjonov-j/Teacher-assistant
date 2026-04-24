@@ -1,18 +1,6 @@
-import { useMemo } from 'react'
+import { lazy, Suspense, useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { eachDayOfInterval, format, subDays } from 'date-fns'
-import {
-  Area,
-  AreaChart,
-  CartesianGrid,
-  Cell,
-  Pie,
-  PieChart,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from 'recharts'
 import { Link } from 'react-router-dom'
 import type { AdminOverviewPayload } from '@teacher-assistant/shared'
 import { Activity, Clock3, Sparkles, TrendingUp, UserCircle2, Zap } from 'lucide-react'
@@ -26,6 +14,13 @@ import { apiRequest } from '@/lib/api'
 import { formatRelativeDate, getFeatureLabel } from '@/lib/format'
 import { cn } from '@/lib/utils'
 
+const AdminDashboardTrendChart = lazy(async () => ({
+  default: (await import('@/components/admin/admin-dashboard-charts')).AdminDashboardTrendChart,
+}))
+const AdminDashboardFeatureChart = lazy(async () => ({
+  default: (await import('@/components/admin/admin-dashboard-charts')).AdminDashboardFeatureChart,
+}))
+
 type TrendPoint = AdminOverviewPayload['usageTrend'][number] & {
   label: string
   longLabel: string
@@ -35,79 +30,6 @@ type PiePoint = AdminOverviewPayload['featureUsage'][number] & {
   fill: string
   label: string
   share: number
-}
-
-type TooltipEntry<T> = {
-  payload: T
-  value?: number | string
-}
-
-function AdminTrendTooltip({
-  active,
-  payload,
-}: {
-  active?: boolean
-  payload?: Array<TooltipEntry<TrendPoint>>
-}) {
-  if (!active || !payload?.length) {
-    return null
-  }
-
-  const point = payload[0]?.payload
-
-  return (
-      <div className="w-[min(220px,calc(100vw-2.5rem))] rounded-2xl border border-white/10 bg-[#09111d]/95 p-4 shadow-2xl backdrop-blur-xl">
-      <div className="text-xs font-bold uppercase tracking-[0.18em] text-slate-400">{point.longLabel}</div>
-      <div className="mt-3 space-y-2 text-sm">
-        <div className="flex items-center justify-between gap-4">
-          <span className="text-slate-400">Requests</span>
-          <span className="font-black text-white">{point.totalRequests}</span>
-        </div>
-        <div className="flex items-center justify-between gap-4">
-          <span className="text-slate-400">Credits</span>
-          <span className="font-black text-sky-300">{point.creditsConsumed}</span>
-        </div>
-        <div className="flex items-center justify-between gap-4">
-          <span className="text-slate-400">Tokens</span>
-          <span className="font-black text-cyan-300">{point.totalTokens.toLocaleString('en-US')}</span>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-function AdminFeatureTooltip({
-  active,
-  payload,
-}: {
-  active?: boolean
-  payload?: Array<TooltipEntry<PiePoint>>
-}) {
-  if (!active || !payload?.length) {
-    return null
-  }
-
-  const point = payload[0]?.payload
-
-  return (
-      <div className="w-[min(220px,calc(100vw-2.5rem))] rounded-2xl border border-white/10 bg-[#09111d]/95 p-4 shadow-2xl backdrop-blur-xl">
-      <div className="text-xs font-bold uppercase tracking-[0.18em] text-slate-400">{point.label}</div>
-      <div className="mt-3 space-y-2 text-sm">
-        <div className="flex items-center justify-between gap-4">
-          <span className="text-slate-400">Share</span>
-          <span className="font-black text-white">{point.share}%</span>
-        </div>
-        <div className="flex items-center justify-between gap-4">
-          <span className="text-slate-400">Requests</span>
-          <span className="font-black text-sky-300">{point.totalRequests}</span>
-        </div>
-        <div className="flex items-center justify-between gap-4">
-          <span className="text-slate-400">Tokens</span>
-          <span className="font-black text-cyan-300">{point.totalTokens.toLocaleString('en-US')}</span>
-        </div>
-      </div>
-    </div>
-  )
 }
 
 const featurePalette = ['#38bdf8', '#0ea5e9', '#0284c7', '#22d3ee'] as const
@@ -248,42 +170,9 @@ export function AdminDashboardPage() {
             </div>
 
             <div className="h-[280px] w-full sm:h-[360px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={trendData} margin={{ top: 10, right: 8, left: -24, bottom: 0 }}>
-                  <defs>
-                    <linearGradient id="usageGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#38bdf8" stopOpacity={0.35} />
-                      <stop offset="95%" stopColor="#38bdf8" stopOpacity={0} />
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid vertical={false} stroke="rgba(148,163,184,0.14)" />
-                  <XAxis
-                    dataKey="label"
-                    stroke="#64748b"
-                    fontSize={11}
-                    tickLine={false}
-                    axisLine={false}
-                    minTickGap={24}
-                  />
-                  <YAxis
-                    stroke="#64748b"
-                    fontSize={11}
-                    tickLine={false}
-                    axisLine={false}
-                    allowDecimals={false}
-                  />
-                  <Tooltip content={<AdminTrendTooltip />} cursor={{ stroke: 'rgba(56,189,248,0.2)', strokeWidth: 1 }} />
-                  <Area
-                    type="monotone"
-                    dataKey="totalRequests"
-                    stroke="#38bdf8"
-                    strokeWidth={3}
-                    fill="url(#usageGradient)"
-                    dot={{ r: 3, strokeWidth: 0, fill: '#38bdf8' }}
-                    activeDot={{ r: 5, strokeWidth: 0, fill: '#67e8f9' }}
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
+              <Suspense fallback={<div className="h-full rounded-xl bg-secondary/50" />}>
+                <AdminDashboardTrendChart data={trendData} />
+              </Suspense>
             </div>
 
             <div className="mt-6 grid gap-3 sm:grid-cols-2">
@@ -314,32 +203,14 @@ export function AdminDashboardPage() {
               ) : null}
             </div>
 
-            <div className="relative mt-6 h-[270px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={featureData}
-                    dataKey="totalRequests"
-                    nameKey="label"
-                    innerRadius={72}
-                    outerRadius={102}
-                    paddingAngle={6}
-                  >
-                    {featureData.map((item) => (
-                      <Cell key={item.featureKey} fill={item.fill} stroke="none" />
-                    ))}
-                  </Pie>
-                  <Tooltip content={<AdminFeatureTooltip />} />
-                </PieChart>
-              </ResponsiveContainer>
-
-              <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center text-center">
-                <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">{t('admin.dashboard.topShare')}</div>
-                <div className="mt-1 text-3xl font-black text-slate-900 dark:text-white">{topFeature?.share ?? 0}%</div>
-                <div className="mt-1 max-w-[140px] text-xs font-medium text-slate-500 dark:text-slate-400">
-                  {topFeature?.label ?? t('admin.dashboard.noDataYet')}
-                </div>
-              </div>
+            <div className="mt-6 h-[270px]">
+              <Suspense fallback={<div className="h-full rounded-xl bg-secondary/50" />}>
+                <AdminDashboardFeatureChart
+                  data={featureData}
+                  topLabel={topFeature?.label ?? ''}
+                  topShare={topFeature?.share ?? 0}
+                />
+              </Suspense>
             </div>
 
             <div className="mt-8 space-y-3">

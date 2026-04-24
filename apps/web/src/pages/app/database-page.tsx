@@ -1,4 +1,3 @@
-import { useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import type { GeneratedContentRecord, TeacherDashboardPayload } from '@teacher-assistant/shared'
 import {
@@ -27,42 +26,38 @@ export function DatabasePage() {
 
   const profile = dashboardQuery.data?.profile
   const items = historyQuery.data?.items ?? []
-
-  const rows = useMemo(
-    () => [
-      {
-        icon: Users,
-        title: t('database.students'),
-        subtitle: t('database.studentsHint'),
-      },
-      {
-        icon: GraduationCap,
-        title: t('database.teachers'),
-        subtitle: profile?.fullName ? `${t('database.teacherProfileLinked')}: ${profile.fullName}` : t('database.teacherProfileIncomplete'),
-      },
-      {
-        icon: School,
-        title: t('database.groups'),
-        subtitle: profile?.gradeFocus ? `${t('settings.grade')}: ${profile.gradeFocus}` : t('database.groupsHint'),
-      },
-      {
-        icon: FileText,
-        title: t('database.tests'),
-        subtitle: `${items.filter((item) => item.featureKey === 'quiz').length} ${t('database.savedTestItems')}`,
-      },
-      {
-        icon: FolderOpen,
-        title: t('database.homework'),
-        subtitle: `${items.filter((item) => item.featureKey === 'lesson_plan').length} ${t('database.lessonPlanRecords')}`,
-      },
-      {
-        icon: FileText,
-        title: t('database.documents'),
-        subtitle: `${items.filter((item) => Boolean(item.pdfUrl)).length} ${t('database.exportedDocs')}`,
-      },
-    ],
-    [items, profile?.fullName, profile?.gradeFocus, t],
-  )
+  const rows = [
+    {
+      icon: Users,
+      title: t('database.students'),
+      subtitle: t('database.studentsHint'),
+    },
+    {
+      icon: GraduationCap,
+      title: t('database.teachers'),
+      subtitle: profile?.fullName ? `${t('database.teacherProfileLinked')}: ${profile.fullName}` : t('database.teacherProfileIncomplete'),
+    },
+    {
+      icon: School,
+      title: t('database.groups'),
+      subtitle: profile?.gradeFocus ? `${t('settings.grade')}: ${profile.gradeFocus}` : t('database.groupsHint'),
+    },
+    {
+      icon: FileText,
+      title: t('database.tests'),
+      subtitle: `${items.filter((item) => item.featureKey === 'quiz').length} ${t('database.savedTestItems')}`,
+    },
+    {
+      icon: FolderOpen,
+      title: t('database.homework'),
+      subtitle: `${items.filter((item) => item.featureKey === 'lesson_plan').length} ${t('database.lessonPlanRecords')}`,
+    },
+    {
+      icon: FileText,
+      title: t('database.documents'),
+      subtitle: `${items.filter((item) => Boolean(item.pdfUrl)).length} ${t('database.exportedDocs')}`,
+    },
+  ]
 
   if (!dashboardQuery.data || !historyQuery.data) {
     return <CardLoader />

@@ -1,15 +1,13 @@
 import { useCallback, useEffect, useMemo, useState, type PropsWithChildren } from 'react'
-import { DEFAULT_LANGUAGE, getStoredLanguage, setCurrentLanguage, translate, type AppLanguage } from '@/lib/i18n'
+import { getStoredLanguage, setCurrentLanguage, translate, type AppLanguage } from '@/lib/i18n'
 import { I18nContext } from './i18n-context'
 
 export function I18nProvider({ children }: PropsWithChildren) {
-  const [language, setLanguageState] = useState<AppLanguage>(DEFAULT_LANGUAGE)
+  const [language, setLanguageState] = useState<AppLanguage>(() => getStoredLanguage())
 
   useEffect(() => {
-    const stored = getStoredLanguage()
-    setLanguageState(stored)
-    setCurrentLanguage(stored)
-  }, [])
+    setCurrentLanguage(language)
+  }, [language])
 
   const setLanguage = useCallback((nextLanguage: AppLanguage) => {
     setLanguageState(nextLanguage)
