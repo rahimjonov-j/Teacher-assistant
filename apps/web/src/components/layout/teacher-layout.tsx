@@ -12,6 +12,7 @@ import {
   X,
 } from 'lucide-react'
 import { Link, NavLink, Outlet, matchPath, useLocation } from 'react-router-dom'
+import { useI18n } from '@/hooks/use-i18n'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
@@ -40,6 +41,7 @@ const pageMeta: Array<{ pattern: string; title: string; actionTo?: string }> = [
 export function TeacherLayout() {
   const location = useLocation()
   const [drawerOpen, setDrawerOpen] = useState(false)
+  const { t } = useI18n()
 
   const currentPage = useMemo(
     () => pageMeta.find((item) => matchPath({ path: item.pattern, end: true }, location.pathname)) ?? pageMeta[0],
@@ -58,7 +60,7 @@ export function TeacherLayout() {
             <div className="flex items-center justify-between px-2">
               <div>
                 <div className="text-sm font-black tracking-tight">Teacher Assistant</div>
-                <div className="text-xs text-muted-foreground">Workspace menu</div>
+                <div className="text-xs text-muted-foreground">{t('teacher.menu.workspace')}</div>
               </div>
               <Button variant="ghost" size="icon" className="rounded-full" onClick={() => setDrawerOpen(false)}>
                 <X className="h-5 w-5" />
@@ -84,7 +86,7 @@ export function TeacherLayout() {
                         <div className={cn('flex h-10 w-10 items-center justify-center rounded-2xl', isActive ? 'bg-background' : 'bg-secondary')}>
                           <item.icon className="h-5 w-5" />
                         </div>
-                        <span>{item.label}</span>
+                        <span>{t(`teacher.nav.${item.label.toLowerCase()}`)}</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <ChevronRight className="h-4 w-4 text-muted-foreground" />
@@ -96,8 +98,8 @@ export function TeacherLayout() {
             </nav>
 
             <Link to="/app/billing" onClick={() => setDrawerOpen(false)} className="rounded-2xl border border-border px-4 py-4">
-              <div className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">Plans</div>
-              <div className="mt-1 text-sm font-bold text-foreground">Upgrade and manage credits</div>
+              <div className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">{t('teacher.menu.plans')}</div>
+              <div className="mt-1 text-sm font-bold text-foreground">{t('teacher.menu.plansHint')}</div>
             </Link>
           </aside>
         </div>
@@ -109,7 +111,15 @@ export function TeacherLayout() {
             <Menu className="h-5 w-5" />
           </Button>
           <div className="text-center">
-            <div className="text-sm font-black tracking-tight">{currentPage.title}</div>
+            <div className="text-sm font-black tracking-tight">
+              {currentPage.title === 'Create'
+                ? t('teacher.header.create')
+                : currentPage.title === 'Detail'
+                  ? t('teacher.header.detail')
+                  : currentPage.title === 'Plans'
+                    ? t('teacher.menu.plans')
+                  : t(`teacher.nav.${currentPage.title.toLowerCase()}`)}
+            </div>
           </div>
           {currentPage.actionTo ? (
             <Button asChild variant="ghost" size="icon" className="rounded-full">

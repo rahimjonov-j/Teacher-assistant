@@ -11,9 +11,11 @@ import {
 } from 'lucide-react'
 import { CardLoader } from '@/components/shared/loading-state'
 import { Card, CardContent } from '@/components/ui/card'
+import { useI18n } from '@/hooks/use-i18n'
 import { apiRequest } from '@/lib/api'
 
 export function DatabasePage() {
+  const { t } = useI18n()
   const dashboardQuery = useQuery({
     queryKey: ['dashboard'],
     queryFn: () => apiRequest<TeacherDashboardPayload>('/teacher/dashboard'),
@@ -30,36 +32,36 @@ export function DatabasePage() {
     () => [
       {
         icon: Users,
-        title: 'Students',
-        subtitle: 'No student records connected yet',
+        title: t('database.students'),
+        subtitle: t('database.studentsHint'),
       },
       {
         icon: GraduationCap,
-        title: 'Teachers',
-        subtitle: profile?.fullName ? `1 linked teacher profile: ${profile.fullName}` : 'Teacher profile incomplete',
+        title: t('database.teachers'),
+        subtitle: profile?.fullName ? `${t('database.teacherProfileLinked')}: ${profile.fullName}` : t('database.teacherProfileIncomplete'),
       },
       {
         icon: School,
-        title: 'Groups / Classes',
-        subtitle: profile?.gradeFocus ? `Primary class: ${profile.gradeFocus}` : 'No class or group added yet',
+        title: t('database.groups'),
+        subtitle: profile?.gradeFocus ? `${t('settings.grade')}: ${profile.gradeFocus}` : t('database.groupsHint'),
       },
       {
         icon: FileText,
-        title: 'Tests',
-        subtitle: `${items.filter((item) => item.featureKey === 'quiz').length} saved test items`,
+        title: t('database.tests'),
+        subtitle: `${items.filter((item) => item.featureKey === 'quiz').length} ${t('database.savedTestItems')}`,
       },
       {
         icon: FolderOpen,
-        title: 'Homework',
-        subtitle: `${items.filter((item) => item.featureKey === 'lesson_plan').length} lesson-plan based records`,
+        title: t('database.homework'),
+        subtitle: `${items.filter((item) => item.featureKey === 'lesson_plan').length} ${t('database.lessonPlanRecords')}`,
       },
       {
         icon: FileText,
-        title: 'Documents',
-        subtitle: `${items.filter((item) => Boolean(item.pdfUrl)).length} exported PDF documents`,
+        title: t('database.documents'),
+        subtitle: `${items.filter((item) => Boolean(item.pdfUrl)).length} ${t('database.exportedDocs')}`,
       },
     ],
-    [items, profile?.fullName, profile?.gradeFocus],
+    [items, profile?.fullName, profile?.gradeFocus, t],
   )
 
   if (!dashboardQuery.data || !historyQuery.data) {

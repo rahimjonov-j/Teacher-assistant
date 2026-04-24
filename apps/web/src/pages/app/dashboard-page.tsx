@@ -15,6 +15,7 @@ import { CardLoader } from '@/components/shared/loading-state'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
+import { useI18n } from '@/hooks/use-i18n'
 import { apiRequest } from '@/lib/api'
 import { formatRelativeDate, getFeatureLabel } from '@/lib/format'
 
@@ -27,6 +28,7 @@ const featureIcons: Record<FeatureKey, typeof FileText> = {
 }
 
 export function DashboardPage() {
+  const { t } = useI18n()
   const query = useQuery({
     queryKey: ['dashboard'],
     queryFn: () => apiRequest<TeacherDashboardPayload>('/teacher/dashboard'),
@@ -44,7 +46,7 @@ export function DashboardPage() {
         <CardContent className="space-y-4 p-5">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <div className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">Welcome</div>
+              <div className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">{t('dashboard.welcome')}</div>
               <h1 className="mt-2 text-2xl font-black tracking-tight">
                 {data.profile.fullName?.split(' ')[0] ?? 'Teacher'}
               </h1>
@@ -60,11 +62,11 @@ export function DashboardPage() {
           <div className="rounded-2xl bg-secondary p-4">
             <div className="flex items-center justify-between gap-4">
               <div>
-                <div className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">Current plan</div>
-                <div className="mt-1 text-lg font-black">{data.subscription?.planName ?? 'No active plan'}</div>
+                <div className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">{t('dashboard.currentPlan')}</div>
+                <div className="mt-1 text-lg font-black">{data.subscription?.planName ?? t('billing.noSubscription')}</div>
               </div>
               <div className="text-right">
-                <div className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">Credits left</div>
+                <div className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">{t('dashboard.creditsLeft')}</div>
                 <div className="mt-1 text-lg font-black">{data.subscription?.creditsRemaining ?? 0}</div>
               </div>
             </div>
@@ -74,15 +76,15 @@ export function DashboardPage() {
 
       <div className="grid grid-cols-2 gap-3">
         <StatCard
-          label="Requests"
+          label={t('dashboard.requests')}
           value={data.usageSummary.totalRequestsThisMonth}
-          hint="This month"
+          hint={t('dashboard.thisMonth')}
           icon={Clock3}
         />
         <StatCard
-          label="Stored"
+          label={t('dashboard.stored')}
           value={data.recentContent.length}
-          hint="Recent outputs"
+          hint={t('dashboard.recentOutputs')}
           icon={Wallet}
         />
       </div>
@@ -91,11 +93,11 @@ export function DashboardPage() {
         <CardContent className="p-5">
           <div className="mb-4 flex items-center justify-between">
             <div>
-              <div className="text-lg font-black tracking-tight">AI shortcuts</div>
-              <p className="text-sm text-muted-foreground">Start the main tools in one tap.</p>
+              <div className="text-lg font-black tracking-tight">{t('dashboard.shortcuts')}</div>
+              <p className="text-sm text-muted-foreground">{t('dashboard.shortcutsHint')}</p>
             </div>
             <Button asChild variant="ghost" size="sm">
-              <Link to="/app/generator">Open</Link>
+              <Link to="/app/generator">{t('common.open')}</Link>
             </Button>
           </div>
           <div className="grid grid-cols-2 gap-3">
@@ -122,11 +124,11 @@ export function DashboardPage() {
         <CardContent className="p-5">
           <div className="mb-4 flex items-center justify-between">
             <div>
-              <div className="text-lg font-black tracking-tight">Recent activities</div>
-              <p className="text-sm text-muted-foreground">Latest generated materials.</p>
+              <div className="text-lg font-black tracking-tight">{t('dashboard.recentActivities')}</div>
+              <p className="text-sm text-muted-foreground">{t('dashboard.recentActivitiesHint')}</p>
             </div>
             <Button asChild variant="ghost" size="sm">
-              <Link to="/app/messenger">View all</Link>
+              <Link to="/app/messenger">{t('dashboard.viewAll')}</Link>
             </Button>
           </div>
 
@@ -149,12 +151,12 @@ export function DashboardPage() {
             </div>
           ) : (
             <EmptyState
-              title="No activity yet"
-              description="Your generated materials will appear here."
+              title={t('dashboard.noActivity')}
+              description={t('dashboard.noActivityHint')}
               icon={Sparkles}
               action={
                 <Button asChild>
-                  <Link to="/app/generator">Create first item</Link>
+                  <Link to="/app/generator">{t('dashboard.createFirst')}</Link>
                 </Button>
               }
             />

@@ -7,6 +7,7 @@ import { CardLoader } from '@/components/shared/loading-state'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
+import { useI18n } from '@/hooks/use-i18n'
 import { apiRequest } from '@/lib/api'
 import { formatRelativeDate, getFeatureLabel } from '@/lib/format'
 
@@ -15,6 +16,7 @@ function toPreview(markdown: string) {
 }
 
 export function MessengerPage() {
+  const { t } = useI18n()
   const [search, setSearch] = useState('')
   const deferredSearch = useMemo(() => search.trim(), [search])
   const query = useQuery({
@@ -38,7 +40,7 @@ export function MessengerPage() {
         <Input
           value={search}
           onChange={(event) => setSearch(event.target.value)}
-          placeholder="Search conversations"
+          placeholder={t('messenger.searchPlaceholder')}
           className="pl-11"
         />
       </div>
@@ -60,7 +62,7 @@ export function MessengerPage() {
                         <div className="truncate text-sm font-black">{item.title}</div>
                         <div className="shrink-0 text-xs text-muted-foreground">{formatRelativeDate(item.createdAt)}</div>
                       </div>
-                      <p className="mt-1 line-clamp-2 text-sm leading-6 text-muted-foreground">{preview || 'No preview available'}</p>
+                      <p className="mt-1 line-clamp-2 text-sm leading-6 text-muted-foreground">{preview || t('messenger.noPreview')}</p>
                       <div className="mt-3 flex items-center justify-between gap-3">
                         <Badge variant="outline">{getFeatureLabel(item.featureKey)}</Badge>
                         <ArrowRight className="h-4 w-4 text-muted-foreground" />
@@ -76,8 +78,8 @@ export function MessengerPage() {
         {items.length === 0 ? (
           <Card>
             <CardContent className="p-5 text-center">
-              <div className="text-sm font-black">No conversations yet</div>
-              <p className="mt-2 text-sm text-muted-foreground">Generated materials will appear here in a chat-style list.</p>
+              <div className="text-sm font-black">{t('messenger.empty')}</div>
+              <p className="mt-2 text-sm text-muted-foreground">{t('messenger.emptyHint')}</p>
             </CardContent>
           </Card>
         ) : null}

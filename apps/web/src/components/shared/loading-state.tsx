@@ -1,5 +1,6 @@
 import { LoaderCircle } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
+import { useI18n } from '@/hooks/use-i18n'
 import { cn } from '@/lib/utils'
 
 export function FullScreenLoader({
@@ -7,9 +8,11 @@ export function FullScreenLoader({
 }: {
   label?: string
 }) {
+  const { t } = useI18n()
+
   return (
     <div className="flex min-h-screen items-center justify-center">
-      <LoaderCircle className="h-10 w-10 animate-spin text-primary" aria-label={label} />
+      <LoaderCircle className="h-10 w-10 animate-spin text-primary" aria-label={label || t('common.loading')} />
     </div>
   )
 }

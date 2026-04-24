@@ -23,6 +23,8 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Select } from '@/components/ui/select'
+import { useI18n } from '@/hooks/use-i18n'
 
 interface LinkCodeResponse {
   linkCode: string
@@ -48,6 +50,7 @@ const settingsSections: Array<{
 
 export function SettingsPage() {
   const { profile, refreshProfile, logout } = useAuth()
+  const { language, setLanguage, t } = useI18n()
   const [activeSection, setActiveSection] = useState<SectionKey>('profile')
   const [fullName, setFullName] = useState(profile?.fullName ?? '')
   const [schoolName, setSchoolName] = useState(profile?.schoolName ?? '')
@@ -81,10 +84,10 @@ export function SettingsPage() {
       }),
     onSuccess: async () => {
       await refreshProfile()
-      toast.success('Settings updated.')
+      toast.success(t('settings.profileSaved'))
     },
     onError: (error) => {
-      toast.error(error instanceof Error ? error.message : 'Settings update failed.')
+      toast.error(error instanceof Error ? error.message : t('settings.profileSaveFailed'))
     },
   })
 
@@ -92,10 +95,10 @@ export function SettingsPage() {
     mutationFn: () => apiRequest<LinkCodeResponse>('/teacher/telegram/link-code', { method: 'POST' }),
     onSuccess: (data) => {
       setLinkData(data)
-      toast.success('Telegram link code created.')
+      toast.success(t('settings.linkCreated'))
     },
     onError: (error) => {
-      toast.error(error instanceof Error ? error.message : 'Link code could not be created.')
+      toast.error(error instanceof Error ? error.message : t('settings.linkFailed'))
     },
   })
 
@@ -120,8 +123,8 @@ export function SettingsPage() {
                     <section.icon className="h-5 w-5" />
                   </div>
                   <div>
-                    <div className="text-sm font-black">{section.title}</div>
-                    <div className="mt-1 text-xs leading-5 text-muted-foreground">{section.subtitle}</div>
+                    <div className="text-sm font-black">{t(`settings.${section.key}`)}</div>
+                    <div className="mt-1 text-xs leading-5 text-muted-foreground">{t(`settings.${section.key}Subtitle`)}</div>
                   </div>
                 </div>
                 <ChevronRight className="h-4 w-4 text-muted-foreground" />
@@ -134,26 +137,26 @@ export function SettingsPage() {
       {activeSection === 'profile' ? (
         <Card>
           <CardContent className="space-y-4 p-5">
-            <div className="text-lg font-black tracking-tight">Profile</div>
+            <div className="text-lg font-black tracking-tight">{t('settings.profile')}</div>
             <div className="space-y-2">
-              <Label htmlFor="fullName">Full name</Label>
+              <Label htmlFor="fullName">{t('settings.fullName')}</Label>
               <Input id="fullName" value={fullName || profileSnapshot.fullName} onChange={(event) => setFullName(event.target.value)} />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="schoolName">School</Label>
+              <Label htmlFor="schoolName">{t('settings.school')}</Label>
               <Input id="schoolName" value={schoolName || profileSnapshot.schoolName} onChange={(event) => setSchoolName(event.target.value)} />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="gradeFocus">Grade / class</Label>
+              <Label htmlFor="gradeFocus">{t('settings.grade')}</Label>
               <Input id="gradeFocus" value={gradeFocus || profileSnapshot.gradeFocus} onChange={(event) => setGradeFocus(event.target.value)} />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="timezone">Timezone</Label>
+              <Label htmlFor="timezone">{t('settings.timezone')}</Label>
               <Input id="timezone" value={timezone || profileSnapshot.timezone} onChange={(event) => setTimezone(event.target.value)} />
             </div>
             <Button onClick={() => saveMutation.mutate()} disabled={saveMutation.isPending} className="w-full">
               {saveMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-              Save profile
+              {t('settings.saveProfile')}
             </Button>
           </CardContent>
         </Card>
@@ -162,9 +165,9 @@ export function SettingsPage() {
       {activeSection === 'account' ? (
         <Card>
           <CardContent className="space-y-4 p-5">
-            <div className="text-lg font-black tracking-tight">Account</div>
+            <div className="text-lg font-black tracking-tight">{t('settings.account')}</div>
             <div className="space-y-2">
-              <Label htmlFor="telegramHandle">Telegram username</Label>
+              <Label htmlFor="telegramHandle">{t('settings.telegramUsername')}</Label>
               <Input
                 id="telegramHandle"
                 value={telegramHandle || profileSnapshot.telegramHandle}
@@ -174,18 +177,18 @@ export function SettingsPage() {
             </div>
             <Button variant="outline" onClick={() => linkMutation.mutate()} disabled={linkMutation.isPending} className="w-full">
               {linkMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Bot className="h-4 w-4" />}
-              Create Telegram link code
+              {t('settings.createLinkCode')}
             </Button>
 
             {linkData ? (
               <div className="rounded-2xl border border-border p-4">
-                <div className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">One-time code</div>
+                <div className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">{t('settings.oneTimeCode')}</div>
                 <div className="mt-3 text-2xl font-black tracking-[0.22em]">{linkData.linkCode}</div>
-                <div className="mt-2 text-xs text-muted-foreground">Expires at: {linkData.expiresAt}</div>
+                <div className="mt-2 text-xs text-muted-foreground">{t('settings.expiresAt')}: {linkData.expiresAt}</div>
                 {deepLink ? (
                   <Button asChild className="mt-4 w-full">
                     <a href={deepLink} target="_blank" rel="noreferrer">
-                      Open Telegram bot
+                      {t('settings.openBot')}
                     </a>
                   </Button>
                 ) : null}
@@ -198,15 +201,15 @@ export function SettingsPage() {
       {activeSection === 'notifications' ? (
         <Card>
           <CardContent className="space-y-4 p-5">
-            <div className="text-lg font-black tracking-tight">Notifications</div>
+            <div className="text-lg font-black tracking-tight">{t('settings.notifications')}</div>
             <p className="text-sm leading-6 text-muted-foreground">
-              Telegram commands are the primary notification surface right now. Use the command list below as your quick access menu.
+              {t('settings.notificationsHint')}
             </p>
             <div className="grid gap-2">
               {TELEGRAM_COMMAND_DEFINITIONS.map((command) => (
                 <div key={command.command} className="rounded-2xl border border-border px-3 py-3">
                   <div className="text-sm font-black">{command.usage}</div>
-                  <div className="mt-1 text-xs text-muted-foreground">{command.description}</div>
+                  <div className="mt-1 text-xs text-muted-foreground">{t(`commands.${command.command}`)}</div>
                 </div>
               ))}
             </div>
@@ -217,12 +220,12 @@ export function SettingsPage() {
       {activeSection === 'privacy' ? (
         <Card>
           <CardContent className="space-y-3 p-5">
-            <div className="text-lg font-black tracking-tight">Privacy</div>
+            <div className="text-lg font-black tracking-tight">{t('settings.privacy')}</div>
             <div className="rounded-2xl border border-border px-4 py-3 text-sm text-muted-foreground">
-              Email: <span className="font-semibold text-foreground">{profile?.email ?? 'Not available'}</span>
+              {t('settings.privacyEmail')}: <span className="font-semibold text-foreground">{profile?.email ?? '-'}</span>
             </div>
             <div className="rounded-2xl border border-border px-4 py-3 text-sm text-muted-foreground">
-              Telegram handle: <span className="font-semibold text-foreground">{profile?.telegramHandle ?? 'Not linked'}</span>
+              {t('settings.privacyTelegram')}: <span className="font-semibold text-foreground">{profile?.telegramHandle ?? t('settings.notLinked')}</span>
             </div>
           </CardContent>
         </Card>
@@ -230,13 +233,20 @@ export function SettingsPage() {
 
       {activeSection === 'language' ? (
         <Card>
-          <CardContent className="space-y-3 p-5">
-            <div className="text-lg font-black tracking-tight">Language</div>
+          <CardContent className="space-y-4 p-5">
+            <div className="text-lg font-black tracking-tight">{t('settings.language')}</div>
             <div className="rounded-2xl border border-border px-4 py-3 text-sm text-muted-foreground">
-              Interface language follows the current app copy.
+              {t('settings.languageHint')}
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="language">{t('common.language')}</Label>
+              <Select id="language" value={language} onChange={(event) => setLanguage(event.target.value as typeof language)}>
+                <option value="uz">{t('common.uzbek')}</option>
+                <option value="en">{t('common.english')}</option>
+              </Select>
             </div>
             <div className="rounded-2xl border border-border px-4 py-3 text-sm text-muted-foreground">
-              Timezone: <span className="font-semibold text-foreground">{profile?.timezone ?? 'Asia/Tashkent'}</span>
+              {t('settings.timezone')}: <span className="font-semibold text-foreground">{profile?.timezone ?? 'Asia/Tashkent'}</span>
             </div>
           </CardContent>
         </Card>
@@ -245,9 +255,9 @@ export function SettingsPage() {
       {activeSection === 'help' ? (
         <Card>
           <CardContent className="space-y-3 p-5">
-            <div className="text-lg font-black tracking-tight">Help & Support</div>
+            <div className="text-lg font-black tracking-tight">{t('settings.help')}</div>
             <div className="rounded-2xl border border-border px-4 py-3 text-sm leading-6 text-muted-foreground">
-              Use Telegram for fast commands, Dashboard for shortcuts, and Messenger to review generated materials.
+              {t('settings.helpHint')}
             </div>
           </CardContent>
         </Card>
@@ -256,12 +266,12 @@ export function SettingsPage() {
       {activeSection === 'about' ? (
         <Card>
           <CardContent className="space-y-3 p-5">
-            <div className="text-lg font-black tracking-tight">About</div>
+            <div className="text-lg font-black tracking-tight">{t('settings.about')}</div>
             <div className="rounded-2xl border border-border px-4 py-3 text-sm text-muted-foreground">
-              Teacher Assistant platform
+              {t('settings.aboutTitle')}
             </div>
             <div className="rounded-2xl border border-border px-4 py-3 text-sm text-muted-foreground">
-              Built for tests, lesson plans, writing analysis and speaking prompts.
+              {t('settings.aboutHint')}
             </div>
           </CardContent>
         </Card>
@@ -269,7 +279,7 @@ export function SettingsPage() {
 
       <Button variant="outline" className="h-12 w-full" onClick={() => logout()}>
         <LogOut className="h-4 w-4" />
-        Logout
+        {t('common.logout')}
       </Button>
     </div>
   )

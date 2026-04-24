@@ -5,6 +5,7 @@ import { PublicLayout } from '@/components/layout/public-layout'
 import { TeacherLayout } from '@/components/layout/teacher-layout'
 import { FullScreenLoader } from '@/components/shared/loading-state'
 import { useAuth } from '@/hooks/use-auth'
+import { useI18n } from '@/hooks/use-i18n'
 
 const LoginPage = lazy(async () => ({
   default: (await import('@/pages/public/login-page')).LoginPage,
@@ -67,9 +68,10 @@ function LazyRoute({ children, label = 'Sahifa yuklanmoqda' }: { children: React
 
 function ProtectedGate() {
   const { session, profile, loading } = useAuth()
+  const { t } = useI18n()
 
   if (loading || (session && !profile)) {
-    return <FullScreenLoader label="Panel ochilmoqda" />
+    return <FullScreenLoader label={t('routes.panelLoading')} />
   }
 
   if (!session) {
@@ -81,9 +83,10 @@ function ProtectedGate() {
 
 function AdminGate() {
   const { session, profile, loading } = useAuth()
+  const { t } = useI18n()
 
   if (loading || (session && !profile)) {
-    return <FullScreenLoader label="Admin panel ochilmoqda" />
+    return <FullScreenLoader label={t('routes.adminLoading')} />
   }
 
   if (!session) {
@@ -99,14 +102,15 @@ function AdminGate() {
 
 function GuestGate() {
   const { session, profile, loading } = useAuth()
+  const { t } = useI18n()
 
   if (loading) {
-    return <FullScreenLoader label="Hisob tekshirilmoqda" />
+    return <FullScreenLoader label={t('routes.homeLoading')} />
   }
 
   if (session) {
     if (!profile) {
-      return <FullScreenLoader label="Yo'naltirilmoqda" />
+      return <FullScreenLoader label={t('routes.redirecting')} />
     }
 
     return <Navigate to={profile.role === 'admin' ? '/admin/dashboard' : '/app/dashboard'} replace />
@@ -117,14 +121,15 @@ function GuestGate() {
 
 function HomeGate() {
   const { session, profile, loading } = useAuth()
+  const { t } = useI18n()
 
   if (loading) {
-    return <FullScreenLoader label="Hisob tekshirilmoqda" />
+    return <FullScreenLoader label={t('routes.homeLoading')} />
   }
 
   if (session) {
     if (!profile) {
-      return <FullScreenLoader label="Yo'naltirilmoqda" />
+      return <FullScreenLoader label={t('routes.redirecting')} />
     }
 
     return <Navigate to={profile.role === 'admin' ? '/admin/dashboard' : '/app/dashboard'} replace />
@@ -134,6 +139,8 @@ function HomeGate() {
 }
 
 export function AppRoutes() {
+  const { t } = useI18n()
+
   return (
     <Routes>
       <Route element={<PublicLayout />}>
@@ -142,7 +149,7 @@ export function AppRoutes() {
         <Route
           path="/reset-password"
           element={
-            <LazyRoute label="Parolni yangilash sahifasi yuklanmoqda">
+            <LazyRoute label={t('routes.resetLoading')}>
               <ResetPasswordPage />
             </LazyRoute>
           }
@@ -151,7 +158,7 @@ export function AppRoutes() {
           <Route
             path="/login"
             element={
-              <LazyRoute label="Kirish sahifasi yuklanmoqda">
+              <LazyRoute label={t('routes.loginLoading')}>
                 <LoginPage />
               </LazyRoute>
             }
@@ -159,7 +166,7 @@ export function AppRoutes() {
           <Route
             path="/register"
             element={
-              <LazyRoute label="Ro'yxatdan o'tish yuklanmoqda">
+              <LazyRoute label={t('routes.registerLoading')}>
                 <RegisterPage />
               </LazyRoute>
             }
@@ -173,7 +180,7 @@ export function AppRoutes() {
           <Route
             path="/app/dashboard"
             element={
-              <LazyRoute label="Dashboard yuklanmoqda">
+              <LazyRoute label={t('routes.dashboardLoading')}>
                 <DashboardPage />
               </LazyRoute>
             }
@@ -181,7 +188,7 @@ export function AppRoutes() {
           <Route
             path="/app/messenger"
             element={
-              <LazyRoute label="Messenger yuklanmoqda">
+              <LazyRoute label={t('routes.messengerLoading')}>
                 <MessengerPage />
               </LazyRoute>
             }
@@ -189,7 +196,7 @@ export function AppRoutes() {
           <Route
             path="/app/calendar"
             element={
-              <LazyRoute label="Calendar yuklanmoqda">
+              <LazyRoute label={t('routes.calendarLoading')}>
                 <CalendarPage />
               </LazyRoute>
             }
@@ -197,7 +204,7 @@ export function AppRoutes() {
           <Route
             path="/app/database"
             element={
-              <LazyRoute label="Database yuklanmoqda">
+              <LazyRoute label={t('routes.databaseLoading')}>
                 <DatabasePage />
               </LazyRoute>
             }
@@ -205,7 +212,7 @@ export function AppRoutes() {
           <Route
             path="/app/attendance"
             element={
-              <LazyRoute label="Attendance yuklanmoqda">
+              <LazyRoute label={t('routes.attendanceLoading')}>
                 <AttendancePage />
               </LazyRoute>
             }
@@ -213,7 +220,7 @@ export function AppRoutes() {
           <Route
             path="/app/generator"
             element={
-              <LazyRoute label="Generator yuklanmoqda">
+              <LazyRoute label={t('routes.generatorLoading')}>
                 <GeneratorPage />
               </LazyRoute>
             }
@@ -222,7 +229,7 @@ export function AppRoutes() {
           <Route
             path="/app/history/:id"
             element={
-              <LazyRoute label="Material yuklanmoqda">
+              <LazyRoute label={t('routes.detailLoading')}>
                 <ContentDetailPage />
               </LazyRoute>
             }
@@ -230,7 +237,7 @@ export function AppRoutes() {
           <Route
             path="/app/settings"
             element={
-              <LazyRoute label="Sozlamalar yuklanmoqda">
+              <LazyRoute label={t('routes.settingsLoading')}>
                 <SettingsPage />
               </LazyRoute>
             }
@@ -238,7 +245,7 @@ export function AppRoutes() {
           <Route
             path="/app/billing"
             element={
-              <LazyRoute label="To'lov sahifasi yuklanmoqda">
+              <LazyRoute label={t('routes.billingLoading')}>
                 <BillingPage />
               </LazyRoute>
             }
@@ -249,52 +256,52 @@ export function AppRoutes() {
           <Route element={<AdminLayout />}>
             <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
             <Route
-              path="/admin/dashboard"
-              element={
-                <LazyRoute label="Admin dashboard yuklanmoqda">
-                  <AdminDashboardPage />
-                </LazyRoute>
-              }
+            path="/admin/dashboard"
+            element={
+              <LazyRoute label={t('routes.dashboardLoading')}>
+                <AdminDashboardPage />
+              </LazyRoute>
+            }
             />
             <Route
-              path="/admin/teachers"
-              element={
-                <LazyRoute label="O'qituvchilar ro'yxati yuklanmoqda">
-                  <AdminTeachersPage />
-                </LazyRoute>
-              }
+            path="/admin/teachers"
+            element={
+              <LazyRoute label={t('routes.databaseLoading')}>
+                <AdminTeachersPage />
+              </LazyRoute>
+            }
             />
             <Route
-              path="/admin/analytics/usage"
-              element={
-                <LazyRoute label="Usage analytics yuklanmoqda">
-                  <AdminUsageAnalyticsPage />
-                </LazyRoute>
-              }
+            path="/admin/analytics/usage"
+            element={
+              <LazyRoute label={t('routes.databaseLoading')}>
+                <AdminUsageAnalyticsPage />
+              </LazyRoute>
+            }
             />
             <Route
-              path="/admin/analytics/features"
-              element={
-                <LazyRoute label="Feature analytics yuklanmoqda">
-                  <AdminFeatureAnalyticsPage />
-                </LazyRoute>
-              }
+            path="/admin/analytics/features"
+            element={
+              <LazyRoute label={t('routes.databaseLoading')}>
+                <AdminFeatureAnalyticsPage />
+              </LazyRoute>
+            }
             />
             <Route
-              path="/admin/subscriptions"
-              element={
-                <LazyRoute label="Obunalar yuklanmoqda">
-                  <AdminSubscriptionsPage />
-                </LazyRoute>
-              }
+            path="/admin/subscriptions"
+            element={
+              <LazyRoute label={t('routes.billingLoading')}>
+                <AdminSubscriptionsPage />
+              </LazyRoute>
+            }
             />
             <Route
-              path="/admin/activity"
-              element={
-                <LazyRoute label="Faollik sahifasi yuklanmoqda">
-                  <AdminActivityPage />
-                </LazyRoute>
-              }
+            path="/admin/activity"
+            element={
+              <LazyRoute label={t('routes.messengerLoading')}>
+                <AdminActivityPage />
+              </LazyRoute>
+            }
             />
           </Route>
         </Route>

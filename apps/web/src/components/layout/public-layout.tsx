@@ -1,7 +1,10 @@
 import { Link, Outlet } from 'react-router-dom'
 import { GraduationCap } from 'lucide-react'
+import { useI18n } from '@/hooks/use-i18n'
 
 export function PublicLayout() {
+  const { t } = useI18n()
+
   return (
     <div className="min-h-screen bg-background">
       <main className="container flex min-h-screen flex-col py-6">
@@ -11,7 +14,7 @@ export function PublicLayout() {
           </div>
           <div>
             <div className="text-sm font-black tracking-tight">Teacher Assistant</div>
-            <div className="text-[11px] font-medium text-muted-foreground">Mobile workspace</div>
+            <div className="text-[11px] font-medium text-muted-foreground">{t('public.mobileWorkspace')}</div>
           </div>
         </Link>
         <div className="flex flex-1 items-center justify-center py-6">

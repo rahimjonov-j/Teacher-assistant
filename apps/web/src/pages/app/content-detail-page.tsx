@@ -8,12 +8,14 @@ import { CardLoader } from '@/components/shared/loading-state'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
+import { useI18n } from '@/hooks/use-i18n'
 import { ApiRequestError, apiRequest } from '@/lib/api'
 import { formatDate, getFeatureLabel } from '@/lib/format'
 
 export function ContentDetailPage() {
   const navigate = useNavigate()
   const params = useParams()
+  const { t } = useI18n()
 
   const query = useQuery({
     queryKey: ['content-detail', params.id],
@@ -28,16 +30,16 @@ export function ContentDetailPage() {
       }),
     onSuccess: (data) => {
       window.open(data.pdfUrl, '_blank', 'noopener,noreferrer')
-      toast.success('PDF export completed.')
+      toast.success(t('detail.exportDone'))
     },
     onError: (error) => {
       if (error instanceof ApiRequestError && error.statusCode === 402) {
-        toast.error('Credits finished. Redirecting to plans.')
+        toast.error(t('detail.creditEnded'))
         navigate('/app/billing')
         return
       }
 
-      toast.error(error instanceof Error ? error.message : 'PDF export failed.')
+      toast.error(error instanceof Error ? error.message : t('detail.exportFailed'))
     },
   })
 
@@ -52,7 +54,7 @@ export function ContentDetailPage() {
       <Button asChild variant="ghost" size="sm" className="w-fit">
         <Link to="/app/messenger">
           <ArrowLeft className="h-4 w-4" />
-          Back
+          {t('common.back')}
         </Link>
       </Button>
 
@@ -72,23 +74,23 @@ export function ContentDetailPage() {
               size="sm"
               onClick={() => {
                 navigator.clipboard.writeText(item.outputMarkdown)
-                toast.success('Copied')
+                toast.success(t('detail.copied'))
               }}
             >
               <Copy className="h-4 w-4" />
-              Copy
+              {t('detail.copy')}
             </Button>
             {item.pdfUrl ? (
               <Button asChild variant="outline" size="sm">
                 <a href={item.pdfUrl} target="_blank" rel="noreferrer">
                   <FileDown className="h-4 w-4" />
-                  PDF
+                  {t('detail.pdf')}
                 </a>
               </Button>
             ) : (
               <Button variant="outline" size="sm" onClick={() => exportMutation.mutate()} disabled={exportMutation.isPending}>
                 {exportMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <FileDown className="h-4 w-4" />}
-                Export PDF
+                {t('detail.exportPdf')}
               </Button>
             )}
           </div>

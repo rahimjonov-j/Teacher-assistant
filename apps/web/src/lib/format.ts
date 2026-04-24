@@ -1,36 +1,47 @@
-import { format } from 'date-fns'
 import { FEATURE_MAP, PLAN_MAP, type FeatureKey, type PlanKey } from '@teacher-assistant/shared'
+import { featureLabels, getCurrentLanguage, planLabels } from '@/lib/i18n'
 
-const wholeNumberFormatterUzs = new Intl.NumberFormat('uz-UZ', {
-  maximumFractionDigits: 0,
-})
+function getLocale() {
+  return getCurrentLanguage() === 'en' ? 'en-US' : 'uz-UZ'
+}
 
 export function formatDate(value: string | null | undefined) {
   if (!value) {
-    return 'Belgilanmagan'
+    return getCurrentLanguage() === 'en' ? 'Not set' : 'Belgilanmagan'
   }
 
-  return format(new Date(value), 'MMM d, yyyy')
+  return new Intl.DateTimeFormat(getLocale(), {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  }).format(new Date(value))
 }
 
 export function formatRelativeDate(value: string) {
-  return format(new Date(value), 'MMM d, HH:mm')
+  return new Intl.DateTimeFormat(getLocale(), {
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  }).format(new Date(value))
 }
 
 export function formatCurrencyUzs(value: number) {
-  const formattedValue = wholeNumberFormatterUzs.format(value).replace(/[\u00A0\u202F]/g, ' ')
+  const formattedValue = new Intl.NumberFormat(getLocale(), {
+    maximumFractionDigits: 0,
+  }).format(value).replace(/[\u00A0\u202F]/g, ' ')
 
-  return `${formattedValue} so'm`
+  return getCurrentLanguage() === 'en' ? `${formattedValue} UZS` : `${formattedValue} so'm`
 }
 
 export function getFeatureLabel(featureKey: FeatureKey) {
-  return FEATURE_MAP[featureKey]?.label ?? featureKey
+  return featureLabels[getCurrentLanguage()][featureKey] ?? FEATURE_MAP[featureKey]?.label ?? featureKey
 }
 
 export function getPlanName(planKey: PlanKey | null | undefined) {
   if (!planKey) {
-    return "Tarif yo'q"
+    return getCurrentLanguage() === 'en' ? 'No plan' : "Tarif yo'q"
   }
 
-  return PLAN_MAP[planKey]?.name ?? planKey
+  return planLabels[getCurrentLanguage()][planKey] ?? PLAN_MAP[planKey]?.name ?? planKey
 }

@@ -16,12 +16,14 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
+import { useI18n } from '@/hooks/use-i18n'
 import { ApiRequestError, apiRequest } from '@/lib/api'
 
 const generatorFeatures = FEATURE_DEFINITIONS.filter((feature) => feature.key !== 'pdf_export')
 
 export function GeneratorPage() {
   const navigate = useNavigate()
+  const { t } = useI18n()
   const [searchParams, setSearchParams] = useSearchParams()
   const initialFeature = (searchParams.get('feature') as FeatureKey) ?? 'quiz'
   const [featureKey, setFeatureKey] = useState<FeatureKey>(initialFeature)
@@ -46,16 +48,16 @@ export function GeneratorPage() {
         }),
       }),
     onSuccess: () => {
-      toast.success('Material created.')
+      toast.success(t('generator.created'))
     },
     onError: (error) => {
       if (error instanceof ApiRequestError && error.statusCode === 402) {
-        toast.error('Credits finished. Redirecting to plans.')
+        toast.error(t('generator.creditEnded'))
         navigate('/app/billing')
         return
       }
 
-      toast.error(error instanceof Error ? error.message : 'Something went wrong.')
+      toast.error(error instanceof Error ? error.message : t('generator.failed'))
     },
   })
 
@@ -72,7 +74,7 @@ export function GeneratorPage() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="feature">Tool</Label>
+            <Label htmlFor="feature">{t('generator.tool')}</Label>
             <Select
               id="feature"
               value={featureKey}
@@ -96,30 +98,30 @@ export function GeneratorPage() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="level">Class / level</Label>
+            <Label htmlFor="level">{t('generator.classLevel')}</Label>
             <Input id="level" value={gradeOrLevel} onChange={(event) => setGradeOrLevel(event.target.value)} placeholder="7-sinf" />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="instructions">Additional instructions</Label>
+            <Label htmlFor="instructions">{t('generator.additional')}</Label>
             <Textarea
               id="instructions"
               value={additionalInstructions}
               onChange={(event) => setAdditionalInstructions(event.target.value)}
               className="min-h-[110px]"
-              placeholder="Optional"
+              placeholder={t('generator.optional')}
             />
           </div>
 
           <div className="rounded-2xl bg-secondary p-4">
-            <div className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">Telegram command</div>
+            <div className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">{t('generator.telegramCommand')}</div>
             <div className="mt-2 text-base font-black">{activeTelegramCommand.usage}</div>
             <div className="mt-1 text-sm text-muted-foreground">{activeTelegramCommand.description}</div>
           </div>
 
           <Button className="h-14 w-full" onClick={() => mutation.mutate()} disabled={mutation.isPending || !topic}>
             {mutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
-            Generate
+            {t('generator.generate')}
           </Button>
         </CardContent>
       </Card>
@@ -141,14 +143,14 @@ export function GeneratorPage() {
             <div className="flex items-start justify-between gap-3">
               <div>
                 <div className="text-lg font-black tracking-tight">{result.title}</div>
-                <p className="mt-1 text-sm text-muted-foreground">Your generated content is ready.</p>
+                <p className="mt-1 text-sm text-muted-foreground">{t('generator.readyHint')}</p>
               </div>
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => {
                   navigator.clipboard.writeText(result.outputMarkdown)
-                  toast.success('Copied')
+                  toast.success(t('generator.copied'))
                 }}
               >
                 <Copy className="h-4 w-4" />
@@ -162,7 +164,7 @@ export function GeneratorPage() {
             <Button asChild variant="outline" className="w-full">
               <Link to={`/app/history/${result.id}`}>
                 <FileText className="h-4 w-4" />
-                Open detail
+                {t('generator.openDetail')}
               </Link>
             </Button>
           </CardContent>

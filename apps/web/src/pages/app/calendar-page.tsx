@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom'
 import { CardLoader } from '@/components/shared/loading-state'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
+import { useI18n } from '@/hooks/use-i18n'
 import { apiRequest } from '@/lib/api'
 import { getFeatureLabel } from '@/lib/format'
 import { cn } from '@/lib/utils'
@@ -19,6 +20,7 @@ function startOfMonth(date: Date) {
 }
 
 export function CalendarPage() {
+  const { language, t } = useI18n()
   const [visibleMonth, setVisibleMonth] = useState(() => startOfMonth(new Date()))
   const [selectedDate, setSelectedDate] = useState(() => toDateKey(new Date()))
   const query = useQuery({
@@ -73,7 +75,7 @@ export function CalendarPage() {
               <ChevronLeft className="h-4 w-4" />
             </Button>
             <div className="text-sm font-black">
-              {visibleMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+              {visibleMonth.toLocaleDateString(language === 'en' ? 'en-US' : 'uz-UZ', { month: 'long', year: 'numeric' })}
             </div>
             <Button variant="ghost" size="icon" onClick={() => setVisibleMonth(new Date(visibleMonth.getFullYear(), visibleMonth.getMonth() + 1, 1))}>
               <ChevronRight className="h-4 w-4" />
@@ -110,7 +112,7 @@ export function CalendarPage() {
 
       <Card>
         <CardContent className="p-5">
-          <div className="text-lg font-black tracking-tight">Events on {selectedDate}</div>
+            <div className="text-lg font-black tracking-tight">{t('calendar.eventsOn')} {selectedDate}</div>
           <div className="mt-4 space-y-3">
             {selectedItems.length > 0 ? (
               selectedItems.map((item) => (
@@ -130,7 +132,7 @@ export function CalendarPage() {
               ))
             ) : (
               <div className="rounded-2xl border border-dashed border-border p-4 text-sm text-muted-foreground">
-                No events for the selected date.
+                {t('calendar.noEvents')}
               </div>
             )}
           </div>
