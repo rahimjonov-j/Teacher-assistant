@@ -1,6 +1,11 @@
 import { useMemo, useState } from 'react'
 import { useMutation } from '@tanstack/react-query'
-import { FEATURE_DEFINITIONS, type GeneratorResponse, type FeatureKey } from '@teacher-assistant/shared'
+import {
+  FEATURE_DEFINITIONS,
+  TELEGRAM_FEATURE_COMMAND_MAP,
+  type GeneratorResponse,
+  type FeatureKey,
+} from '@teacher-assistant/shared'
 import { useSearchParams, Link, useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 import { Sparkles, Loader2, Copy, FileText } from 'lucide-react'
@@ -56,6 +61,7 @@ export function GeneratorPage() {
   })
 
   const result = mutation.data?.content
+  const activeTelegramCommand = TELEGRAM_FEATURE_COMMAND_MAP[featureKey]
 
   return (
     <div className="space-y-10 animate-in">
@@ -122,6 +128,16 @@ export function GeneratorPage() {
 
               <div className="rounded-xl bg-primary/10 p-4 text-[11px] font-bold text-primary uppercase tracking-widest text-center">
                 Sarflanadigan kredit: {activeFeature.creditCost}
+              </div>
+
+              <div className="rounded-2xl border border-border/40 bg-background/70 p-4">
+                <div className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60">
+                  Telegram mos command
+                </div>
+                <div className="mt-2 text-base font-black text-foreground">{activeTelegramCommand.usage}</div>
+                <div className="mt-1 text-xs font-medium leading-relaxed text-muted-foreground">
+                  {activeTelegramCommand.description}
+                </div>
               </div>
 
               <Button

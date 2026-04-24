@@ -1,29 +1,28 @@
-import { FEATURE_MAP, type FeatureKey } from '@teacher-assistant/shared'
+import {
+  FEATURE_MAP,
+  PLAN_MAP,
+  TELEGRAM_COMMAND_DEFINITIONS,
+  TELEGRAM_COMMAND_MAP,
+  TELEGRAM_FEATURE_COMMAND_MAP,
+  TELEGRAM_FEATURE_COMMANDS,
+  TELEGRAM_MENU_COMMANDS,
+  type FeatureKey,
+  type PlanKey,
+} from '@teacher-assistant/shared'
 import { Telegraf } from 'telegraf'
 import { env, hasOpenAiConfig, hasTelegramConfig } from '../config/env.js'
 import { plansRepository } from '../repositories/plans.repository.js'
+import { telegramRepository } from '../repositories/telegram.repository.js'
 import { dashboardService } from './dashboard.service.js'
 import { generationService } from './generation.service.js'
 import { openAiService } from './openai.service.js'
-import { telegramRepository } from '../repositories/telegram.repository.js'
 
 let bot: Telegraf | null = null
+
 const TELEGRAM_TEXT_LIMIT = 3800
 const uzsFormatter = new Intl.NumberFormat('uz-UZ', {
-  style: 'currency',
-  currency: 'UZS',
   maximumFractionDigits: 0,
 })
-const TELEGRAM_COMMANDS = [
-  { command: 'help', description: "Komandalar ro'yxati" },
-  { command: 'plans', description: "Tariflar va kreditlar" },
-  { command: 'balance', description: 'Joriy kredit balansi' },
-  { command: 'quiz', description: 'Mavzu bo‘yicha test yaratish' },
-  { command: 'lesson', description: 'Dars rejasi yaratish' },
-  { command: 'feedback', description: 'Yozma ish feedbacki' },
-  { command: 'speaking', description: 'Gapirish savollari' },
-  { command: 'gpt', description: "Erkin savol-javob (GPT)" },
-] as const
 
 export function getTelegramBot() {
   if (!hasTelegramConfig) {
@@ -44,7 +43,7 @@ export async function bootstrapTelegramBot() {
     return
   }
 
-  await instance.telegram.setMyCommands(TELEGRAM_COMMANDS)
+  await instance.telegram.setMyCommands(TELEGRAM_MENU_COMMANDS)
 
   if (env.TELEGRAM_WEBHOOK_URL) {
     const webhookUrl = resolveWebhookUrl(env.TELEGRAM_WEBHOOK_URL)
@@ -63,16 +62,27 @@ function registerHandlers(instance: Telegraf) {
   })
 
   instance.start(async (context) => {
-    const payload = context.payload?.trim()
+    const payload = parseStartPayload(context.payload?.trim())
 
-    if (payload) {
+    if (payload?.type === 'upgrade') {
+      await context.reply(await upgradeMessage(payload.planKey))
+      return
+    }
+
+    if (payload?.type === 'link') {
       try {
-        await telegramRepository.consumeLinkCode(payload, {
+        await telegramRepository.consumeLinkCode(payload.code, {
           id: context.from.id,
           username: context.from.username,
         })
+
         await context.reply(
-          "Telegram akkauntingiz muvaffaqiyatli ulandi.\n\nIshlatish uchun:\n/help\n/balance\n/quiz mavzu\n/lesson mavzu\n/feedback matn\n/speaking mavzu\n/gpt savol",
+          [
+            "Telegram akkauntingiz muvaffaqiyatli ulandi.",
+            '',
+            "Endi quyidagi komandalarni ishlatishingiz mumkin:",
+            ...commandDirectoryLines(),
+          ].join('\n'),
         )
         return
       } catch (error) {
@@ -102,7 +112,7 @@ function registerHandlers(instance: Telegraf) {
     try {
       const plans = await plansRepository.listAll()
       const lines = plans.map(
-        (plan) => `${plan.name}: ${plan.monthlyCredits} token / ${uzsFormatter.format(plan.priceMonthlyUzs)}`,
+        (plan) => `${plan.name}: ${plan.monthlyCredits} token / ${formatUzs(plan.priceMonthlyUzs)}`,
       )
       await context.reply(lines.join('\n'))
     } catch {
@@ -139,7 +149,7 @@ function registerHandlers(instance: Telegraf) {
 
     const prompt = extractCommandArgument(context.message.text, 'gpt')
     if (!prompt) {
-      await context.reply("Misol: /gpt 7-sinflar uchun kasr mavzusini sodda tushuntirib ber")
+      await context.reply(TELEGRAM_COMMAND_MAP.gpt?.example ?? "Misol: /gpt Savol yozing")
       return
     }
 
@@ -157,10 +167,9 @@ function registerHandlers(instance: Telegraf) {
     }
   })
 
-  registerQuickAction(instance, 'quiz', 'quiz')
-  registerQuickAction(instance, 'lesson', 'lesson_plan')
-  registerQuickAction(instance, 'feedback', 'writing_feedback')
-  registerQuickAction(instance, 'speaking', 'speaking_questions')
+  TELEGRAM_FEATURE_COMMANDS.forEach((command) => {
+    registerQuickAction(instance, command.command, command.featureKey)
+  })
 
   instance.on('text', async (context) => {
     const text = context.message.text.trim()
@@ -177,45 +186,13 @@ function registerHandlers(instance: Telegraf) {
       return
     }
 
-    if (normalized.startsWith('test ') || normalized.startsWith('quiz ')) {
+    const matchedFeatureCommand = matchFeatureCommandFromText(text)
+    if (matchedFeatureCommand) {
       await runQuickGeneration({
         telegramUserId: context.from.id,
-        commandHint: '/quiz',
-        featureKey: 'quiz',
-        text: text.split(/\s+/).slice(1).join(' '),
-        reply: (value) => context.reply(value),
-      })
-      return
-    }
-
-    if (normalized.startsWith('dars ') || normalized.startsWith('lesson ')) {
-      await runQuickGeneration({
-        telegramUserId: context.from.id,
-        commandHint: '/lesson',
-        featureKey: 'lesson_plan',
-        text: text.split(/\s+/).slice(1).join(' '),
-        reply: (value) => context.reply(value),
-      })
-      return
-    }
-
-    if (normalized.startsWith('feedback ') || normalized.startsWith('fikr ')) {
-      await runQuickGeneration({
-        telegramUserId: context.from.id,
-        commandHint: '/feedback',
-        featureKey: 'writing_feedback',
-        text: text.split(/\s+/).slice(1).join(' '),
-        reply: (value) => context.reply(value),
-      })
-      return
-    }
-
-    if (normalized.startsWith('speaking ') || normalized.startsWith('gapirish ')) {
-      await runQuickGeneration({
-        telegramUserId: context.from.id,
-        commandHint: '/speaking',
-        featureKey: 'speaking_questions',
-        text: text.split(/\s+/).slice(1).join(' '),
+        commandHint: matchedFeatureCommand.usage,
+        featureKey: matchedFeatureCommand.featureKey,
+        text: matchedFeatureCommand.argument,
         reply: (value) => context.reply(value),
       })
       return
@@ -250,10 +227,11 @@ function registerHandlers(instance: Telegraf) {
 function registerQuickAction(instance: Telegraf, command: string, featureKey: FeatureKey) {
   instance.command(command, async (context) => {
     const text = extractCommandArgument(context.message.text, command)
+    const commandConfig = TELEGRAM_COMMAND_MAP[command]
 
     await runQuickGeneration({
       telegramUserId: context.from.id,
-      commandHint: `/${command}`,
+      commandHint: commandConfig?.usage ?? `/${command}`,
       featureKey,
       text,
       reply: (value) => context.reply(value),
@@ -276,7 +254,8 @@ async function runQuickGeneration(input: {
   }
 
   if (!input.text) {
-    await input.reply(`Mavzu kiriting. Misol: ${input.commandHint} Algebra bo'yicha 10 ta savol`)
+    const commandConfig = TELEGRAM_FEATURE_COMMAND_MAP[input.featureKey]
+    await input.reply(`Mavzu kiriting. Misol: ${commandConfig?.example ?? input.commandHint}`)
     return
   }
 
@@ -328,27 +307,16 @@ function startMessage() {
     "1) Web ilovadagi Sozlamalar bo'limidan link code oling.",
     '2) Botga /start CODE yuboring.',
     "3) Keyin quyidagi komandalarni ishlating:",
-    '/help',
-    '/quiz mavzu',
-    '/lesson mavzu',
-    '/feedback matn',
-    '/speaking mavzu',
-    '/gpt savol',
+    ...commandDirectoryLines(),
   ].join('\n')
 }
 
 function helpMessage() {
   return [
     "Asosiy komandalar:",
-    '/plans - tariflar',
-    '/balance - qolgan kreditlar',
-    '/quiz mavzu - test',
-    '/lesson mavzu - dars rejasi',
-    "/feedback matn - yozma ish bo'yicha fikr",
-    '/speaking mavzu - gapirish savollari',
-    '/gpt savol - GPT bilan erkin savol-javob',
+    ...TELEGRAM_COMMAND_DEFINITIONS.map((command) => `${command.usage} - ${command.description}`),
     '',
-    "Masalan: /gpt 9-sinf uchun energiya mavzusini sodda tushuntir",
+    `Masalan: ${TELEGRAM_COMMAND_MAP.gpt?.example ?? '/gpt savol'}`,
   ].join('\n')
 }
 
@@ -372,6 +340,79 @@ function linkingHelpMessage() {
 
 function isGreeting(text: string) {
   return /^(salom|assalomu alaykum|hello|hi)\b/i.test(text)
+}
+
+function formatUzs(value: number) {
+  return `${uzsFormatter.format(value).replace(/[\u00A0\u202F]/g, ' ')} so'm`
+}
+
+function commandDirectoryLines() {
+  return TELEGRAM_COMMAND_DEFINITIONS.map((command) => command.usage)
+}
+
+function matchFeatureCommandFromText(text: string) {
+  const parts = text.trim().split(/\s+/)
+  const prefix = parts[0]?.toLowerCase()
+
+  if (!prefix) {
+    return null
+  }
+
+  const matchedCommand = TELEGRAM_FEATURE_COMMANDS.find((command) =>
+    command.aliases?.some((alias) => alias === prefix),
+  )
+
+  if (!matchedCommand) {
+    return null
+  }
+
+  return {
+    ...matchedCommand,
+    argument: parts.slice(1).join(' ').trim(),
+  }
+}
+
+function parseStartPayload(payload: string | undefined) {
+  if (!payload) {
+    return null
+  }
+
+  if (payload.startsWith('link_')) {
+    const code = payload.slice('link_'.length).trim()
+    return code ? { type: 'link' as const, code } : null
+  }
+
+  if (payload.startsWith('upgrade_')) {
+    const planKey = payload.slice('upgrade_'.length).trim() as PlanKey
+    if (planKey in PLAN_MAP) {
+      return { type: 'upgrade' as const, planKey }
+    }
+
+    return null
+  }
+
+  return { type: 'link' as const, code: payload }
+}
+
+async function upgradeMessage(planKey: PlanKey) {
+  const configuredPlan = await plansRepository.findByKey(planKey)
+  const plan = configuredPlan ?? PLAN_MAP[planKey]
+
+  if (!plan) {
+    return "Tanlangan tarif topilmadi. /plans orqali mavjud tariflarni ko'rishingiz mumkin."
+  }
+
+  const lines = [
+    `${plan.name} tarifi tanlandi.`,
+    `Narx: ${formatUzs(plan.priceMonthlyUzs)} / oy`,
+    `Limit: ${plan.monthlyCredits} oylik token`,
+    '',
+    plan.description,
+  ]
+
+  lines.push('', `Davom etish uchun billing sahifasi: ${new URL('/app/billing', env.APP_URL).toString()}`)
+
+  return lines.join('\n')
 }
 
 function resolveWebhookUrl(rawUrl: string) {

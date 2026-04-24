@@ -33,6 +33,16 @@ export interface FeatureDefinition {
   helperText: string
 }
 
+export interface AssistantCommandDefinition {
+  command: string
+  description: string
+  usage: string
+  example?: string
+  featureKey?: FeatureKey
+  aliases?: string[]
+  showInTelegramMenu?: boolean
+}
+
 export interface TeacherProfile {
   id: string
   email: string

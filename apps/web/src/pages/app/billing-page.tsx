@@ -149,22 +149,24 @@ export function BillingPage() {
                       </li>
                     </ul>
                   </div>
-                  {isCurrent ? (
-                    <Button className="mt-auto w-full rounded-2xl font-bold" disabled>
-                      Joriy tarif
-                    </Button>
-                  ) : upgradeLink ? (
-                    <Button asChild className="mt-auto w-full rounded-2xl font-bold" variant="outline">
-                      <a href={upgradeLink} target="_blank" rel="noreferrer">
-                        <ShoppingBag className="mr-2 h-4 w-4" />
-                        Sotib olish
-                      </a>
-                    </Button>
-                  ) : (
-                    <Button asChild className="mt-auto w-full rounded-2xl font-bold" variant="outline">
-                      <Link to="/app/settings">Sotib olish</Link>
-                    </Button>
-                  )}
+                  <div className="mt-auto pt-5 sm:pt-6">
+                    {isCurrent ? (
+                      <Button className="h-14 w-full rounded-2xl font-bold" disabled>
+                        Joriy tarif
+                      </Button>
+                    ) : upgradeLink ? (
+                      <Button asChild className="h-14 w-full rounded-2xl font-bold" variant="outline">
+                        <a href={upgradeLink} target="_blank" rel="noreferrer">
+                          <ShoppingBag className="mr-2 h-4 w-4" />
+                          Sotib olish
+                        </a>
+                      </Button>
+                    ) : (
+                      <Button asChild className="h-14 w-full rounded-2xl font-bold" variant="outline">
+                        <Link to="/app/settings">Sotib olish</Link>
+                      </Button>
+                    )}
+                  </div>
                 </CardContent>
               </Card>
             )

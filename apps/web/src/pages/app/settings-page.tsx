@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useMutation } from '@tanstack/react-query'
+import { TELEGRAM_COMMAND_DEFINITIONS } from '@teacher-assistant/shared'
 import { toast } from 'sonner'
 import { Loader2, LogOut, Save, Bot } from 'lucide-react'
 import { PageHeader } from '@/components/shared/page-header'
@@ -157,8 +158,20 @@ export function SettingsPage() {
             <h2 className="text-lg font-black tracking-tight">Telegram ulanishi</h2>
             <p className="mt-1 text-sm font-medium text-muted-foreground/70">Botdan foydalanish uchun hisobingizni ulang.</p>
           </div>
-          <div className="rounded-2xl bg-secondary/50 p-4 text-sm leading-relaxed text-muted-foreground">
-            Buyruqlar: <span className="font-bold text-foreground">/start</span>, <span className="font-bold text-foreground">/quiz</span>, <span className="font-bold text-foreground">/plans</span>, <span className="font-bold text-foreground">/balance</span>
+          <div className="rounded-2xl bg-secondary/50 p-4">
+            <div className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60">
+              Telegram komandalar
+            </div>
+            <div className="mt-3 grid gap-2 sm:grid-cols-2">
+              {TELEGRAM_COMMAND_DEFINITIONS.map((command) => (
+                <div key={command.command} className="rounded-xl border border-border/40 bg-background/70 px-3 py-2">
+                  <div className="text-sm font-black text-foreground">{command.usage}</div>
+                  <div className="mt-1 text-xs font-medium leading-relaxed text-muted-foreground">
+                    {command.description}
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
           <Button
             variant="outline"
