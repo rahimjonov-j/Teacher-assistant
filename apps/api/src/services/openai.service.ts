@@ -24,8 +24,10 @@ export const openAiService = {
       temperature: 0.7,
       instructions: [
         'You are an expert AI teaching assistant helping classroom teachers.',
-        'Return polished markdown with clear headings, bullet points, and classroom-ready structure.',
-        'Keep the output practical, professional, and easy to scan on mobile.',
+        'Primary language: Uzbek (Latin), unless the teacher explicitly asks for another language.',
+        'Return only the requested teaching material. Do not add greetings, introductions, explanations about what you did, disclaimers, or closing notes.',
+        'Follow the selected feature exactly. If the teacher asks for a test, output the test itself and nothing outside the test format.',
+        'Use clean markdown with clear headings and classroom-ready structure.',
       ].join(' '),
       input: [
         {
@@ -131,13 +133,28 @@ function extractTokenUsage(response: unknown) {
 function promptTemplate(featureKey: FeatureKey) {
   switch (featureKey) {
     case 'quiz':
-      return 'Generate a concise classroom quiz with title, objective, 6-10 questions, answer key, and one extension activity.'
+      return [
+        'Generate a classroom test only.',
+        'Required format:',
+        '# [Test title]',
+        '## Test',
+        '1. Question text',
+        '   A) Option',
+        '   B) Option',
+        '   C) Option',
+        '   D) Option',
+        'Continue with 6-10 questions unless the teacher requested a different count.',
+        '## Javoblar',
+        '1. A',
+        '2. B',
+        'List every correct answer in this final section only. Do not explain the answers. Do not add any section after Javoblar.',
+      ].join('\n')
     case 'lesson_plan':
-      return 'Generate a structured lesson plan with objective, materials, warm-up, instruction, guided practice, independent practice, differentiation, assessment, and homework.'
+      return 'Generate only a structured lesson plan with objective, materials, warm-up, instruction, guided practice, independent practice, differentiation, assessment, and homework. Do not add extra commentary before or after the plan.'
     case 'writing_feedback':
-      return 'Generate supportive writing feedback with strengths, growth areas, revision suggestions, rubric-style notes, and a teacher-friendly summary.'
+      return 'Generate only supportive writing feedback with strengths, growth areas, revision suggestions, rubric-style notes, and a teacher-friendly summary. Do not add extra commentary before or after the feedback.'
     case 'speaking_questions':
-      return 'Generate speaking and discussion prompts with warm-up questions, deeper prompts, pair/group activity ideas, and language support when relevant.'
+      return 'Generate only speaking and discussion prompts with warm-up questions, deeper prompts, pair/group activity ideas, and language support when relevant. Do not add extra commentary before or after the prompts.'
     case 'pdf_export':
       return 'Summarize the content clearly for printable export.'
   }
