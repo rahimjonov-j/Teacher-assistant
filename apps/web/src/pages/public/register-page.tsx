@@ -2,12 +2,12 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { Link, useNavigate } from 'react-router-dom'
-import { Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Spinner } from '@/components/ui/spinner'
 import { useAuth } from '@/hooks/use-auth'
 import { useI18n } from '@/hooks/use-i18n'
 import { isSupabaseConfigured } from '@/lib/supabase'
@@ -78,7 +78,7 @@ export function RegisterPage() {
           </div>
 
           <Button type="submit" className="h-12 w-full" disabled={form.formState.isSubmitting || !isSupabaseConfigured}>
-            {form.formState.isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+            {form.formState.isSubmitting ? <Spinner /> : null}
             {t('common.register')}
           </Button>
         </form>
