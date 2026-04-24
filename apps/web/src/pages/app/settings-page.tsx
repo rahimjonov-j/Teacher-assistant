@@ -10,10 +10,13 @@ import {
   Info,
   Lock,
   LogOut,
+  Moon,
   Save,
   Shield,
+  SunMedium,
   UserCircle2,
 } from 'lucide-react'
+import { useTheme } from 'next-themes'
 import { toast } from 'sonner'
 import { useAuth } from '@/hooks/use-auth'
 import { useI18n } from '@/hooks/use-i18n'
@@ -50,6 +53,7 @@ const settingsSections: Array<{
 export function SettingsPage() {
   const { profile, refreshProfile, logout } = useAuth()
   const { language, setLanguage, t } = useI18n()
+  const { resolvedTheme, setTheme } = useTheme()
   const [activeSection, setActiveSection] = useState<SectionKey | null>('profile')
   const [fullName, setFullName] = useState(profile?.fullName ?? '')
   const [schoolName, setSchoolName] = useState(profile?.schoolName ?? '')
@@ -106,6 +110,8 @@ export function SettingsPage() {
     : null
 
   const currentLanguageLabel = language === 'uz' ? t('common.uzbek') : t('common.english')
+  const currentTheme = resolvedTheme === 'dark' ? 'dark' : 'light'
+  const currentThemeLabel = currentTheme === 'dark' ? t('common.dark') : t('common.light')
 
   const toggleSection = (section: SectionKey) => {
     setActiveSection((current) => (current === section ? null : section))
@@ -242,6 +248,43 @@ export function SettingsPage() {
           <div className="rounded-2xl border border-border px-4 py-3 text-sm text-muted-foreground">
             {t('settings.timezone')}: <span className="font-semibold text-foreground">{profile?.timezone ?? 'Asia/Tashkent'}</span>
           </div>
+          <div className="rounded-2xl border border-border bg-secondary/30 px-4 py-3 text-sm text-muted-foreground">
+            {t('settings.themeHint')}
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <button
+              type="button"
+              onClick={() => setTheme('light')}
+              className={cn(
+                'rounded-2xl border px-4 py-4 text-left transition-colors',
+                currentTheme === 'light' ? 'border-foreground bg-foreground text-background' : 'border-border bg-background hover:bg-secondary',
+              )}
+            >
+              <div className="flex items-center gap-2 text-sm font-black">
+                <SunMedium className="h-4 w-4" />
+                {t('common.light')}
+              </div>
+              <div className={cn('mt-1 text-xs', currentTheme === 'light' ? 'text-background/80' : 'text-muted-foreground')}>
+                Light interface
+              </div>
+            </button>
+            <button
+              type="button"
+              onClick={() => setTheme('dark')}
+              className={cn(
+                'rounded-2xl border px-4 py-4 text-left transition-colors',
+                currentTheme === 'dark' ? 'border-foreground bg-foreground text-background' : 'border-border bg-background hover:bg-secondary',
+              )}
+            >
+              <div className="flex items-center gap-2 text-sm font-black">
+                <Moon className="h-4 w-4" />
+                {t('common.dark')}
+              </div>
+              <div className={cn('mt-1 text-xs', currentTheme === 'dark' ? 'text-background/80' : 'text-muted-foreground')}>
+                Dark interface
+              </div>
+            </button>
+          </div>
         </div>
       )
     }
@@ -301,16 +344,24 @@ export function SettingsPage() {
 
                     <div className="flex shrink-0 items-center gap-2">
                       {section.key === 'language' ? (
-                        <div className="w-[132px]" onClick={(event) => event.stopPropagation()}>
+                        <div className="flex items-center gap-2" onClick={(event) => event.stopPropagation()}>
                           <Select
                             aria-label={t('common.language')}
                             value={language}
                             onChange={(event) => setLanguage(event.target.value as typeof language)}
-                            className="h-10 rounded-xl border-border bg-background pr-9 text-xs font-semibold"
+                            className="h-10 w-[120px] rounded-xl border-border bg-background pr-9 text-xs font-semibold"
                           >
                             <option value="uz">{t('common.uzbek')}</option>
                             <option value="en">{t('common.english')}</option>
                           </Select>
+                          <button
+                            type="button"
+                            onClick={() => setTheme(currentTheme === 'dark' ? 'light' : 'dark')}
+                            className="flex h-10 w-10 items-center justify-center rounded-xl border border-border bg-background text-foreground transition-colors hover:bg-secondary"
+                            aria-label={t('settings.theme')}
+                          >
+                            {currentTheme === 'dark' ? <Moon className="h-4 w-4" /> : <SunMedium className="h-4 w-4" />}
+                          </button>
                         </div>
                       ) : null}
 
@@ -319,8 +370,10 @@ export function SettingsPage() {
                   </button>
 
                   {section.key === 'language' ? (
-                    <div className="px-4 pb-3 text-xs font-semibold text-muted-foreground">
-                      {currentLanguageLabel}
+                    <div className="flex flex-wrap items-center gap-2 px-4 pb-3 text-xs font-semibold text-muted-foreground">
+                      <span>{currentLanguageLabel}</span>
+                      <span className="text-border">•</span>
+                      <span>{currentThemeLabel}</span>
                     </div>
                   ) : null}
 
