@@ -49,8 +49,9 @@ export function TeacherLayout() {
   return (
     <div className="relative min-h-screen bg-background">
       {drawerOpen ? (
-        <div className="fixed inset-0 z-50 bg-black/20 backdrop-blur-[1px]" onClick={() => setDrawerOpen(false)}>
+        <div data-no-swipe-back className="fixed inset-0 z-50 bg-black/20 backdrop-blur-[1px]" onClick={() => setDrawerOpen(false)}>
           <aside
+            data-no-swipe-back
             className="flex h-full w-[84%] max-w-[320px] flex-col rounded-r-[32px] border-r border-border bg-card px-4 pb-6 pt-5"
             onClick={(event) => event.stopPropagation()}
           >
