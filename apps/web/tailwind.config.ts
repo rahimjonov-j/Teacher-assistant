@@ -14,9 +14,9 @@ export default {
     },
     extend: {
       borderRadius: {
-        '3xl': '1.5rem',
-        '4xl': '2rem',
-        '5xl': '2.5rem',
+        '3xl': '1.25rem',
+        '4xl': '1.5rem',
+        '5xl': '2rem',
       },
       colors: {
         background: 'hsl(var(--background))',
@@ -47,7 +47,7 @@ export default {
         glass: '0 8px 32px 0 rgba(31, 38, 135, 0.07)',
       },
       fontFamily: {
-        sans: ['Inter', 'sans-serif'],
+        sans: ['Manrope', 'sans-serif'],
       },
     },
   },

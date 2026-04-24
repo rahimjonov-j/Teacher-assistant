@@ -1,13 +1,22 @@
-import { Link, Outlet } from 'react-router-dom'
+import { Link, Outlet, useLocation } from 'react-router-dom'
 import { GraduationCap } from 'lucide-react'
 import { useI18n } from '@/hooks/use-i18n'
 
 export function PublicLayout() {
   const { t } = useI18n()
+  const location = useLocation()
+
+  if (location.pathname === '/') {
+    return (
+      <div className="min-h-screen bg-background">
+        <Outlet />
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-background">
-      <main className="container flex min-h-screen flex-col py-6">
+      <main className="mobile-container flex min-h-screen flex-col py-6">
         <Link to="/login" className="mx-auto flex items-center gap-3 py-2">
           <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-foreground text-background">
             <GraduationCap className="h-5 w-5" />

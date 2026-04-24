@@ -1,10 +1,10 @@
 import { useMutation, useQuery } from '@tanstack/react-query'
 import type { GeneratedContentRecord } from '@teacher-assistant/shared'
 import { ArrowLeft, Copy, FileDown } from 'lucide-react'
-import ReactMarkdown from 'react-markdown'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { toast } from 'sonner'
 import { CardLoader } from '@/components/shared/loading-state'
+import { MarkdownRenderer } from '@/components/shared/markdown-renderer'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -97,7 +97,7 @@ export function ContentDetailPage() {
           </div>
 
           <div className="markdown-body">
-            <ReactMarkdown>{item.outputMarkdown}</ReactMarkdown>
+            <MarkdownRenderer>{item.outputMarkdown}</MarkdownRenderer>
           </div>
         </CardContent>
       </Card>

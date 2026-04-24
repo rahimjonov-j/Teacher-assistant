@@ -32,7 +32,7 @@ export function CardLoader({
     >
       <CardContent className="space-y-6 p-8">
         <div className="flex items-center gap-4">
-          <Skeleton className="h-14 w-14 rounded-[20px]" />
+          <Skeleton className="h-14 w-14 rounded-xl" />
           <div className="space-y-2">
             <Skeleton className="h-4 w-40 rounded-full" />
             <Skeleton className="h-3.5 w-60 rounded-full" />
@@ -40,19 +40,19 @@ export function CardLoader({
         </div>
 
         <div className="space-y-4">
-          <div className="rounded-[24px] border border-border/70 bg-secondary/40 p-5">
+          <div className="rounded-xl border border-border/70 bg-secondary/40 p-5">
             <div className="space-y-3">
               <Skeleton className="h-4 w-[78%] rounded-full" />
               <Skeleton className="h-4 w-[96%] rounded-full" />
             </div>
           </div>
 
-          <div className="space-y-5 rounded-[30px] border border-border bg-card p-6">
-            <Skeleton className="h-14 w-full rounded-[24px]" />
-            <Skeleton className="h-36 w-full rounded-[28px]" />
+          <div className="space-y-5 rounded-xl border border-border bg-card p-6">
+            <Skeleton className="h-14 w-full rounded-xl" />
+            <Skeleton className="h-36 w-full rounded-xl" />
             <div className="grid gap-4 sm:grid-cols-2">
-              <Skeleton className="h-14 w-full rounded-[24px]" />
-              <Skeleton className="h-14 w-full rounded-[24px]" />
+              <Skeleton className="h-14 w-full rounded-xl" />
+              <Skeleton className="h-14 w-full rounded-xl" />
             </div>
           </div>
         </div>

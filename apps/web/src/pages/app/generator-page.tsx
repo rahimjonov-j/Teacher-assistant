@@ -7,9 +7,9 @@ import {
   type GeneratorResponse,
 } from '@teacher-assistant/shared'
 import { Copy, FileText, Sparkles } from 'lucide-react'
-import ReactMarkdown from 'react-markdown'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { toast } from 'sonner'
+import { MarkdownRenderer } from '@/components/shared/markdown-renderer'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -167,7 +167,7 @@ export function GeneratorPage() {
             </div>
 
             <div className="markdown-body">
-              <ReactMarkdown>{result.outputMarkdown}</ReactMarkdown>
+              <MarkdownRenderer>{result.outputMarkdown}</MarkdownRenderer>
             </div>
 
             <Button asChild variant="outline" className="w-full">

@@ -16,6 +16,9 @@ const ResetPasswordPage = lazy(async () => ({
 const RegisterPage = lazy(async () => ({
   default: (await import('@/pages/public/register-page')).RegisterPage,
 }))
+const LandingPage = lazy(async () => ({
+  default: (await import('@/pages/public/landing-page')).LandingPage,
+}))
 const DashboardPage = lazy(async () => ({
   default: (await import('@/pages/app/dashboard-page')).DashboardPage,
 }))
@@ -135,7 +138,11 @@ function HomeGate() {
     return <Navigate to={profile.role === 'admin' ? '/admin/dashboard' : '/app/dashboard'} replace />
   }
 
-  return <Navigate to="/login" replace />
+  return (
+    <LazyRoute label={t('routes.homeLoading')}>
+      <LandingPage />
+    </LazyRoute>
+  )
 }
 
 export function AppRoutes() {
@@ -145,7 +152,14 @@ export function AppRoutes() {
     <Routes>
       <Route element={<PublicLayout />}>
         <Route path="/" element={<HomeGate />} />
-        <Route path="/pricing" element={<Navigate to="/login" replace />} />
+        <Route
+          path="/pricing"
+          element={
+            <LazyRoute label={t('routes.homeLoading')}>
+              <LandingPage />
+            </LazyRoute>
+          }
+        />
         <Route
           path="/reset-password"
           element={
