@@ -8,7 +8,6 @@ import {
   Globe,
   HelpCircle,
   Info,
-  Loader2,
   Lock,
   LogOut,
   Save,
@@ -26,6 +25,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select } from '@/components/ui/select'
+import { Spinner } from '@/components/ui/spinner'
 
 interface LinkCodeResponse {
   linkCode: string
@@ -132,7 +132,7 @@ export function SettingsPage() {
             <Input id="timezone" value={timezone || profileSnapshot.timezone} onChange={(event) => setTimezone(event.target.value)} />
           </div>
           <Button onClick={() => saveMutation.mutate()} disabled={saveMutation.isPending} className="w-full">
-            {saveMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+            {saveMutation.isPending ? <Spinner /> : <Save className="h-4 w-4" />}
             {t('settings.saveProfile')}
           </Button>
         </div>
@@ -152,7 +152,7 @@ export function SettingsPage() {
             />
           </div>
           <Button variant="outline" onClick={() => linkMutation.mutate()} disabled={linkMutation.isPending} className="w-full">
-            {linkMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Bot className="h-4 w-4" />}
+            {linkMutation.isPending ? <Spinner /> : <Bot className="h-4 w-4" />}
             {t('settings.createLinkCode')}
           </Button>
 

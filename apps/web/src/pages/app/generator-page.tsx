@@ -6,7 +6,7 @@ import {
   type FeatureKey,
   type GeneratorResponse,
 } from '@teacher-assistant/shared'
-import { Copy, FileText, Loader2, Sparkles } from 'lucide-react'
+import { Copy, FileText, Sparkles } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { toast } from 'sonner'
@@ -15,6 +15,8 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select } from '@/components/ui/select'
+import { Skeleton } from '@/components/ui/skeleton'
+import { Spinner } from '@/components/ui/spinner'
 import { Textarea } from '@/components/ui/textarea'
 import { useI18n } from '@/hooks/use-i18n'
 import { ApiRequestError, apiRequest } from '@/lib/api'
@@ -127,7 +129,7 @@ export function GeneratorPage() {
           </div>
 
           <Button className="h-14 w-full" onClick={() => mutation.mutate()} disabled={mutation.isPending || !topic}>
-            {mutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+            {mutation.isPending ? <Spinner /> : <Sparkles className="h-4 w-4" />}
             {t('generator.generate')}
           </Button>
         </CardContent>
@@ -136,10 +138,10 @@ export function GeneratorPage() {
       {mutation.isPending ? (
         <Card>
           <CardContent className="space-y-3 p-5">
-            <div className="h-4 w-2/5 animate-pulse rounded-full bg-muted" />
-            <div className="h-4 w-full animate-pulse rounded-full bg-muted" />
-            <div className="h-4 w-4/5 animate-pulse rounded-full bg-muted" />
-            <div className="h-48 animate-pulse rounded-2xl bg-muted" />
+            <Skeleton className="h-4 w-2/5 rounded-full" />
+            <Skeleton className="h-4 w-full rounded-full" />
+            <Skeleton className="h-4 w-4/5 rounded-full" />
+            <Skeleton className="h-48 rounded-2xl" />
           </CardContent>
         </Card>
       ) : null}

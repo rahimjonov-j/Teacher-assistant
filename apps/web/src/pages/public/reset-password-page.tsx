@@ -3,12 +3,13 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { Link, useNavigate } from 'react-router-dom'
-import { Eye, EyeOff, Loader2 } from 'lucide-react'
+import { Eye, EyeOff } from 'lucide-react'
 import { toast } from 'sonner'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Spinner } from '@/components/ui/spinner'
 import { useI18n } from '@/hooks/use-i18n'
 import { isSupabaseConfigured, supabase } from '@/lib/supabase'
 
@@ -130,7 +131,7 @@ export function ResetPasswordPage() {
             </div>
 
             <Button type="submit" className="h-12 w-full" disabled={updateForm.formState.isSubmitting || !isSupabaseConfigured}>
-              {updateForm.formState.isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+              {updateForm.formState.isSubmitting ? <Spinner /> : null}
               {t('public.password.update')}
             </Button>
           </form>
@@ -146,7 +147,7 @@ export function ResetPasswordPage() {
               <Input id="email" type="email" placeholder="teacher@school.uz" {...requestForm.register('email')} />
             </div>
               <Button type="submit" className="h-12 w-full" disabled={requestForm.formState.isSubmitting || !isSupabaseConfigured}>
-                {requestForm.formState.isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+                {requestForm.formState.isSubmitting ? <Spinner /> : null}
                 {t('public.password.sendLink')}
               </Button>
             </form>

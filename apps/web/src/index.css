@@ -96,18 +96,6 @@
   .markdown-body {
     @apply whitespace-pre-wrap text-[15px] leading-7 text-foreground;
   }
-
-  .telegram-loader-line {
-    @apply animate-pulse bg-muted;
-  }
-
-  .telegram-loader-panel {
-    @apply rounded-2xl border border-border bg-card;
-  }
-
-  .telegram-loader-sheen {
-    animation: telegramSheen 2s linear infinite;
-  }
 }
 
 @keyframes fadeIn {
@@ -118,15 +106,6 @@
   to {
     opacity: 1;
     transform: translateY(0);
-  }
-}
-
-@keyframes telegramSheen {
-  from {
-    transform: translateX(-120%);
-  }
-  to {
-    transform: translateX(200%);
   }
 }
 

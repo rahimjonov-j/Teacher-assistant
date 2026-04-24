@@ -1,6 +1,6 @@
 import { useMutation, useQuery } from '@tanstack/react-query'
 import type { GeneratedContentRecord } from '@teacher-assistant/shared'
-import { ArrowLeft, Copy, FileDown, Loader2 } from 'lucide-react'
+import { ArrowLeft, Copy, FileDown } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { toast } from 'sonner'
@@ -8,6 +8,7 @@ import { CardLoader } from '@/components/shared/loading-state'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
+import { Spinner } from '@/components/ui/spinner'
 import { useI18n } from '@/hooks/use-i18n'
 import { ApiRequestError, apiRequest } from '@/lib/api'
 import { formatDate, getFeatureLabel } from '@/lib/format'
@@ -89,7 +90,7 @@ export function ContentDetailPage() {
               </Button>
             ) : (
               <Button variant="outline" size="sm" onClick={() => exportMutation.mutate()} disabled={exportMutation.isPending}>
-                {exportMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <FileDown className="h-4 w-4" />}
+                {exportMutation.isPending ? <Spinner /> : <FileDown className="h-4 w-4" />}
                 {t('detail.exportPdf')}
               </Button>
             )}
