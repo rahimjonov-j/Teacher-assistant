@@ -8,12 +8,12 @@ import { useI18n } from '@/hooks/use-i18n'
 import { cn } from '@/lib/utils'
 
 const navItems = [
-  { to: '/admin/dashboard', label: 'Umumiy', icon: BarChart3 },
-  { to: '/admin/teachers', label: 'Foydalanuvchilar', icon: Users },
-  { to: '/admin/analytics/usage', label: 'Foydalanish', icon: LineChart },
-  { to: '/admin/analytics/features', label: 'Funksiyalar', icon: Layers3 },
-  { to: '/admin/subscriptions', label: 'Obunalar', icon: CreditCard },
-  { to: '/admin/activity', label: 'Faollik', icon: Activity },
+  { to: '/admin/dashboard', labelKey: 'admin.layout.overview', icon: BarChart3 },
+  { to: '/admin/teachers', labelKey: 'admin.layout.users', icon: Users },
+  { to: '/admin/analytics/usage', labelKey: 'admin.layout.usage', icon: LineChart },
+  { to: '/admin/analytics/features', labelKey: 'admin.layout.features', icon: Layers3 },
+  { to: '/admin/subscriptions', labelKey: 'admin.layout.subscriptions', icon: CreditCard },
+  { to: '/admin/activity', labelKey: 'admin.layout.activity', icon: Activity },
 ]
 
 export function AdminLayout() {
@@ -21,87 +21,135 @@ export function AdminLayout() {
   const { t } = useI18n()
 
   return (
-    <div className="app-shell selection:bg-sky-500/20 selection:text-sky-400">
-      <header className="mb-8 overflow-hidden rounded-[32px] border border-border/70 bg-white/90 text-slate-900 shadow-xl animate-in dark:border-white/5 dark:bg-[#0a0c10] dark:text-slate-100 dark:shadow-2xl dark:shadow-black/50 max-sm:rounded-none max-sm:border-0 max-sm:bg-background max-sm:shadow-none max-sm:dark:bg-background">
-        <div className="border-b border-slate-200/80 px-6 py-8 dark:border-white/5 sm:px-8 max-sm:border-0 max-sm:px-4 max-sm:py-5">
-          <div className="flex flex-col gap-6 xl:flex-row xl:items-center xl:justify-between">
-            <div className="space-y-4">
-              <div className="flex flex-wrap items-center gap-3">
-                <Badge variant="gradient" className="h-6 border-none bg-sky-500 px-3 text-[10px] text-white max-sm:bg-secondary max-sm:text-foreground">ADMIN</Badge>
-                <div className="h-4 w-[1px] bg-slate-200 dark:bg-white/10 max-sm:hidden" />
-                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 max-sm:hidden">{t('admin.layout.controlPanel')}</span>
+    <div className="min-h-screen bg-background selection:bg-sky-500/20 selection:text-sky-400">
+      <div className="mx-auto grid min-h-screen w-full max-w-[1440px] gap-6 px-4 py-4 lg:grid-cols-[280px_minmax(0,1fr)] lg:px-6 lg:py-6">
+        <aside className="sticky top-6 hidden h-[calc(100vh-3rem)] flex-col overflow-hidden rounded-[32px] border border-border/70 bg-white/92 p-4 shadow-xl lg:flex">
+          <div className="border-b border-border/70 px-3 pb-4 pt-2">
+            <div className="flex items-center gap-3">
+              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-foreground text-background">
+                <BarChart3 className="h-5 w-5" />
               </div>
               <div>
-                <Link to="/admin/dashboard" className="flex items-center gap-3 text-2xl font-black tracking-tight text-slate-900 dark:text-white sm:text-3xl">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-sky-500/20 bg-sky-500/10 max-sm:hidden">
-                    <BarChart3 className="h-6 w-6 text-sky-400" />
-                  </div>
-                  {t('admin.layout.systemAnalytics')}
-                </Link>
+                <div className="text-sm font-black tracking-tight">{t('admin.layout.controlPanel')}</div>
+                <div className="text-xs text-muted-foreground">{t('admin.layout.systemAnalytics')}</div>
               </div>
             </div>
+          </div>
+          <nav className="mt-4 flex flex-1 flex-col gap-2">
+            {navItems.map((item) => (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                className={({ isActive }) =>
+                  cn(
+                    'flex items-center gap-3 rounded-2xl px-3 py-3 text-sm font-semibold transition-colors',
+                    isActive ? 'bg-foreground text-background' : 'text-muted-foreground hover:bg-secondary hover:text-foreground',
+                  )
+                }
+              >
+                {({ isActive }) => (
+                  <>
+                    <div className={cn('flex h-10 w-10 items-center justify-center rounded-2xl', isActive ? 'bg-background/10' : 'bg-secondary')}>
+                      <item.icon className="h-5 w-5" />
+                    </div>
+                    <span>{t(item.labelKey)}</span>
+                  </>
+                )}
+              </NavLink>
+            ))}
+          </nav>
 
-            <div className="flex flex-wrap items-center gap-3 max-sm:gap-2">
-              <Button asChild variant="outline" className="h-11 rounded-2xl border-border/70 bg-white/80 text-slate-700 hover:bg-white dark:border-white/10 dark:bg-white/5 dark:text-slate-200 dark:hover:bg-white/10 max-sm:border-0 max-sm:bg-secondary max-sm:shadow-none max-sm:backdrop-blur-none">
-                <Link to="/app/dashboard">
-                  <ArrowRightLeft className="h-4 w-4 text-sky-400" />
-                  {t('admin.layout.teacherApp')}
-                </Link>
-              </Button>
-              <div className="mx-1 h-8 w-[1px] bg-slate-200 dark:bg-white/5 max-sm:hidden" />
+          <div className="space-y-3 border-t border-border/70 px-2 pt-4">
+            <Button asChild variant="outline" className="w-full justify-start">
+              <Link to="/app/dashboard">
+                <ArrowRightLeft className="h-4 w-4" />
+                {t('admin.layout.teacherApp')}
+              </Link>
+            </Button>
+
+            <div className="flex items-center gap-3">
               <ThemeToggle />
               <Button
                 variant="outline"
-                className="h-11 w-11 rounded-2xl border-border/70 bg-white/80 text-slate-500 hover:bg-white hover:text-slate-900 dark:border-white/10 dark:bg-white/5 dark:text-slate-400 dark:hover:bg-white/10 dark:hover:text-white max-sm:border-0 max-sm:bg-secondary max-sm:shadow-none max-sm:backdrop-blur-none"
-                size="icon"
+                className="flex-1 justify-start"
                 onClick={async () => {
                   await logout()
                 }}
               >
                 <LogOut className="h-4 w-4" />
+                {t('common.logout')}
               </Button>
             </div>
           </div>
-        </div>
-      </header>
+        </aside>
 
-      <main className="animate-in [animation-delay:150ms]">
-        <Outlet />
-      </main>
+        <div className="min-w-0">
+          <header className="mb-6 overflow-hidden rounded-[32px] border border-border/70 bg-white/92 shadow-xl animate-in">
+            <div className="border-b border-border/70 px-5 py-6 sm:px-6">
+              <div className="flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between">
+                <div className="space-y-3">
+                  <div className="flex flex-wrap items-center gap-3">
+                    <Badge variant="gradient" className="h-6 border-none bg-foreground px-3 text-[10px] text-background">
+                      ADMIN
+                    </Badge>
+                    <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
+                      {t('admin.layout.controlPanel')}
+                    </span>
+                  </div>
+                  <Link to="/admin/dashboard" className="flex items-center gap-3 text-2xl font-black tracking-tight sm:text-3xl">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-border bg-secondary lg:hidden">
+                      <BarChart3 className="h-5 w-5" />
+                    </div>
+                    {t('admin.layout.systemAnalytics')}
+                  </Link>
+                </div>
 
-      <nav className="fixed inset-x-0 bottom-0 z-50 border-t border-border/60 bg-background/95 px-2 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2 shadow-[0_-12px_32px_-30px_rgba(15,23,42,0.45)] backdrop-blur-xl sm:inset-x-6 sm:bottom-6 sm:mx-auto sm:max-w-2xl sm:rounded-[28px] sm:border sm:p-2">
-        <div className="flex items-center gap-1 overflow-x-auto sm:justify-center">
-          {navItems.map((item) => (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              className={({ isActive }) =>
-                cn(
-                  'group flex h-12 min-w-0 flex-1 items-center justify-center rounded-2xl px-2 text-muted-foreground transition-colors duration-200 sm:h-11 sm:flex-none sm:px-4',
-                  isActive
-                    ? 'bg-foreground text-background'
-                    : 'hover:bg-secondary hover:text-foreground',
-                )
-              }
-            >
-              <item.icon className="h-5 w-5 transition-transform duration-200 group-active:scale-90" />
-              <span className="sr-only">
-                {item.to === '/admin/dashboard'
-                  ? t('admin.layout.overview')
-                  : item.to === '/admin/teachers'
-                    ? t('admin.layout.users')
-                    : item.to === '/admin/analytics/usage'
-                      ? t('admin.layout.usage')
-                      : item.to === '/admin/analytics/features'
-                        ? t('admin.layout.features')
-                        : item.to === '/admin/subscriptions'
-                          ? t('admin.layout.subscriptions')
-                          : t('admin.layout.activity')}
-              </span>
-            </NavLink>
-          ))}
+                <div className="flex flex-wrap items-center gap-3">
+                  <Button asChild variant="outline" className="h-11 rounded-2xl">
+                    <Link to="/app/dashboard">
+                      <ArrowRightLeft className="h-4 w-4" />
+                      {t('admin.layout.teacherApp')}
+                    </Link>
+                  </Button>
+                  <ThemeToggle />
+                  <Button
+                    variant="outline"
+                    className="h-11 rounded-2xl"
+                    onClick={async () => {
+                      await logout()
+                    }}
+                  >
+                    <LogOut className="h-4 w-4" />
+                    {t('common.logout')}
+                  </Button>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap gap-2 px-4 py-4 lg:hidden">
+              {navItems.map((item) => (
+                <NavLink
+                  key={item.to}
+                  to={item.to}
+                  className={({ isActive }) =>
+                    cn(
+                      'inline-flex items-center gap-2 rounded-2xl px-4 py-2.5 text-sm font-semibold transition-colors',
+                      isActive ? 'bg-foreground text-background' : 'bg-secondary text-foreground hover:bg-accent',
+                    )
+                  }
+                >
+                  <item.icon className="h-4 w-4" />
+                  <span>{t(item.labelKey)}</span>
+                </NavLink>
+              ))}
+            </div>
+          </header>
+
+          <main className="animate-in [animation-delay:150ms]">
+            <Outlet />
+          </main>
         </div>
-      </nav>
+      </div>
     </div>
   )
 }
