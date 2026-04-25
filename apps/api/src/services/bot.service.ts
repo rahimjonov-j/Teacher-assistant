@@ -144,7 +144,7 @@ function registerHandlers(instance: Telegraf) {
 
   instance.command('link', async (context) => {
     pendingActions.set(context.from.id, { type: 'link' })
-    await context.reply(linkPrompt(), backKeyboard())
+    await context.reply(linkPrompt(), linkCodeKeyboard())
   })
 
   instance.command('plans', async (context) => {
@@ -221,7 +221,7 @@ function registerHandlers(instance: Telegraf) {
   instance.action('settings:link', async (context) => {
     pendingActions.set(context.from.id, { type: 'link' })
     await context.answerCbQuery()
-    await context.reply(linkPrompt(), backKeyboard())
+    await context.reply(linkPrompt(), linkCodeKeyboard())
   })
 
   instance.action('settings:language', async (context) => {
@@ -378,7 +378,7 @@ async function consumeLinkCodeFromText(input: {
 
   if (!code) {
     pendingActions.set(input.telegramUserId, { type: 'link' })
-    await input.reply(linkPrompt(), backKeyboard())
+    await input.reply(linkPrompt(), linkCodeKeyboard())
     return
   }
 
@@ -391,7 +391,7 @@ async function consumeLinkCodeFromText(input: {
     await input.reply('✅ Muvaffaqiyatli ulandingiz!', mainMenuKeyboard())
   } catch (error) {
     pendingActions.set(input.telegramUserId, { type: 'link' })
-    await input.reply(linkErrorMessage(error), backKeyboard())
+    await input.reply(linkErrorMessage(error), linkCodeKeyboard())
   }
 }
 
@@ -433,7 +433,11 @@ function helpMessage() {
 }
 
 function linkPrompt() {
-  return 'Web ilovadagi Sozlamalar bo‘limidan link code oling va shu yerga yuboring 🔐'
+  return [
+    'Botni ulash uchun web ilovadan ro‘yxatdan o‘ting.',
+    '',
+    'Keyin “Telegram kodni olish” sahifasidan link code oling va shu yerga yuboring 🔐',
+  ].join('\n')
 }
 
 function unlinkedMessage() {
@@ -506,6 +510,20 @@ function linkingKeyboard() {
   ])
 }
 
+function linkCodeKeyboard() {
+  const linkCodePageUrl = getLinkCodePageUrl()
+  const buttons: Array<
+    Array<ReturnType<typeof Markup.button.url> | ReturnType<typeof Markup.button.callback>>
+  > = []
+
+  if (linkCodePageUrl) {
+    buttons.push([Markup.button.url('🔑 Kodni olish', linkCodePageUrl)])
+  }
+
+  buttons.push([Markup.button.callback('🔙 Ortga', 'back')])
+  return Markup.inlineKeyboard(buttons)
+}
+
 function backKeyboard() {
   return Markup.inlineKeyboard([[Markup.button.callback('🔙 Ortga', 'back')]])
 }
@@ -549,6 +567,14 @@ function buildPlansKeyboard(
 function getTelegramBotLink() {
   const username = env.TELEGRAM_BOT_USERNAME?.replace(/^@+/, '').trim()
   return username ? `https://t.me/${username}` : null
+}
+
+function getLinkCodePageUrl() {
+  try {
+    return new URL('/app/telegram-link', env.APP_URL).toString()
+  } catch {
+    return null
+  }
 }
 
 function isBotFeatureKey(featureKey: FeatureKey | undefined): featureKey is BotFeatureKey {

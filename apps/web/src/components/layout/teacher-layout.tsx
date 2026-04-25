@@ -5,6 +5,7 @@ import {
   ClipboardCheck,
   CreditCard,
   Database,
+  KeyRound,
   LayoutDashboard,
   LogOut,
   Menu,
@@ -20,26 +21,28 @@ import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
 const navItems = [
-  { to: '/app/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { to: '/app/messenger', label: 'Messenger', icon: MessageSquare },
-  { to: '/app/calendar', label: 'Calendar', icon: CalendarDays },
-  { to: '/app/database', label: 'Database', icon: Database },
-  { to: '/app/attendance', label: 'Attendance', icon: ClipboardCheck },
-  { to: '/app/settings', label: 'Settings', icon: Settings },
-  { to: '/app/billing', label: 'Plans', icon: CreditCard },
+  { to: '/app/dashboard', labelKey: 'teacher.nav.dashboard', icon: LayoutDashboard },
+  { to: '/app/messenger', labelKey: 'teacher.nav.messenger', icon: MessageSquare },
+  { to: '/app/calendar', labelKey: 'teacher.nav.calendar', icon: CalendarDays },
+  { to: '/app/database', labelKey: 'teacher.nav.database', icon: Database },
+  { to: '/app/attendance', labelKey: 'teacher.nav.attendance', icon: ClipboardCheck },
+  { to: '/app/telegram-link', labelKey: 'teacher.nav.telegramLink', icon: KeyRound },
+  { to: '/app/settings', labelKey: 'teacher.nav.settings', icon: Settings },
+  { to: '/app/billing', labelKey: 'teacher.menu.plans', icon: CreditCard },
 ] as const
 
-const pageMeta: Array<{ pattern: string; title: string; actionTo?: string }> = [
-  { pattern: '/app/dashboard', title: 'Dashboard', actionTo: '/app/generator' },
-  { pattern: '/app/messenger', title: 'Messenger', actionTo: '/app/generator' },
-  { pattern: '/app/calendar', title: 'Calendar', actionTo: '/app/generator' },
-  { pattern: '/app/database', title: 'Database', actionTo: '/app/generator' },
-  { pattern: '/app/attendance', title: 'Attendance', actionTo: '/app/generator' },
-  { pattern: '/app/settings', title: 'Settings' },
-  { pattern: '/app/generator', title: 'Create' },
-  { pattern: '/app/history', title: 'Messenger' },
-  { pattern: '/app/history/:id', title: 'Detail' },
-  { pattern: '/app/billing', title: 'Plans' },
+const pageMeta: Array<{ pattern: string; titleKey: string; actionTo?: string }> = [
+  { pattern: '/app/dashboard', titleKey: 'teacher.nav.dashboard', actionTo: '/app/generator' },
+  { pattern: '/app/messenger', titleKey: 'teacher.nav.messenger', actionTo: '/app/generator' },
+  { pattern: '/app/calendar', titleKey: 'teacher.nav.calendar', actionTo: '/app/generator' },
+  { pattern: '/app/database', titleKey: 'teacher.nav.database', actionTo: '/app/generator' },
+  { pattern: '/app/attendance', titleKey: 'teacher.nav.attendance', actionTo: '/app/generator' },
+  { pattern: '/app/telegram-link', titleKey: 'teacher.nav.telegramLink' },
+  { pattern: '/app/settings', titleKey: 'teacher.nav.settings' },
+  { pattern: '/app/generator', titleKey: 'teacher.header.create' },
+  { pattern: '/app/history', titleKey: 'teacher.nav.messenger' },
+  { pattern: '/app/history/:id', titleKey: 'teacher.header.detail' },
+  { pattern: '/app/billing', titleKey: 'teacher.menu.plans' },
 ] as const
 
 export function TeacherLayout() {
@@ -118,7 +121,7 @@ export function TeacherLayout() {
                         <div className={cn('flex h-10 w-10 items-center justify-center rounded-2xl', isActive ? 'bg-background' : 'bg-secondary')}>
                           <item.icon className="h-5 w-5" />
                         </div>
-                        <span>{item.label === 'Plans' ? t('teacher.menu.plans') : t(`teacher.nav.${item.label.toLowerCase()}`)}</span>
+                        <span>{t(item.labelKey)}</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <ChevronRight className="h-4 w-4 text-muted-foreground" />
@@ -153,13 +156,7 @@ export function TeacherLayout() {
           </Button>
           <div className="text-center">
             <div className="text-sm font-black tracking-tight">
-              {currentPage.title === 'Create'
-                ? t('teacher.header.create')
-                : currentPage.title === 'Detail'
-                  ? t('teacher.header.detail')
-                  : currentPage.title === 'Plans'
-                    ? t('teacher.menu.plans')
-                  : t(`teacher.nav.${currentPage.title.toLowerCase()}`)}
+              {t(currentPage.titleKey)}
             </div>
           </div>
           {currentPage.actionTo ? (

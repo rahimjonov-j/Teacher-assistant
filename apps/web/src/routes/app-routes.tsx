@@ -43,6 +43,9 @@ const ContentDetailPage = lazy(async () => ({
 const SettingsPage = lazy(async () => ({
   default: (await import('@/pages/app/settings-page')).SettingsPage,
 }))
+const TelegramLinkPage = lazy(async () => ({
+  default: (await import('@/pages/app/telegram-link-page')).TelegramLinkPage,
+}))
 const BillingPage = lazy(async () => ({
   default: (await import('@/pages/app/billing-page')).BillingPage,
 }))
@@ -245,6 +248,14 @@ export function AppRoutes() {
             element={
               <LazyRoute label={t('routes.detailLoading')}>
                 <ContentDetailPage />
+              </LazyRoute>
+            }
+          />
+          <Route
+            path="/app/telegram-link"
+            element={
+              <LazyRoute label={t('routes.telegramLinkLoading')}>
+                <TelegramLinkPage />
               </LazyRoute>
             }
           />

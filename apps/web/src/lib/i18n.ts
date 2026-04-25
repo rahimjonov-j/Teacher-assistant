@@ -190,6 +190,7 @@ export const messages: Record<AppLanguage, Record<string, string>> = {
     'routes.generatorLoading': 'Generator yuklanmoqda',
     'routes.detailLoading': 'Material yuklanmoqda',
     'routes.settingsLoading': 'Sozlamalar yuklanmoqda',
+    'routes.telegramLinkLoading': 'Telegram kodi yuklanmoqda',
     'routes.billingLoading': "To'lov sahifasi yuklanmoqda",
 
     'teacher.nav.dashboard': 'Dashboard',
@@ -197,6 +198,7 @@ export const messages: Record<AppLanguage, Record<string, string>> = {
     'teacher.nav.calendar': 'Kalendar',
     'teacher.nav.database': 'Baza',
     'teacher.nav.attendance': 'Davomat',
+    'teacher.nav.telegramLink': 'Telegram kod',
     'teacher.nav.settings': 'Sozlamalar',
     'teacher.menu.workspace': 'Ish maydoni menyusi',
     'teacher.menu.plans': 'Tariflar',
@@ -501,6 +503,7 @@ export const messages: Record<AppLanguage, Record<string, string>> = {
     'routes.generatorLoading': 'Loading generator',
     'routes.detailLoading': 'Loading content',
     'routes.settingsLoading': 'Loading settings',
+    'routes.telegramLinkLoading': 'Loading Telegram code',
     'routes.billingLoading': 'Loading billing page',
 
     'teacher.nav.dashboard': 'Dashboard',
@@ -508,6 +511,7 @@ export const messages: Record<AppLanguage, Record<string, string>> = {
     'teacher.nav.calendar': 'Calendar',
     'teacher.nav.database': 'Database',
     'teacher.nav.attendance': 'Attendance',
+    'teacher.nav.telegramLink': 'Telegram code',
     'teacher.nav.settings': 'Settings',
     'teacher.menu.workspace': 'Workspace menu',
     'teacher.menu.plans': 'Plans',
