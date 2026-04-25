@@ -39,6 +39,39 @@ type InlineKeyboard = ReturnType<typeof Markup.inlineKeyboard>
 
 const pendingActions = new Map<number, PendingAction>()
 
+const helpIssues = {
+  code: {
+    button: '🔑 Kod topolmayapman',
+    text: 'Web ilovaga kiring. Sidebar’dan “Telegram kod” sahifasini oching va “Kod yaratish” tugmasini bosing.',
+  },
+  link: {
+    button: '🔗 Bot ulanmayapti',
+    text: 'Yangi kod yarating va botga aynan shu kodni yuboring. Kod 20 daqiqa ichida ishlatilishi kerak.',
+  },
+  ai: {
+    button: '🤖 AI javob bermayapti',
+    text: 'Avval hisob ulanganini tekshiring. Keyin mavzuni qisqa va aniq yozing. Masalan: “Fotosintez bo‘yicha 10 ta test”.',
+  },
+  credits: {
+    button: '💳 Kredit yetmayapti',
+    text: 'Kredit tugagan bo‘lsa, web ilovadagi “Tariflar” sahifasidan tarifni yangilang yoki keyingi davrni kuting.',
+  },
+  result: {
+    button: '📝 Natija mos emas',
+    text: 'Mavzuga sinf, fan va talabni qo‘shib yozing. Masalan: “7-sinf biologiya, fotosintez, 8 ta oson test”.',
+  },
+  web: {
+    button: '🌐 Web ochilmayapti',
+    text: 'Internetni tekshiring va qayta kiring. Agar lokal test bo‘lsa, web ilova ochiq turganiga ishonch hosil qiling.',
+  },
+  language: {
+    button: '🇺🇿 Til muammosi',
+    text: 'Bot asosiy javoblarni o‘zbek tilida beradi. Agar natija boshqa tilda chiqsa, so‘rovga “o‘zbek tilida” deb qo‘shing.',
+  },
+} as const
+
+type HelpIssueKey = keyof typeof helpIssues
+
 const featureUx: Record<
   BotFeatureKey,
   {
@@ -141,7 +174,7 @@ function registerHandlers(instance: Telegraf) {
 
   instance.command('help', async (context) => {
     pendingActions.delete(context.from.id)
-    await context.reply(helpMessage(), settingsKeyboard())
+    await context.reply(helpMessage(), helpKeyboard())
   })
 
   instance.command('link', async (context) => {
@@ -235,7 +268,25 @@ function registerHandlers(instance: Telegraf) {
   instance.action('settings:help', async (context) => {
     pendingActions.delete(context.from.id)
     await context.answerCbQuery()
-    await updateTelegramMessage(context, helpMessage(), backKeyboard())
+    await updateTelegramMessage(context, helpMessage(), helpKeyboard())
+  })
+
+  instance.action('help:other', async (context) => {
+    pendingActions.delete(context.from.id)
+    await context.answerCbQuery()
+    await updateTelegramMessage(context, 'Boshqa muammolar 👇', helpOtherKeyboard())
+  })
+
+  Object.keys(helpIssues).forEach((issueKey) => {
+    instance.action(`help:${issueKey}`, async (context) => {
+      pendingActions.delete(context.from.id)
+      await context.answerCbQuery()
+      await updateTelegramMessage(
+        context,
+        helpIssueMessage(issueKey as HelpIssueKey),
+        helpAnswerKeyboard(),
+      )
+    })
   })
 
   instance.action('back', async (context) => {
@@ -439,8 +490,13 @@ function helpMessage() {
   return [
     'Qanday yordam beraman? 👇',
     '',
-    'Kerakli bo‘limni tanlang, mavzu yoki matn yuboring. Natijadan keyin yana davom ettirishingiz mumkin.',
+    'Muammo turini tanlang. Men qisqa yo‘l ko‘rsataman.',
   ].join('\n')
+}
+
+function helpIssueMessage(issueKey: HelpIssueKey) {
+  const issue = helpIssues[issueKey]
+  return [issue.button, '', issue.text].join('\n')
 }
 
 function linkPrompt() {
@@ -516,6 +572,33 @@ function settingsKeyboard() {
     [Markup.button.callback('🔗 Ulanish (link code)', 'settings:link')],
     [Markup.button.callback('🌐 Til', 'settings:language')],
     [Markup.button.callback('❓ Yordam', 'settings:help')],
+    [Markup.button.callback('🔙 Ortga', 'back')],
+  ])
+}
+
+function helpKeyboard() {
+  return Markup.inlineKeyboard([
+    [Markup.button.callback(helpIssues.code.button, 'help:code')],
+    [Markup.button.callback(helpIssues.link.button, 'help:link')],
+    [Markup.button.callback(helpIssues.ai.button, 'help:ai')],
+    [Markup.button.callback('➕ Boshqa', 'help:other')],
+    [Markup.button.callback('🔙 Ortga', 'back')],
+  ])
+}
+
+function helpOtherKeyboard() {
+  return Markup.inlineKeyboard([
+    [Markup.button.callback(helpIssues.credits.button, 'help:credits')],
+    [Markup.button.callback(helpIssues.result.button, 'help:result')],
+    [Markup.button.callback(helpIssues.web.button, 'help:web')],
+    [Markup.button.callback(helpIssues.language.button, 'help:language')],
+    [Markup.button.callback('🔙 Ortga', 'back')],
+  ])
+}
+
+function helpAnswerKeyboard() {
+  return Markup.inlineKeyboard([
+    [Markup.button.callback('➕ Boshqa muammolar', 'help:other')],
     [Markup.button.callback('🔙 Ortga', 'back')],
   ])
 }
