@@ -4,7 +4,7 @@ import {
   type FeatureKey,
   type PlanKey,
 } from '@teacher-assistant/shared'
-import { Markup, Telegraf } from 'telegraf'
+import { Markup, Telegraf, type Context } from 'telegraf'
 import { env, hasTelegramConfig } from '../config/env.js'
 import { plansRepository } from '../repositories/plans.repository.js'
 import { telegramRepository } from '../repositories/telegram.repository.js'
@@ -34,6 +34,8 @@ type PendingAction =
   | {
       type: 'link'
     }
+
+type InlineKeyboard = ReturnType<typeof Markup.inlineKeyboard>
 
 const pendingActions = new Map<number, PendingAction>()
 
@@ -200,14 +202,14 @@ function registerHandlers(instance: Telegraf) {
     instance.action(`feature:${featureKey}`, async (context) => {
       await context.answerCbQuery()
       await promptForFeature(context.from.id, featureKey, (message, keyboard) =>
-        context.reply(message, keyboard),
+        updateTelegramMessage(context, message, keyboard),
       )
     })
 
     instance.action(`repeat:${featureKey}`, async (context) => {
       await context.answerCbQuery()
       await promptForFeature(context.from.id, featureKey, (message, keyboard) =>
-        context.reply(message, keyboard),
+        updateTelegramMessage(context, message, keyboard),
       )
     })
   })
@@ -215,31 +217,31 @@ function registerHandlers(instance: Telegraf) {
   instance.action('settings', async (context) => {
     pendingActions.delete(context.from.id)
     await context.answerCbQuery()
-    await context.reply('Sozlamalar 👇', settingsKeyboard())
+    await updateTelegramMessage(context, 'Sozlamalar 👇', settingsKeyboard())
   })
 
   instance.action('settings:link', async (context) => {
     pendingActions.set(context.from.id, { type: 'link' })
     await context.answerCbQuery()
-    await context.reply(linkPrompt(), linkCodeKeyboard())
+    await updateTelegramMessage(context, linkPrompt(), linkCodeKeyboard())
   })
 
   instance.action('settings:language', async (context) => {
     pendingActions.delete(context.from.id)
     await context.answerCbQuery()
-    await context.reply('🌐 Bot tili: O‘zbek tili', backKeyboard())
+    await updateTelegramMessage(context, '🌐 Bot tili: O‘zbek tili', backKeyboard())
   })
 
   instance.action('settings:help', async (context) => {
     pendingActions.delete(context.from.id)
     await context.answerCbQuery()
-    await context.reply(helpMessage(), backKeyboard())
+    await updateTelegramMessage(context, helpMessage(), backKeyboard())
   })
 
   instance.action('back', async (context) => {
     pendingActions.delete(context.from.id)
     await context.answerCbQuery()
-    await context.reply('Asosiy menyu 👇', mainMenuKeyboard())
+    await updateTelegramMessage(context, 'Asosiy menyu 👇', mainMenuKeyboard())
   })
 
   instance.on('text', async (context) => {
@@ -304,10 +306,18 @@ function registerQuickAction(instance: Telegraf, command: string, featureKey: Bo
   })
 }
 
+async function updateTelegramMessage(context: Context, message: string, keyboard?: InlineKeyboard) {
+  try {
+    await context.editMessageText(message, keyboard)
+  } catch {
+    await context.reply(message, keyboard)
+  }
+}
+
 async function promptForFeature(
   telegramUserId: number,
   featureKey: BotFeatureKey,
-  reply: (message: string, keyboard?: ReturnType<typeof Markup.inlineKeyboard>) => Promise<unknown>,
+  reply: (message: string, keyboard?: InlineKeyboard) => Promise<unknown>,
 ) {
   const linkedUser = await telegramRepository.findByTelegramUserId(telegramUserId)
   if (!linkedUser) {
@@ -325,7 +335,7 @@ async function runFeatureGeneration(input: {
   featureKey: BotFeatureKey
   text: string
   sendTyping: () => Promise<unknown>
-  reply: (message: string, keyboard?: ReturnType<typeof Markup.inlineKeyboard>) => Promise<unknown>
+  reply: (message: string, keyboard?: InlineKeyboard) => Promise<unknown>
 }) {
   const linkedUser = await telegramRepository.findByTelegramUserId(input.telegramUserId)
 
@@ -372,7 +382,7 @@ async function consumeLinkCodeFromText(input: {
   telegramUserId: number
   telegramUsername?: string | null
   code: string
-  reply: (message: string, keyboard?: ReturnType<typeof Markup.inlineKeyboard>) => Promise<unknown>
+  reply: (message: string, keyboard?: InlineKeyboard) => Promise<unknown>
 }) {
   const code = input.code.trim()
 
