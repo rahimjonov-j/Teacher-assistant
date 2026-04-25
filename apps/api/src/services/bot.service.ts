@@ -309,7 +309,8 @@ function registerQuickAction(instance: Telegraf, command: string, featureKey: Bo
 async function updateTelegramMessage(context: Context, message: string, keyboard?: InlineKeyboard) {
   try {
     await context.editMessageText(message, keyboard)
-  } catch {
+  } catch (error) {
+    console.warn('Telegram message edit failed, falling back to reply:', error)
     await context.reply(message, keyboard)
   }
 }
@@ -443,11 +444,17 @@ function helpMessage() {
 }
 
 function linkPrompt() {
-  return [
+  const lines = [
     'Botni ulash uchun web ilovadan ro‘yxatdan o‘ting.',
     '',
     'Keyin “Telegram kodni olish” sahifasidan link code oling va shu yerga yuboring 🔐',
-  ].join('\n')
+  ]
+
+  if (!getLinkCodePageUrl()) {
+    lines.push('', 'Hozir web manzil lokal sozlangan. Web ilovada sidebar orqali “Telegram kod” sahifasini oching.')
+  }
+
+  return lines.join('\n')
 }
 
 function unlinkedMessage() {
@@ -581,7 +588,14 @@ function getTelegramBotLink() {
 
 function getLinkCodePageUrl() {
   try {
-    return new URL('/app/telegram-link', env.APP_URL).toString()
+    const url = new URL('/app/telegram-link', env.APP_URL)
+    const blockedHosts = new Set(['localhost', '127.0.0.1', '0.0.0.0'])
+
+    if (blockedHosts.has(url.hostname) || url.hostname.endsWith('.local')) {
+      return null
+    }
+
+    return url.toString()
   } catch {
     return null
   }
