@@ -20,12 +20,16 @@ const uzsFormatter = new Intl.NumberFormat('uz-UZ', {
 })
 
 const TELEGRAM_MENU_COMMANDS = [
-  { command: 'start', description: 'Asosiy menyu' },
-  { command: 'menu', description: 'Asosiy menyu' },
-  { command: 'help', description: 'Yordam' },
-  { command: 'link', description: 'Web hisobni ulash' },
-  { command: 'plans', description: 'Tariflar' },
-  { command: 'balance', description: 'Kredit balans' },
+  { command: 'start', description: '🚀 Botni ishga tushirish' },
+  { command: 'menu', description: '🏠 Asosiy menyu' },
+  { command: 'quiz', description: '📝 Test yaratish' },
+  { command: 'lesson', description: '📚 Dars rejasi yaratish' },
+  { command: 'feedback', description: '✍️ Writing feedback' },
+  { command: 'speaking', description: '🎤 Speaking savollari' },
+  { command: 'plans', description: '💎 Tariflar' },
+  { command: 'balance', description: '💳 Kredit balans' },
+  { command: 'link', description: '🔗 Web hisobni ulash' },
+  { command: 'help', description: '❓ Yordam' },
 ]
 
 const BOT_FEATURE_KEYS = ['quiz', 'lesson_plan', 'writing_feedback', 'speaking_questions'] as const
@@ -46,31 +50,31 @@ const pendingActions = new Map<number, PendingAction>()
 
 const helpIssues = {
   code: {
-    button: 'Kodni topolmayapman',
+    button: '🔑 Kod topolmayapman',
     text: 'Web ilovaga kiring. Sidebar orqali "Telegram kod" sahifasini oching va "Kod yaratish" tugmasini bosing.',
   },
   link: {
-    button: 'Bot ulanmayapti',
+    button: '🔗 Bot ulanmayapti',
     text: 'Yangi kod yarating va botga aynan shu kodni yuboring. Kod 20 daqiqa ichida ishlatilishi kerak.',
   },
   ai: {
-    button: 'AI javob bermayapti',
+    button: '🤖 AI javob bermayapti',
     text: 'Avval hisob ulanganini tekshiring. Keyin mavzuni qisqa va aniq yozing. Masalan: "Fotosintez bo\'yicha 10 ta test".',
   },
   credits: {
-    button: 'Kredit yetmayapti',
+    button: '💳 Kredit yetmayapti',
     text: 'Kredit tugagan bo\'lsa, web ilovadagi "Tariflar" sahifasidan tarifni yangilang yoki keyingi davrni kuting.',
   },
   result: {
-    button: 'Natija mos emas',
+    button: '🧩 Natija mos emas',
     text: 'Mavzuga sinf, fan va talabni qo\'shib yozing. Masalan: "7-sinf biologiya, fotosintez, 8 ta oson test".',
   },
   web: {
-    button: 'Web ochilmayapti',
+    button: '🌐 Web ochilmayapti',
     text: 'Internetni tekshiring va qayta kiring. Agar lokal test bo\'lsa, web ilova ochiq turganiga ishonch hosil qiling.',
   },
   language: {
-    button: 'Til muammosi',
+    button: '🇺🇿 Til muammosi',
     text: 'Bot asosiy javoblarni o\'zbek tilida beradi. Agar natija boshqa tilda chiqsa, so\'rovga "o\'zbek tilida" deb qo\'shing.',
   },
 } as const
@@ -84,31 +88,36 @@ const featureUx: Record<
     prompt: string
     repeat: string
     resultTitle: string
+    example: string
   }
 > = {
   quiz: {
-    button: 'Test yaratish',
+    button: '📝 Test yaratish',
     prompt: 'Qaysi mavzuda test yaratamiz?',
-    repeat: 'Yana test',
-    resultTitle: 'Test tayyor',
+    repeat: '🔁 Yana test',
+    resultTitle: '📝 Test tayyor',
+    example: 'Masalan: 7-sinf biologiya, fotosintez bo\'yicha 10 ta test',
   },
   lesson_plan: {
-    button: 'Dars reja',
+    button: '📚 Dars reja',
     prompt: 'Qaysi mavzuda dars reja tuzaylik?',
-    repeat: 'Yana reja',
-    resultTitle: 'Dars reja tayyor',
+    repeat: '🔁 Yana reja',
+    resultTitle: '📚 Dars reja tayyor',
+    example: 'Masalan: 8-sinf algebra, kvadrat tenglama uchun 45 daqiqalik reja',
   },
   writing_feedback: {
-    button: 'Writing tahlil',
+    button: '✍️ Writing tahlil',
     prompt: 'Matn yuboring, men uni tahlil qilib beraman.',
-    repeat: 'Yana tahlil',
-    resultTitle: 'Tahlil tayyor',
+    repeat: '🔁 Yana tahlil',
+    resultTitle: '✍️ Tahlil tayyor',
+    example: 'Masalan: o\'quvchi inshosini yuboring yoki baholash mezonini yozing',
   },
   speaking_questions: {
-    button: 'Speaking savol',
+    button: '🎤 Speaking savol',
     prompt: 'Qaysi mavzuda speaking savollar kerak?',
-    repeat: 'Yana savol',
-    resultTitle: 'Savollar tayyor',
+    repeat: '🔁 Yana savol',
+    resultTitle: '🎤 Savollar tayyor',
+    example: 'Masalan: Travel mavzusida B1 daraja uchun 12 ta speaking savol',
   },
 }
 
@@ -219,7 +228,7 @@ function registerHandlers(instance: Telegraf) {
     }
 
     pendingActions.delete(context.from.id)
-    await context.reply('Asosiy menyu:', mainMenuKeyboard())
+    await context.reply(menuMessage(), mainMenuKeyboard())
   })
 
   instance.command('help', async (context) => {
@@ -252,10 +261,7 @@ function registerHandlers(instance: Telegraf) {
         (plan) => `${plan.name}: ${plan.monthlyCredits} kredit / ${formatUzs(plan.priceMonthlyUzs)}`,
       )
       const plansKeyboard = buildPlansKeyboard(plans)
-      await context.reply(
-        ['Tariflar:', '', ...lines].join('\n'),
-        plansKeyboard ?? mainMenuKeyboard(),
-      )
+      await context.reply(plansMessage(lines), plansKeyboard ?? mainMenuKeyboard())
     } catch {
       await context.reply("Tariflarni hozircha ko'rsata olmadim.", mainMenuKeyboard())
     }
@@ -274,16 +280,7 @@ function registerHandlers(instance: Telegraf) {
     }
 
     const dashboard = await dashboardService.getTeacherDashboard(linkedUser.userId)
-    await context.reply(
-      [
-        'Balans:',
-        `Tarif: ${dashboard.subscription?.planName ?? "Faol tarif yo'q"}`,
-        `Qolgan kredit: ${dashboard.subscription?.creditsRemaining ?? 0} / ${
-          dashboard.subscription?.creditsTotal ?? 0
-        }`,
-      ].join('\n'),
-      mainMenuKeyboard(),
-    )
+    await context.reply(balanceMessage(dashboard), mainMenuKeyboard())
   })
 
   instance.command('gpt', async (context) => {
@@ -292,7 +289,7 @@ function registerHandlers(instance: Telegraf) {
     }
 
     pendingActions.delete(context.from.id)
-    await context.reply('Kerakli bo\'limni tanlang, men davom ettiraman:', mainMenuKeyboard())
+    await context.reply(menuMessage('🤖 GPT rejimi uchun kerakli bo\'limni tanlang.'), mainMenuKeyboard())
   })
 
   TELEGRAM_FEATURE_COMMANDS.forEach((command) => {
@@ -325,6 +322,43 @@ function registerHandlers(instance: Telegraf) {
     })
   })
 
+  instance.action('balance', async (context) => {
+    if (!context.from) {
+      return
+    }
+
+    pendingActions.delete(context.from.id)
+    await context.answerCbQuery()
+    const linkedUser = await telegramRepository.findByTelegramUserId(context.from.id)
+
+    if (!linkedUser) {
+      await updateTelegramMessage(context, unlinkedMessage(), linkingKeyboard())
+      return
+    }
+
+    const dashboard = await dashboardService.getTeacherDashboard(linkedUser.userId)
+    await updateTelegramMessage(context, balanceMessage(dashboard), mainMenuKeyboard())
+  })
+
+  instance.action('plans', async (context) => {
+    if (!context.from) {
+      return
+    }
+
+    pendingActions.delete(context.from.id)
+    await context.answerCbQuery()
+
+    try {
+      const plans = await plansRepository.listAll()
+      const lines = plans.map(
+        (plan) => `${plan.name}: ${plan.monthlyCredits} kredit / ${formatUzs(plan.priceMonthlyUzs)}`,
+      )
+      await updateTelegramMessage(context, plansMessage(lines), buildPlansKeyboard(plans) ?? mainMenuKeyboard())
+    } catch {
+      await updateTelegramMessage(context, "Tariflarni hozircha ko'rsata olmadim.", mainMenuKeyboard())
+    }
+  })
+
   instance.action('settings', async (context) => {
     if (!context.from) {
       return
@@ -332,7 +366,7 @@ function registerHandlers(instance: Telegraf) {
 
     pendingActions.delete(context.from.id)
     await context.answerCbQuery()
-    await updateTelegramMessage(context, 'Sozlamalar:', settingsKeyboard())
+    await updateTelegramMessage(context, settingsMessage(), settingsKeyboard())
   })
 
   instance.action('settings:link', async (context) => {
@@ -352,7 +386,7 @@ function registerHandlers(instance: Telegraf) {
 
     pendingActions.delete(context.from.id)
     await context.answerCbQuery()
-    await updateTelegramMessage(context, 'Bot tili: O\'zbek tili', backKeyboard())
+    await updateTelegramMessage(context, '🇺🇿 Bot tili: O\'zbek tili\n\nHozircha asosiy javoblar Uzbek Latin formatida beriladi.', backKeyboard())
   })
 
   instance.action('settings:help', async (context) => {
@@ -372,7 +406,7 @@ function registerHandlers(instance: Telegraf) {
 
     pendingActions.delete(context.from.id)
     await context.answerCbQuery()
-    await updateTelegramMessage(context, 'Boshqa muammolar:', helpOtherKeyboard())
+    await updateTelegramMessage(context, '🛠 Boshqa muammolar\n\nQuyidagilardan birini tanlang:', helpOtherKeyboard())
   })
 
   Object.keys(helpIssues).forEach((issueKey) => {
@@ -398,7 +432,7 @@ function registerHandlers(instance: Telegraf) {
 
     pendingActions.delete(context.from.id)
     await context.answerCbQuery()
-    await updateTelegramMessage(context, 'Asosiy menyu:', mainMenuKeyboard())
+    await updateTelegramMessage(context, menuMessage(), mainMenuKeyboard())
   })
 
   instance.on('text', async (context) => {
@@ -437,11 +471,11 @@ function registerHandlers(instance: Telegraf) {
     }
 
     if (isGreeting(text.toLowerCase())) {
-      await context.reply('Salom! Kerakli bo\'limni tanlang:', mainMenuKeyboard())
+      await context.reply(menuMessage('👋 Salom! Kerakli bo\'limni tanlang.'), mainMenuKeyboard())
       return
     }
 
-    await context.reply('Boshlash uchun bo\'lim tanlang:', mainMenuKeyboard())
+    await context.reply(menuMessage('✨ Boshlash uchun bo\'lim tanlang.'), mainMenuKeyboard())
   })
 }
 
@@ -493,7 +527,7 @@ async function promptForFeature(
   }
 
   pendingActions.set(telegramUserId, { type: 'feature', featureKey })
-  await reply(featureUx[featureKey].prompt, backKeyboard())
+  await reply(featurePromptMessage(featureKey), backKeyboard())
 }
 
 async function runFeatureGeneration(input: {
@@ -527,13 +561,7 @@ async function runFeatureGeneration(input: {
     })
 
     await input.reply(
-      [
-        featureUx[input.featureKey].resultTitle,
-        '',
-        trimTelegramText(result.content.outputMarkdown),
-        '',
-        `Qolgan kredit: ${result.subscription?.creditsRemaining ?? 0}`,
-      ].join('\n'),
+      resultMessage(input.featureKey, result.content.outputMarkdown, result.subscription?.creditsRemaining),
       resultKeyboard(input.featureKey),
     )
   } catch (error) {
@@ -568,6 +596,76 @@ async function consumeLinkCodeFromText(input: {
   }
 }
 
+function settingsMessage() {
+  return [
+    '⚙️ Sozlamalar',
+    '',
+    'Hisobni ulash, til va yordam bo\'limlarini shu yerdan boshqarishingiz mumkin.',
+  ].join('\n')
+}
+
+function plansMessage(lines: string[]) {
+  return [
+    '💎 Tariflar',
+    '',
+    ...lines.map((line) => `• ${line}`),
+    '',
+    'Tarifni web ilovada faollashtirishingiz mumkin.',
+  ].join('\n')
+}
+
+function balanceMessage(dashboard: {
+  subscription?: {
+    planName?: string | null
+    creditsRemaining?: number | null
+    creditsTotal?: number | null
+  } | null
+}) {
+  const remaining = dashboard.subscription?.creditsRemaining ?? 0
+  const total = dashboard.subscription?.creditsTotal ?? 0
+
+  return [
+    '💳 Kredit balans',
+    '',
+    `💎 Tarif: ${dashboard.subscription?.planName ?? "Faol tarif yo'q"}`,
+    `⚡ Qolgan kredit: ${remaining} / ${total}`,
+    '',
+    total > 0 ? creditBar(remaining, total) : 'Tarif faollashgandan keyin balans shu yerda ko\'rinadi.',
+  ].join('\n')
+}
+
+function creditBar(remaining: number, total: number) {
+  const slots = 10
+  const filled = Math.max(0, Math.min(slots, Math.round((remaining / total) * slots)))
+  return `${'●'.repeat(filled)}${'○'.repeat(slots - filled)}`
+}
+
+function featurePromptMessage(featureKey: BotFeatureKey) {
+  const feature = featureUx[featureKey]
+
+  return [
+    `${feature.button}`,
+    '',
+    feature.prompt,
+    '',
+    `💡 ${feature.example}`,
+  ].join('\n')
+}
+
+function resultMessage(
+  featureKey: BotFeatureKey,
+  outputMarkdown: string,
+  creditsRemaining: number | null | undefined,
+) {
+  return [
+    featureUx[featureKey].resultTitle,
+    '━━━━━━━━━━━━━━',
+    trimTelegramText(outputMarkdown),
+    '━━━━━━━━━━━━━━',
+    `⚡ Qolgan kredit: ${creditsRemaining ?? 0}`,
+  ].join('\n')
+}
+
 function trimTelegramText(value: string) {
   if (value.length <= TELEGRAM_TEXT_LIMIT) {
     return value
@@ -589,19 +687,43 @@ function extractCommandArgument(text: string, command: string) {
 
 function startMessage() {
   return [
-    'Xush kelibsiz!',
+    '🚀 Teacher Assistant AI',
     '',
-    'Teacher Assistant AI - zamonaviy o\'qituvchilar uchun aqlli yordamchi.',
+    'Dars rejasi, test, writing feedback va speaking savollarini tez tayyorlab beraman.',
     '',
-    'Boshlash uchun tanlang:',
+    'Ishni boshlash uchun pastdagi menyudan birini tanlang yoki komandadan foydalaning:',
+    '',
+    '📝 /quiz mavzu',
+    '📚 /lesson mavzu',
+    '✍️ /feedback matn',
+    '🎤 /speaking mavzu',
+  ].join('\n')
+}
+
+function menuMessage(intro = '🏠 Asosiy menyu') {
+  return [
+    intro,
+    '',
+    'Kerakli AI vositani tanlang. Hisobingiz ulanmagan bo\'lsa, avval "Ulanish" orqali web profilingizni bog\'lang.',
   ].join('\n')
 }
 
 function helpMessage() {
   return [
-    'Qanday yordam beraman?',
+    '❓ Yordam markazi',
     '',
-    'Muammo turini tanlang. Men qisqa yo\'l ko\'rsataman.',
+    'Tez komandalar:',
+    '🚀 /start - botni qayta boshlash',
+    '🏠 /menu - asosiy menyu',
+    '📝 /quiz mavzu - test yaratish',
+    '📚 /lesson mavzu - dars rejasi',
+    '✍️ /feedback matn - writing tahlil',
+    '🎤 /speaking mavzu - speaking savollar',
+    '💳 /balance - kredit balans',
+    '💎 /plans - tariflar',
+    '🔗 /link - web hisobni ulash',
+    '',
+    'Muammo turini tanlang, men qisqa yo\'l ko\'rsataman:',
   ].join('\n')
 }
 
@@ -612,9 +734,13 @@ function helpIssueMessage(issueKey: HelpIssueKey) {
 
 function linkPrompt() {
   const lines = [
-    'Botni ulash uchun web ilovadan ro\'yxatdan o\'ting.',
+    '🔗 Web hisobni ulash',
     '',
-    'Keyin "Telegram kodni olish" sahifasidan link code oling va shu yerga yuboring.',
+    '1. Web ilovaga kiring yoki ro\'yxatdan o\'ting.',
+    '2. "Telegram kod" sahifasidan link code oling.',
+    '3. Kodni shu chatga yuboring.',
+    '',
+    'Kod odatda 20 daqiqa ichida ishlatilishi kerak.',
   ]
 
   if (!getLinkCodePageUrl()) {
@@ -625,35 +751,35 @@ function linkPrompt() {
 }
 
 function unlinkedMessage() {
-  return 'Avval web hisobingizni ulang.'
+  return '🔐 Avval web hisobingizni ulang.\n\nUlangandan keyin kredit, tarix va tariflaringiz bot bilan birga ishlaydi.'
 }
 
 function linkErrorMessage(error: unknown) {
   const message = error instanceof Error ? error.message.toLowerCase() : ''
 
   if (message.includes('expired')) {
-    return 'Link code muddati tugagan. Web ilovadan yangi code oling.'
+    return '⏱ Link code muddati tugagan. Web ilovadan yangi code oling.'
   }
 
   if (message.includes('not found')) {
-    return 'Link code topilmadi. Tekshirib qayta yuboring.'
+    return '🔎 Link code topilmadi. Tekshirib qayta yuboring.'
   }
 
-  return "Hozircha ulab bo'lmadi. Qayta urinib ko'ring."
+  return "⚠️ Hozircha ulab bo'lmadi. Qayta urinib ko'ring."
 }
 
 function generationErrorMessage(error: unknown) {
   const message = error instanceof Error ? error.message.toLowerCase() : ''
 
   if (message.includes('not enough credits')) {
-    return 'Kredit yetarli emas. Tarifni yangilab qayta urinib ko\'ring.'
+    return '💳 Kredit yetarli emas. Tarifni yangilab qayta urinib ko\'ring.'
   }
 
   if (message.includes('no active subscription')) {
-    return 'Faol tarif topilmadi. Web ilovada tarifni faollashtiring.'
+    return '💎 Faol tarif topilmadi. Web ilovada tarifni faollashtiring.'
   }
 
-  return "Hozircha javob tayyorlay olmadim. Birozdan keyin qayta urinib ko'ring."
+  return "⚠️ Hozircha javob tayyorlay olmadim. Birozdan keyin qayta urinib ko'ring."
 }
 
 function isGreeting(text: string) {
@@ -665,7 +791,9 @@ function formatUzs(value: number) {
 }
 
 function mainMenuKeyboard() {
-  return Markup.inlineKeyboard([
+  const rows: Array<
+    Array<ReturnType<typeof Markup.button.url> | ReturnType<typeof Markup.button.callback>>
+  > = [
     [
       Markup.button.callback(featureUx.quiz.button, 'feature:quiz'),
       Markup.button.callback(featureUx.lesson_plan.button, 'feature:lesson_plan'),
@@ -674,16 +802,30 @@ function mainMenuKeyboard() {
       Markup.button.callback(featureUx.writing_feedback.button, 'feature:writing_feedback'),
       Markup.button.callback(featureUx.speaking_questions.button, 'feature:speaking_questions'),
     ],
-    [Markup.button.callback('Sozlamalar', 'settings')],
-  ])
+    [
+      Markup.button.callback('💳 Balans', 'balance'),
+      Markup.button.callback('💎 Tariflar', 'plans'),
+    ],
+    [
+      Markup.button.callback('🔗 Ulanish', 'settings:link'),
+      Markup.button.callback('⚙️ Sozlamalar', 'settings'),
+    ],
+  ]
+
+  const appUrl = getAppUrl()
+  if (appUrl) {
+    rows.push([Markup.button.url('🌐 Web ilova', appUrl)])
+  }
+
+  return Markup.inlineKeyboard(rows)
 }
 
 function settingsKeyboard() {
   return Markup.inlineKeyboard([
-    [Markup.button.callback('Ulanish (link code)', 'settings:link')],
-    [Markup.button.callback('Til', 'settings:language')],
-    [Markup.button.callback('Yordam', 'settings:help')],
-    [Markup.button.callback('Ortga', 'back')],
+    [Markup.button.callback('🔗 Ulanish (link code)', 'settings:link')],
+    [Markup.button.callback('🇺🇿 Til', 'settings:language')],
+    [Markup.button.callback('❓ Yordam', 'settings:help')],
+    [Markup.button.callback('⬅️ Ortga', 'back')],
   ])
 }
 
@@ -692,8 +834,8 @@ function helpKeyboard() {
     [Markup.button.callback(helpIssues.code.button, 'help:code')],
     [Markup.button.callback(helpIssues.link.button, 'help:link')],
     [Markup.button.callback(helpIssues.ai.button, 'help:ai')],
-    [Markup.button.callback('Boshqa', 'help:other')],
-    [Markup.button.callback('Ortga', 'back')],
+    [Markup.button.callback('➕ Boshqa', 'help:other')],
+    [Markup.button.callback('⬅️ Ortga', 'back')],
   ])
 }
 
@@ -703,21 +845,21 @@ function helpOtherKeyboard() {
     [Markup.button.callback(helpIssues.result.button, 'help:result')],
     [Markup.button.callback(helpIssues.web.button, 'help:web')],
     [Markup.button.callback(helpIssues.language.button, 'help:language')],
-    [Markup.button.callback('Ortga', 'back')],
+    [Markup.button.callback('⬅️ Ortga', 'back')],
   ])
 }
 
 function helpAnswerKeyboard() {
   return Markup.inlineKeyboard([
-    [Markup.button.callback('Boshqa muammolar', 'help:other')],
-    [Markup.button.callback('Ortga', 'back')],
+    [Markup.button.callback('➕ Boshqa muammolar', 'help:other')],
+    [Markup.button.callback('⬅️ Ortga', 'back')],
   ])
 }
 
 function linkingKeyboard() {
   return Markup.inlineKeyboard([
-    [Markup.button.callback('Ulanish (link code)', 'settings:link')],
-    [Markup.button.callback('Ortga', 'back')],
+    [Markup.button.callback('🔗 Ulanish (link code)', 'settings:link')],
+    [Markup.button.callback('⬅️ Ortga', 'back')],
   ])
 }
 
@@ -728,21 +870,21 @@ function linkCodeKeyboard() {
   > = []
 
   if (linkCodePageUrl) {
-    buttons.push([Markup.button.url('Kodni olish', linkCodePageUrl)])
+    buttons.push([Markup.button.url('🔑 Kodni olish', linkCodePageUrl)])
   }
 
-  buttons.push([Markup.button.callback('Ortga', 'back')])
+  buttons.push([Markup.button.callback('⬅️ Ortga', 'back')])
   return Markup.inlineKeyboard(buttons)
 }
 
 function backKeyboard() {
-  return Markup.inlineKeyboard([[Markup.button.callback('Ortga', 'back')]])
+  return Markup.inlineKeyboard([[Markup.button.callback('⬅️ Ortga', 'back')]])
 }
 
 function resultKeyboard(featureKey: BotFeatureKey) {
   return Markup.inlineKeyboard([
     [Markup.button.callback(featureUx[featureKey].repeat, `repeat:${featureKey}`)],
-    [Markup.button.callback('Ortga', 'back')],
+    [Markup.button.callback('🏠 Asosiy menyu', 'back')],
   ])
 }
 
@@ -759,20 +901,35 @@ function buildPlansKeyboard(
   > = plans
     .filter((plan) => plan.key !== 'free_trial')
     .map((plan) => [
-      Markup.button.url(`${plan.name} sotib olish`, `${botLink}?start=upgrade_${plan.key}`),
+      Markup.button.url(`💎 ${plan.name} sotib olish`, `${botLink}?start=upgrade_${plan.key}`),
     ])
 
   if (buttons.length === 0) {
     return null
   }
 
-  buttons.push([Markup.button.callback('Ortga', 'back')])
+  buttons.push([Markup.button.callback('⬅️ Ortga', 'back')])
   return Markup.inlineKeyboard(buttons)
 }
 
 function getTelegramBotLink() {
   const username = (resolvedBotUsername ?? env.TELEGRAM_BOT_USERNAME)?.replace(/^@+/, '').trim()
   return username ? `https://t.me/${username}` : null
+}
+
+function getAppUrl() {
+  try {
+    const url = new URL(env.APP_URL)
+    const blockedHosts = new Set(['localhost', '127.0.0.1', '0.0.0.0'])
+
+    if (blockedHosts.has(url.hostname) || url.hostname.endsWith('.local')) {
+      return null
+    }
+
+    return url.toString()
+  } catch {
+    return null
+  }
 }
 
 function getLinkCodePageUrl() {
