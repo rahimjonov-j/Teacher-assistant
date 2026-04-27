@@ -142,11 +142,14 @@ export async function getTelegramBotStatus() {
   resolvedBotUsername = me.username ?? resolvedBotUsername
 
   const webhookInfo = await instance.telegram.getWebhookInfo()
+  const configuredUsername = env.TELEGRAM_BOT_USERNAME?.replace(/^@+/, '').trim() || null
 
   return {
     configured: true,
     webhookConfigured: Boolean(webhookInfo.url),
-    username: me.username,
+    configuredUsername,
+    tokenUsername: me.username,
+    usernameMatchesConfig: !configuredUsername || configuredUsername === me.username,
     webhookUrl: webhookInfo.url || null,
     pendingUpdateCount: webhookInfo.pending_update_count,
     lastErrorDate: webhookInfo.last_error_date ?? null,
