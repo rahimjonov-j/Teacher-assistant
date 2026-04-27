@@ -1,0 +1,40 @@
+services:
+  - type: web
+    name: teacher-assistant-api
+    runtime: node
+    plan: free
+    region: oregon
+    buildCommand: npm ci --include=dev && npm run build --workspace @teacher-assistant/shared && npm run build --workspace @teacher-assistant/api
+    startCommand: node apps/api/dist/index.js
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NPM_CONFIG_PRODUCTION
+        value: "false"
+      - key: PORT
+        value: 10000
+      - key: APP_URL
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_ANON_KEY
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: OPENAI_MODEL_LIGHT
+        value: gpt-4.1-mini
+      - key: OPENAI_MODEL_STRONG
+        value: gpt-4.1
+      - key: TELEGRAM_BOT_TOKEN
+        sync: false
+      - key: TELEGRAM_BOT_USERNAME
+        sync: false
+      - key: TELEGRAM_WEBHOOK_URL
+        sync: false
+      - key: PDF_STORAGE_BUCKET
+        value: generated-pdfs
+      - key: SUPER_ADMIN_EMAILS
+        sync: false

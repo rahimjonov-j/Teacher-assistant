@@ -1,0 +1,13 @@
+{
+  "buildCommand": "npm run build --workspace @teacher-assistant/shared && npm run build --workspace @teacher-assistant/web",
+  "devCommand": "npm run dev --workspace @teacher-assistant/web",
+  "framework": "vite",
+  "installCommand": "npm ci",
+  "outputDirectory": "apps/web/dist",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
