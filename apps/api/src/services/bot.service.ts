@@ -12,6 +12,7 @@ import { dashboardService } from './dashboard.service.js'
 import { generationService } from './generation.service.js'
 
 let bot: Telegraf | null = null
+let resolvedBotUsername: string | null = null
 
 const TELEGRAM_TEXT_LIMIT = 3800
 const uzsFormatter = new Intl.NumberFormat('uz-UZ', {
@@ -21,6 +22,10 @@ const uzsFormatter = new Intl.NumberFormat('uz-UZ', {
 const TELEGRAM_MENU_COMMANDS = [
   { command: 'start', description: 'Asosiy menyu' },
   { command: 'menu', description: 'Asosiy menyu' },
+  { command: 'help', description: 'Yordam' },
+  { command: 'link', description: 'Web hisobni ulash' },
+  { command: 'plans', description: 'Tariflar' },
+  { command: 'balance', description: 'Kredit balans' },
 ]
 
 const BOT_FEATURE_KEYS = ['quiz', 'lesson_plan', 'writing_feedback', 'speaking_questions'] as const
@@ -41,32 +46,32 @@ const pendingActions = new Map<number, PendingAction>()
 
 const helpIssues = {
   code: {
-    button: '🔑 Kod topolmayapman',
-    text: 'Web ilovaga kiring. Sidebar’dan “Telegram kod” sahifasini oching va “Kod yaratish” tugmasini bosing.',
+    button: 'Kodni topolmayapman',
+    text: 'Web ilovaga kiring. Sidebar orqali "Telegram kod" sahifasini oching va "Kod yaratish" tugmasini bosing.',
   },
   link: {
-    button: '🔗 Bot ulanmayapti',
+    button: 'Bot ulanmayapti',
     text: 'Yangi kod yarating va botga aynan shu kodni yuboring. Kod 20 daqiqa ichida ishlatilishi kerak.',
   },
   ai: {
-    button: '🤖 AI javob bermayapti',
-    text: 'Avval hisob ulanganini tekshiring. Keyin mavzuni qisqa va aniq yozing. Masalan: “Fotosintez bo‘yicha 10 ta test”.',
+    button: 'AI javob bermayapti',
+    text: 'Avval hisob ulanganini tekshiring. Keyin mavzuni qisqa va aniq yozing. Masalan: "Fotosintez bo\'yicha 10 ta test".',
   },
   credits: {
-    button: '💳 Kredit yetmayapti',
-    text: 'Kredit tugagan bo‘lsa, web ilovadagi “Tariflar” sahifasidan tarifni yangilang yoki keyingi davrni kuting.',
+    button: 'Kredit yetmayapti',
+    text: 'Kredit tugagan bo\'lsa, web ilovadagi "Tariflar" sahifasidan tarifni yangilang yoki keyingi davrni kuting.',
   },
   result: {
-    button: '📝 Natija mos emas',
-    text: 'Mavzuga sinf, fan va talabni qo‘shib yozing. Masalan: “7-sinf biologiya, fotosintez, 8 ta oson test”.',
+    button: 'Natija mos emas',
+    text: 'Mavzuga sinf, fan va talabni qo\'shib yozing. Masalan: "7-sinf biologiya, fotosintez, 8 ta oson test".',
   },
   web: {
-    button: '🌐 Web ochilmayapti',
-    text: 'Internetni tekshiring va qayta kiring. Agar lokal test bo‘lsa, web ilova ochiq turganiga ishonch hosil qiling.',
+    button: 'Web ochilmayapti',
+    text: 'Internetni tekshiring va qayta kiring. Agar lokal test bo\'lsa, web ilova ochiq turganiga ishonch hosil qiling.',
   },
   language: {
-    button: '🇺🇿 Til muammosi',
-    text: 'Bot asosiy javoblarni o‘zbek tilida beradi. Agar natija boshqa tilda chiqsa, so‘rovga “o‘zbek tilida” deb qo‘shing.',
+    button: 'Til muammosi',
+    text: 'Bot asosiy javoblarni o\'zbek tilida beradi. Agar natija boshqa tilda chiqsa, so\'rovga "o\'zbek tilida" deb qo\'shing.',
   },
 } as const
 
@@ -82,28 +87,28 @@ const featureUx: Record<
   }
 > = {
   quiz: {
-    button: '📝 Test yaratish',
-    prompt: 'Qaysi mavzuda test yaratamiz? ✍️',
-    repeat: '🔁 Yana test',
-    resultTitle: '📝 Test tayyor',
+    button: 'Test yaratish',
+    prompt: 'Qaysi mavzuda test yaratamiz?',
+    repeat: 'Yana test',
+    resultTitle: 'Test tayyor',
   },
   lesson_plan: {
-    button: '📚 Dars reja',
-    prompt: 'Qaysi mavzuda dars reja tuzaylik? 📚',
-    repeat: '🔁 Yana reja',
-    resultTitle: '📚 Dars reja tayyor',
+    button: 'Dars reja',
+    prompt: 'Qaysi mavzuda dars reja tuzaylik?',
+    repeat: 'Yana reja',
+    resultTitle: 'Dars reja tayyor',
   },
   writing_feedback: {
-    button: '✍️ Writing tahlil',
-    prompt: 'Matn yuboring, men uni tahlil qilib beraman ✍️',
-    repeat: '🔁 Yana tahlil',
-    resultTitle: '✍️ Tahlil tayyor',
+    button: 'Writing tahlil',
+    prompt: 'Matn yuboring, men uni tahlil qilib beraman.',
+    repeat: 'Yana tahlil',
+    resultTitle: 'Tahlil tayyor',
   },
   speaking_questions: {
-    button: '🎤 Speaking savol',
-    prompt: 'Qaysi mavzuda speaking savollar kerak? 🎤',
-    repeat: '🔁 Yana savol',
-    resultTitle: '🎤 Savollar tayyor',
+    button: 'Speaking savol',
+    prompt: 'Qaysi mavzuda speaking savollar kerak?',
+    repeat: 'Yana savol',
+    resultTitle: 'Savollar tayyor',
   },
 }
 
@@ -120,17 +125,51 @@ export function getTelegramBot() {
   return bot
 }
 
+export async function getTelegramBotStatus() {
+  const instance = getTelegramBot()
+
+  if (!instance) {
+    return {
+      configured: false,
+      webhookConfigured: false,
+      username: null,
+      webhookUrl: null,
+      pendingUpdateCount: null,
+    }
+  }
+
+  const me = await instance.telegram.getMe()
+  resolvedBotUsername = me.username ?? resolvedBotUsername
+
+  const webhookInfo = await instance.telegram.getWebhookInfo()
+
+  return {
+    configured: true,
+    webhookConfigured: Boolean(webhookInfo.url),
+    username: me.username,
+    webhookUrl: webhookInfo.url || null,
+    pendingUpdateCount: webhookInfo.pending_update_count,
+    lastErrorDate: webhookInfo.last_error_date ?? null,
+    lastErrorMessage: webhookInfo.last_error_message ?? null,
+  }
+}
+
 export async function bootstrapTelegramBot() {
   const instance = getTelegramBot()
   if (!instance) {
     return
   }
 
+  const me = await instance.telegram.getMe()
+  resolvedBotUsername = me.username ?? null
+
   await instance.telegram.setMyCommands(TELEGRAM_MENU_COMMANDS)
 
   const webhookUrl = getUsableWebhookUrl(env.TELEGRAM_WEBHOOK_URL)
   if (webhookUrl) {
-    await instance.telegram.setWebhook(webhookUrl)
+    await instance.telegram.setWebhook(webhookUrl, {
+      drop_pending_updates: true,
+    })
     console.log(`Telegram webhook configured: ${webhookUrl}`)
     return
   }
@@ -146,6 +185,10 @@ function registerHandlers(instance: Telegraf) {
   })
 
   instance.start(async (context) => {
+    if (!context.from) {
+      return
+    }
+
     pendingActions.delete(context.from.id)
     const payload = parseStartPayload(context.payload?.trim())
 
@@ -168,21 +211,37 @@ function registerHandlers(instance: Telegraf) {
   })
 
   instance.command('menu', async (context) => {
+    if (!context.from) {
+      return
+    }
+
     pendingActions.delete(context.from.id)
-    await context.reply('Asosiy menyu 👇', mainMenuKeyboard())
+    await context.reply('Asosiy menyu:', mainMenuKeyboard())
   })
 
   instance.command('help', async (context) => {
+    if (!context.from) {
+      return
+    }
+
     pendingActions.delete(context.from.id)
     await context.reply(helpMessage(), helpKeyboard())
   })
 
   instance.command('link', async (context) => {
+    if (!context.from) {
+      return
+    }
+
     pendingActions.set(context.from.id, { type: 'link' })
     await context.reply(linkPrompt(), linkCodeKeyboard())
   })
 
   instance.command('plans', async (context) => {
+    if (!context.from) {
+      return
+    }
+
     pendingActions.delete(context.from.id)
     try {
       const plans = await plansRepository.listAll()
@@ -191,7 +250,7 @@ function registerHandlers(instance: Telegraf) {
       )
       const plansKeyboard = buildPlansKeyboard(plans)
       await context.reply(
-        ['Tariflar 👇', '', ...lines].join('\n'),
+        ['Tariflar:', '', ...lines].join('\n'),
         plansKeyboard ?? mainMenuKeyboard(),
       )
     } catch {
@@ -200,6 +259,10 @@ function registerHandlers(instance: Telegraf) {
   })
 
   instance.command('balance', async (context) => {
+    if (!context.from) {
+      return
+    }
+
     pendingActions.delete(context.from.id)
     const linkedUser = await telegramRepository.findByTelegramUserId(context.from.id)
     if (!linkedUser) {
@@ -210,7 +273,7 @@ function registerHandlers(instance: Telegraf) {
     const dashboard = await dashboardService.getTeacherDashboard(linkedUser.userId)
     await context.reply(
       [
-        'Balans 👇',
+        'Balans:',
         `Tarif: ${dashboard.subscription?.planName ?? "Faol tarif yo'q"}`,
         `Qolgan kredit: ${dashboard.subscription?.creditsRemaining ?? 0} / ${
           dashboard.subscription?.creditsTotal ?? 0
@@ -221,8 +284,12 @@ function registerHandlers(instance: Telegraf) {
   })
 
   instance.command('gpt', async (context) => {
+    if (!context.from) {
+      return
+    }
+
     pendingActions.delete(context.from.id)
-    await context.reply('Kerakli bo‘limni tanlang, men davom ettiraman 👇', mainMenuKeyboard())
+    await context.reply('Kerakli bo\'limni tanlang, men davom ettiraman:', mainMenuKeyboard())
   })
 
   TELEGRAM_FEATURE_COMMANDS.forEach((command) => {
@@ -233,6 +300,10 @@ function registerHandlers(instance: Telegraf) {
 
   BOT_FEATURE_KEYS.forEach((featureKey) => {
     instance.action(`feature:${featureKey}`, async (context) => {
+      if (!context.from) {
+        return
+      }
+
       await context.answerCbQuery()
       await promptForFeature(context.from.id, featureKey, (message, keyboard) =>
         updateTelegramMessage(context, message, keyboard),
@@ -240,6 +311,10 @@ function registerHandlers(instance: Telegraf) {
     })
 
     instance.action(`repeat:${featureKey}`, async (context) => {
+      if (!context.from) {
+        return
+      }
+
       await context.answerCbQuery()
       await promptForFeature(context.from.id, featureKey, (message, keyboard) =>
         updateTelegramMessage(context, message, keyboard),
@@ -248,37 +323,61 @@ function registerHandlers(instance: Telegraf) {
   })
 
   instance.action('settings', async (context) => {
+    if (!context.from) {
+      return
+    }
+
     pendingActions.delete(context.from.id)
     await context.answerCbQuery()
-    await updateTelegramMessage(context, 'Sozlamalar 👇', settingsKeyboard())
+    await updateTelegramMessage(context, 'Sozlamalar:', settingsKeyboard())
   })
 
   instance.action('settings:link', async (context) => {
+    if (!context.from) {
+      return
+    }
+
     pendingActions.set(context.from.id, { type: 'link' })
     await context.answerCbQuery()
     await updateTelegramMessage(context, linkPrompt(), linkCodeKeyboard())
   })
 
   instance.action('settings:language', async (context) => {
+    if (!context.from) {
+      return
+    }
+
     pendingActions.delete(context.from.id)
     await context.answerCbQuery()
-    await updateTelegramMessage(context, '🌐 Bot tili: O‘zbek tili', backKeyboard())
+    await updateTelegramMessage(context, 'Bot tili: O\'zbek tili', backKeyboard())
   })
 
   instance.action('settings:help', async (context) => {
+    if (!context.from) {
+      return
+    }
+
     pendingActions.delete(context.from.id)
     await context.answerCbQuery()
     await updateTelegramMessage(context, helpMessage(), helpKeyboard())
   })
 
   instance.action('help:other', async (context) => {
+    if (!context.from) {
+      return
+    }
+
     pendingActions.delete(context.from.id)
     await context.answerCbQuery()
-    await updateTelegramMessage(context, 'Boshqa muammolar 👇', helpOtherKeyboard())
+    await updateTelegramMessage(context, 'Boshqa muammolar:', helpOtherKeyboard())
   })
 
   Object.keys(helpIssues).forEach((issueKey) => {
     instance.action(`help:${issueKey}`, async (context) => {
+      if (!context.from) {
+        return
+      }
+
       pendingActions.delete(context.from.id)
       await context.answerCbQuery()
       await updateTelegramMessage(
@@ -290,12 +389,20 @@ function registerHandlers(instance: Telegraf) {
   })
 
   instance.action('back', async (context) => {
+    if (!context.from) {
+      return
+    }
+
     pendingActions.delete(context.from.id)
     await context.answerCbQuery()
-    await updateTelegramMessage(context, 'Asosiy menyu 👇', mainMenuKeyboard())
+    await updateTelegramMessage(context, 'Asosiy menyu:', mainMenuKeyboard())
   })
 
   instance.on('text', async (context) => {
+    if (!context.from) {
+      return
+    }
+
     const text = context.message.text.trim()
     if (!text || text.startsWith('/')) {
       return
@@ -327,16 +434,20 @@ function registerHandlers(instance: Telegraf) {
     }
 
     if (isGreeting(text.toLowerCase())) {
-      await context.reply('Salom! Kerakli bo‘limni tanlang 👇', mainMenuKeyboard())
+      await context.reply('Salom! Kerakli bo\'limni tanlang:', mainMenuKeyboard())
       return
     }
 
-    await context.reply('Boshlash uchun bo‘lim tanlang 👇', mainMenuKeyboard())
+    await context.reply('Boshlash uchun bo\'lim tanlang:', mainMenuKeyboard())
   })
 }
 
 function registerQuickAction(instance: Telegraf, command: string, featureKey: BotFeatureKey) {
   instance.command(command, async (context) => {
+    if (!context.from) {
+      return
+    }
+
     const text = extractCommandArgument(context.message.text, command)
 
     if (!text) {
@@ -423,10 +534,7 @@ async function runFeatureGeneration(input: {
       resultKeyboard(input.featureKey),
     )
   } catch (error) {
-    await input.reply(
-      generationErrorMessage(error),
-      resultKeyboard(input.featureKey),
-    )
+    await input.reply(generationErrorMessage(error), resultKeyboard(input.featureKey))
   }
 }
 
@@ -450,7 +558,7 @@ async function consumeLinkCodeFromText(input: {
       username: input.telegramUsername,
     })
 
-    await input.reply('✅ Muvaffaqiyatli ulandingiz!', mainMenuKeyboard())
+    await input.reply('Muvaffaqiyatli ulandingiz!', mainMenuKeyboard())
   } catch (error) {
     pendingActions.set(input.telegramUserId, { type: 'link' })
     await input.reply(linkErrorMessage(error), linkCodeKeyboard())
@@ -478,19 +586,19 @@ function extractCommandArgument(text: string, command: string) {
 
 function startMessage() {
   return [
-    '👋 Xush kelibsiz!',
+    'Xush kelibsiz!',
     '',
-    'Teacher Assistant AI — zamonaviy o‘qituvchilar uchun aqlli yordamchi.',
+    'Teacher Assistant AI - zamonaviy o\'qituvchilar uchun aqlli yordamchi.',
     '',
-    'Boshlash uchun tanlang 👇',
+    'Boshlash uchun tanlang:',
   ].join('\n')
 }
 
 function helpMessage() {
   return [
-    'Qanday yordam beraman? 👇',
+    'Qanday yordam beraman?',
     '',
-    'Muammo turini tanlang. Men qisqa yo‘l ko‘rsataman.',
+    'Muammo turini tanlang. Men qisqa yo\'l ko\'rsataman.',
   ].join('\n')
 }
 
@@ -501,41 +609,41 @@ function helpIssueMessage(issueKey: HelpIssueKey) {
 
 function linkPrompt() {
   const lines = [
-    'Botni ulash uchun web ilovadan ro‘yxatdan o‘ting.',
+    'Botni ulash uchun web ilovadan ro\'yxatdan o\'ting.',
     '',
-    'Keyin “Telegram kodni olish” sahifasidan link code oling va shu yerga yuboring 🔐',
+    'Keyin "Telegram kodni olish" sahifasidan link code oling va shu yerga yuboring.',
   ]
 
   if (!getLinkCodePageUrl()) {
-    lines.push('', 'Hozir web manzil lokal sozlangan. Web ilovada sidebar orqali “Telegram kod” sahifasini oching.')
+    lines.push('', 'Hozir web manzil lokal sozlangan. Web ilovada sidebar orqali "Telegram kod" sahifasini oching.')
   }
 
   return lines.join('\n')
 }
 
 function unlinkedMessage() {
-  return 'Avval web hisobingizni ulang 🔐'
+  return 'Avval web hisobingizni ulang.'
 }
 
 function linkErrorMessage(error: unknown) {
   const message = error instanceof Error ? error.message.toLowerCase() : ''
 
   if (message.includes('expired')) {
-    return 'Link code muddati tugagan. Web ilovadan yangi code oling 🔐'
+    return 'Link code muddati tugagan. Web ilovadan yangi code oling.'
   }
 
   if (message.includes('not found')) {
-    return 'Link code topilmadi. Tekshirib qayta yuboring 🔐'
+    return 'Link code topilmadi. Tekshirib qayta yuboring.'
   }
 
-  return "Hozircha ulab bo'lmadi. Qayta urinib ko'ring 🔐"
+  return "Hozircha ulab bo'lmadi. Qayta urinib ko'ring."
 }
 
 function generationErrorMessage(error: unknown) {
   const message = error instanceof Error ? error.message.toLowerCase() : ''
 
   if (message.includes('not enough credits')) {
-    return 'Kredit yetarli emas. Tarifni yangilab qayta urinib ko‘ring.'
+    return 'Kredit yetarli emas. Tarifni yangilab qayta urinib ko\'ring.'
   }
 
   if (message.includes('no active subscription')) {
@@ -563,16 +671,16 @@ function mainMenuKeyboard() {
       Markup.button.callback(featureUx.writing_feedback.button, 'feature:writing_feedback'),
       Markup.button.callback(featureUx.speaking_questions.button, 'feature:speaking_questions'),
     ],
-    [Markup.button.callback('⚙️ Sozlamalar', 'settings')],
+    [Markup.button.callback('Sozlamalar', 'settings')],
   ])
 }
 
 function settingsKeyboard() {
   return Markup.inlineKeyboard([
-    [Markup.button.callback('🔗 Ulanish (link code)', 'settings:link')],
-    [Markup.button.callback('🌐 Til', 'settings:language')],
-    [Markup.button.callback('❓ Yordam', 'settings:help')],
-    [Markup.button.callback('🔙 Ortga', 'back')],
+    [Markup.button.callback('Ulanish (link code)', 'settings:link')],
+    [Markup.button.callback('Til', 'settings:language')],
+    [Markup.button.callback('Yordam', 'settings:help')],
+    [Markup.button.callback('Ortga', 'back')],
   ])
 }
 
@@ -581,8 +689,8 @@ function helpKeyboard() {
     [Markup.button.callback(helpIssues.code.button, 'help:code')],
     [Markup.button.callback(helpIssues.link.button, 'help:link')],
     [Markup.button.callback(helpIssues.ai.button, 'help:ai')],
-    [Markup.button.callback('➕ Boshqa', 'help:other')],
-    [Markup.button.callback('🔙 Ortga', 'back')],
+    [Markup.button.callback('Boshqa', 'help:other')],
+    [Markup.button.callback('Ortga', 'back')],
   ])
 }
 
@@ -592,21 +700,21 @@ function helpOtherKeyboard() {
     [Markup.button.callback(helpIssues.result.button, 'help:result')],
     [Markup.button.callback(helpIssues.web.button, 'help:web')],
     [Markup.button.callback(helpIssues.language.button, 'help:language')],
-    [Markup.button.callback('🔙 Ortga', 'back')],
+    [Markup.button.callback('Ortga', 'back')],
   ])
 }
 
 function helpAnswerKeyboard() {
   return Markup.inlineKeyboard([
-    [Markup.button.callback('➕ Boshqa muammolar', 'help:other')],
-    [Markup.button.callback('🔙 Ortga', 'back')],
+    [Markup.button.callback('Boshqa muammolar', 'help:other')],
+    [Markup.button.callback('Ortga', 'back')],
   ])
 }
 
 function linkingKeyboard() {
   return Markup.inlineKeyboard([
-    [Markup.button.callback('🔗 Ulanish (link code)', 'settings:link')],
-    [Markup.button.callback('🔙 Ortga', 'back')],
+    [Markup.button.callback('Ulanish (link code)', 'settings:link')],
+    [Markup.button.callback('Ortga', 'back')],
   ])
 }
 
@@ -617,21 +725,21 @@ function linkCodeKeyboard() {
   > = []
 
   if (linkCodePageUrl) {
-    buttons.push([Markup.button.url('🔑 Kodni olish', linkCodePageUrl)])
+    buttons.push([Markup.button.url('Kodni olish', linkCodePageUrl)])
   }
 
-  buttons.push([Markup.button.callback('🔙 Ortga', 'back')])
+  buttons.push([Markup.button.callback('Ortga', 'back')])
   return Markup.inlineKeyboard(buttons)
 }
 
 function backKeyboard() {
-  return Markup.inlineKeyboard([[Markup.button.callback('🔙 Ortga', 'back')]])
+  return Markup.inlineKeyboard([[Markup.button.callback('Ortga', 'back')]])
 }
 
 function resultKeyboard(featureKey: BotFeatureKey) {
   return Markup.inlineKeyboard([
     [Markup.button.callback(featureUx[featureKey].repeat, `repeat:${featureKey}`)],
-    [Markup.button.callback('🔙 Ortga', 'back')],
+    [Markup.button.callback('Ortga', 'back')],
   ])
 }
 
@@ -647,25 +755,20 @@ function buildPlansKeyboard(
     Array<ReturnType<typeof Markup.button.url> | ReturnType<typeof Markup.button.callback>>
   > = plans
     .filter((plan) => plan.key !== 'free_trial')
-    .map((plan) =>
-      [
-        Markup.button.url(
-          `${plan.name} sotib olish`,
-          `${botLink}?start=upgrade_${plan.key}`,
-        ),
-      ],
-    )
+    .map((plan) => [
+      Markup.button.url(`${plan.name} sotib olish`, `${botLink}?start=upgrade_${plan.key}`),
+    ])
 
   if (buttons.length === 0) {
     return null
   }
 
-  buttons.push([Markup.button.callback('🔙 Ortga', 'back')])
+  buttons.push([Markup.button.callback('Ortga', 'back')])
   return Markup.inlineKeyboard(buttons)
 }
 
 function getTelegramBotLink() {
-  const username = env.TELEGRAM_BOT_USERNAME?.replace(/^@+/, '').trim()
+  const username = (resolvedBotUsername ?? env.TELEGRAM_BOT_USERNAME)?.replace(/^@+/, '').trim()
   return username ? `https://t.me/${username}` : null
 }
 

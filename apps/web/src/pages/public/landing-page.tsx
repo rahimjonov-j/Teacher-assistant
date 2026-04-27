@@ -1,52 +1,79 @@
-import { ArrowRight, Bot, CheckCircle2, FileText, GraduationCap, LineChart, ShieldCheck, Sparkles, Zap } from 'lucide-react'
+import {
+  ArrowRight,
+  Bot,
+  CheckCircle2,
+  FileText,
+  GraduationCap,
+  LineChart,
+  ShieldCheck,
+  Sparkles,
+  Zap,
+} from 'lucide-react'
 import { Link } from 'react-router-dom'
 import heroImage from '@/assets/hero.png'
 import { SiteFooter } from '@/components/shared/site-footer'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
 
 const features = [
   {
     icon: FileText,
-    title: 'Tez material',
-    description: 'Dars rejasi, test va yozma ish uchun feedback soniyalarda tayyor.',
+    tone: 'bg-sky-100 text-sky-700 dark:bg-sky-400/15 dark:text-sky-200',
+    title: 'Materiallar tez tayyor',
+    description: 'Dars rejasi, test, speaking savollari va feedback bir ish oqimida.',
   },
   {
     icon: Bot,
-    title: 'Web + Telegram',
-    description: 'Bir xil hisob, bir xil imkoniyatlar - brauzerda ham, Telegramda ham.',
+    tone: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-400/15 dark:text-emerald-200',
+    title: 'Telegram bilan birga',
+    description: 'Webdagi hisobingiz bot bilan ulanadi, kredit va tarix bir joyda qoladi.',
   },
   {
     icon: LineChart,
-    title: 'Oddiy nazorat',
-    description: "Kredit sarfi va faollik statistikasi qulay ko'rinishda.",
+    tone: 'bg-amber-100 text-amber-800 dark:bg-amber-400/15 dark:text-amber-200',
+    title: 'Sarflar nazoratda',
+    description: "Kredit, aktivlik va eng ko'p ishlatilgan funksiyalar ko'rinib turadi.",
   },
   {
     icon: ShieldCheck,
-    title: 'Tayyor poydevor',
-    description: 'Auth, tarix va PDF eksport imkoniyatlari allaqachon tayyor.',
+    tone: 'bg-rose-100 text-rose-700 dark:bg-rose-400/15 dark:text-rose-200',
+    title: 'Tayyor platforma',
+    description: 'Auth, saqlash, PDF eksport va admin panel allaqachon ulangan.',
   },
+]
+
+const stats = [
+  { value: '50', label: 'bepul kredit' },
+  { value: '4', label: 'AI vosita' },
+  { value: 'PDF', label: 'eksport' },
+  { value: '24/7', label: 'web va bot' },
+]
+
+const steps = [
+  'Mavzu va sinfni kiriting',
+  'AI tayyor draft yaratadi',
+  'Natijani saqlang yoki PDF qiling',
 ]
 
 export function LandingPage() {
   return (
     <div className="flex min-h-screen flex-col bg-background">
-      <header className="border-b border-border/70 bg-background/95 backdrop-blur">
-        <div className="container flex h-16 items-center justify-between">
-          <Link to="/" className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-foreground text-background">
+      <header className="sticky top-0 z-30 border-b border-border/70 bg-background/95 backdrop-blur">
+        <div className="container flex min-h-16 items-center justify-between gap-3 py-3">
+          <Link to="/" className="flex min-w-0 items-center gap-3">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-foreground text-background">
               <GraduationCap className="h-5 w-5" />
             </div>
-            <div>
-              <div className="text-sm font-black tracking-tight">Teacher Assistant</div>
-              <div className="text-[11px] font-medium text-muted-foreground">AI yordamchi</div>
+            <div className="min-w-0">
+              <div className="truncate text-sm font-black tracking-tight">Teacher Assistant</div>
+              <div className="truncate text-[11px] font-medium text-muted-foreground">AI yordamchi</div>
             </div>
           </Link>
-          <div className="flex items-center gap-2">
-            <Button asChild variant="ghost" size="sm">
+
+          <div className="flex shrink-0 items-center gap-2">
+            <Button asChild variant="ghost" size="sm" className="px-3">
               <Link to="/login">Kirish</Link>
             </Button>
-            <Button asChild size="sm">
+            <Button asChild size="sm" className="px-3">
               <Link to="/register">Boshlash</Link>
             </Button>
           </div>
@@ -54,139 +81,151 @@ export function LandingPage() {
       </header>
 
       <main className="flex-1">
-      <section className="relative overflow-hidden border-b border-border/70 bg-secondary/35 px-4 pb-16 pt-10 md:pb-20 md:pt-16">
-        <div className="container relative grid items-center gap-10 lg:grid-cols-[1fr_0.94fr]">
-          <div className="text-center lg:text-left">
-            <div className="animate-in mx-auto flex max-w-fit items-center gap-2 rounded-full bg-background px-4 py-2 text-[10px] font-extrabold uppercase tracking-[0.18em] text-primary shadow-sm ring-1 ring-border lg:mx-0">
-              <span className="flex h-2 w-2 rounded-full bg-primary animate-pulse" />
-              AI yordamida dars tayyorlash
-            </div>
+        <section className="relative isolate min-h-[calc(100svh-9rem)] overflow-hidden border-b border-border/70">
+          <img
+            src={heroImage}
+            alt=""
+            className="absolute inset-0 h-full w-full object-cover"
+            loading="eager"
+            decoding="async"
+          />
+          <div className="absolute inset-0 bg-slate-950/60" />
+          <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(2,6,23,0.25),rgba(2,6,23,0.78))]" />
 
-            <h1 className="animate-in mt-7 text-4xl font-black tracking-tight text-foreground sm:text-6xl lg:text-7xl">
-              Dars materiali tayyorlashni{' '}
-              <span className="text-sky-600 dark:text-sky-300">
-                bir necha daqiqaga
-              </span>{' '}
-              qisqartiring
-            </h1>
+          <div className="container relative flex min-h-[calc(100svh-9rem)] flex-col justify-end pb-7 pt-12 text-white sm:pb-10 lg:pb-12">
+            <div className="max-w-4xl">
+              <div className="inline-flex max-w-full items-center gap-2 rounded-lg bg-white/12 px-3 py-2 text-[10px] font-extrabold uppercase text-white/90 ring-1 ring-white/18 backdrop-blur sm:text-xs">
+                <span className="h-2 w-2 shrink-0 rounded-full bg-emerald-300" />
+                AI yordamida dars tayyorlash
+              </div>
 
-            <p className="animate-in mx-auto mt-6 max-w-2xl text-base font-medium leading-8 text-muted-foreground sm:text-xl lg:mx-0">
-              Test, dars rejasi, speaking savollari va yozma ish feedbackini bitta joyda yarating.
-              O'qituvchi vaqtini hujjatga emas, o'quvchiga sarflashi kerak.
-            </p>
+              <h1 className="mt-5 max-w-3xl text-4xl font-black leading-[1.04] tracking-tight sm:text-6xl lg:text-7xl">
+                O'qituvchi uchun dars materiali bir necha daqiqada
+              </h1>
 
-            <div className="animate-in mt-9 flex flex-col items-center gap-3 sm:flex-row lg:justify-start">
-              <Button asChild size="lg" className="h-14 w-full rounded-xl px-8 text-base font-black shadow-lg shadow-primary/10 sm:w-auto">
-                <Link to="/register">
-                  Bepul material yaratish
-                  <ArrowRight className="h-5 w-5" />
-                </Link>
-              </Button>
-              <div className="flex items-center gap-2 text-sm font-bold text-muted-foreground">
-                <CheckCircle2 className="h-5 w-5 text-primary" />
-                Karta talab qilinmaydi
+              <p className="mt-5 max-w-2xl text-base font-medium leading-7 text-white/82 sm:text-xl sm:leading-8">
+                Test, dars rejasi, speaking savollari va yozma ish feedbackini webda yoki Telegram botda yarating.
+              </p>
+
+              <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:items-center">
+                <Button
+                  asChild
+                  size="lg"
+                  className="h-13 w-full rounded-lg bg-white px-6 text-base font-black text-slate-950 hover:bg-white/90 sm:w-auto"
+                >
+                  <Link to="/register">
+                    Bepul boshlash
+                    <ArrowRight className="h-5 w-5" />
+                  </Link>
+                </Button>
+                <Button
+                  asChild
+                  size="lg"
+                  variant="outline"
+                  className="h-13 w-full rounded-lg border-white/30 bg-white/10 px-6 text-base font-black text-white backdrop-blur hover:bg-white/18 hover:text-white sm:w-auto"
+                >
+                  <Link to="/login">Hisobga kirish</Link>
+                </Button>
+              </div>
+
+              <div className="mt-5 flex items-center gap-2 text-sm font-bold text-white/80">
+                <CheckCircle2 className="h-5 w-5 shrink-0 text-emerald-300" />
+                Ro'yxatdan o'tish uchun bank kartasi shart emas
               </div>
             </div>
 
-            <div className="mt-8 grid grid-cols-3 gap-2 text-left sm:max-w-xl">
-              {['50 kredit', 'PDF eksport', 'Telegram bot'].map((item) => (
-                <div key={item} className="rounded-xl bg-background p-3 text-sm font-black shadow-sm ring-1 ring-border">
-                  {item}
+            <div className="mt-8 grid grid-cols-2 gap-2 sm:grid-cols-4">
+              {stats.map((item) => (
+                <div key={item.label} className="rounded-lg bg-white/12 p-3 ring-1 ring-white/15 backdrop-blur">
+                  <div className="text-xl font-black sm:text-2xl">{item.value}</div>
+                  <div className="mt-1 text-xs font-bold text-white/70">{item.label}</div>
                 </div>
               ))}
             </div>
           </div>
+        </section>
 
-          <div className="animate-in relative">
-            <div className="absolute left-4 top-4 z-10 rounded-xl bg-background/95 p-4 shadow-xl backdrop-blur">
-              <div className="flex items-center gap-3">
-                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                  <Sparkles className="h-5 w-5" />
+        <section className="border-b border-border/70 bg-background py-14 sm:py-20">
+          <div className="container grid gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
+            <div>
+              <div className="inline-flex items-center gap-2 rounded-lg bg-secondary px-3 py-2 text-xs font-black text-muted-foreground">
+                <Sparkles className="h-4 w-4" />
+                Har kuni ishlatiladigan vositalar
+              </div>
+              <h2 className="mt-4 max-w-xl text-3xl font-black tracking-tight sm:text-4xl">
+                Dars tayyorlashdagi mayda ishlarni AIga topshiring
+              </h2>
+              <p className="mt-4 max-w-xl text-base font-medium leading-7 text-muted-foreground">
+                Platforma o'qituvchi ritmiga mos: tez kirish, aniq forma, saqlangan tarix va Telegram orqali davom ettirish.
+              </p>
+            </div>
+
+            <div className="grid gap-3 sm:grid-cols-2">
+              {features.map((feature) => (
+                <article key={feature.title} className="rounded-lg border border-border bg-card p-5 shadow-sm">
+                  <div className={`flex h-11 w-11 items-center justify-center rounded-lg ${feature.tone}`}>
+                    <feature.icon className="h-5 w-5" />
+                  </div>
+                  <h3 className="mt-4 text-base font-black">{feature.title}</h3>
+                  <p className="mt-2 text-sm leading-6 text-muted-foreground">{feature.description}</p>
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="bg-secondary/45 py-14 sm:py-20">
+          <div className="container grid gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
+            <div className="overflow-hidden rounded-lg border border-border bg-card shadow-sm">
+              <div className="border-b border-border bg-muted/60 px-4 py-3">
+                <div className="flex items-center gap-2">
+                  <span className="h-3 w-3 rounded-full bg-rose-400" />
+                  <span className="h-3 w-3 rounded-full bg-amber-400" />
+                  <span className="h-3 w-3 rounded-full bg-emerald-400" />
                 </div>
-                <div>
-                  <div className="text-sm font-black">10 soniyada draft</div>
-                  <div className="text-xs font-medium text-muted-foreground">Mavzudan tayyor reja</div>
+              </div>
+              <div className="space-y-4 p-4 sm:p-6">
+                <div className="rounded-lg bg-secondary p-4">
+                  <div className="text-xs font-black uppercase text-muted-foreground">So'rov</div>
+                  <p className="mt-2 text-sm font-bold leading-6">
+                    7-sinf biologiya, fotosintez mavzusi uchun 10 ta test va qisqa dars rejasi.
+                  </p>
+                </div>
+                <div className="rounded-lg border border-border p-4">
+                  <div className="mb-3 flex items-center gap-2 text-sm font-black">
+                    <Zap className="h-4 w-4 text-amber-500" />
+                    Tayyor natija
+                  </div>
+                  <div className="space-y-2 text-sm leading-6 text-muted-foreground">
+                    <p>1. Dars maqsadi va kutilgan natijalar.</p>
+                    <p>2. Qisqa tushuntirish, amaliy mashq va mustahkamlash.</p>
+                    <p>3. Javob kaliti bilan test savollari.</p>
+                  </div>
                 </div>
               </div>
             </div>
 
-            <div
-              aria-label="Sinfxonadagi o'qituvchi va o'quvchilar"
-              className="relative aspect-[4/3] min-h-[360px] overflow-hidden rounded-2xl shadow-2xl shadow-slate-900/10 sm:min-h-[480px]"
-            >
-              <img
-                src={heroImage}
-                alt=""
-                className="absolute inset-0 h-full w-full object-cover"
-                loading="eager"
-                decoding="async"
-              />
-              <div className="absolute inset-0 bg-gradient-to-b from-slate-950/5 to-slate-950/60" />
-              <div className="absolute inset-x-0 bottom-0 p-6 text-white sm:p-8">
-                <div className="max-w-sm text-2xl font-black tracking-tight sm:text-3xl">
-                  Reja, test va feedback bitta ish oqimida
-                </div>
-                <div className="mt-2 text-sm font-medium text-white/80">
-                  O'qituvchi uchun tez, sodda va amaliy yordamchi.
-                </div>
+            <div>
+              <h2 className="text-3xl font-black tracking-tight sm:text-4xl">Ishlash tartibi juda oddiy</h2>
+              <div className="mt-6 space-y-3">
+                {steps.map((step, index) => (
+                  <div key={step} className="flex gap-3 rounded-lg border border-border bg-card p-4">
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-foreground text-sm font-black text-background">
+                      {index + 1}
+                    </div>
+                    <div className="pt-1 text-sm font-bold sm:text-base">{step}</div>
+                  </div>
+                ))}
               </div>
-            </div>
-
-            <div className="absolute -bottom-5 right-3 rounded-xl bg-slate-950 px-5 py-4 text-white shadow-xl dark:bg-white dark:text-slate-950">
-              <div className="text-[10px] font-black uppercase tracking-[0.18em] opacity-60">Bugungi natija</div>
-              <div className="mt-1 text-2xl font-black">3 material</div>
+              <Button asChild size="lg" className="mt-6 h-13 w-full rounded-lg text-base font-black sm:w-auto">
+                <Link to="/register">
+                  Material yaratish
+                  <ArrowRight className="h-5 w-5" />
+                </Link>
+              </Button>
             </div>
           </div>
-        </div>
-      </section>
-
-      <section className="container pb-24">
-        <div className="mb-12 text-center">
-          <h2 className="text-3xl font-black tracking-tight sm:text-4xl">
-            Nima uchun <span className="text-primary">Teacher Assistant?</span>
-          </h2>
-          <p className="mt-4 text-base font-medium text-muted-foreground/70">
-            Hamma narsani bir joyda - tez, qulay va professional.
-          </p>
-        </div>
-        <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
-          {features.map((feature) => (
-            <Card key={feature.title} className="bg-card/85">
-              <CardContent className="space-y-4 p-6">
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-primary/10 bg-primary/10 text-primary">
-                  <feature.icon className="h-6 w-6" />
-                </div>
-                <div>
-                  <h3 className="text-base font-bold">{feature.title}</h3>
-                  <p className="mt-1 text-sm text-muted-foreground/70">{feature.description}</p>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </section>
-
-      <section className="container pb-24">
-        <div className="relative overflow-hidden rounded-2xl bg-slate-950 p-10 text-center text-white shadow-2xl shadow-primary/15 md:p-16">
-          <div className="relative">
-            <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-xl bg-white/15">
-              <Zap className="h-8 w-8 fill-white" />
-            </div>
-            <h2 className="text-3xl font-black tracking-tight sm:text-4xl">
-              Birinchi materialingizni bugun yarating
-            </h2>
-            <p className="mx-auto mt-4 max-w-xl text-base font-medium opacity-80">
-              Ro'yxatdan o'ting va darhol 50 ta bepul kredit oling. Hech qanday bank kartasi talab qilinmaydi.
-            </p>
-            <Button asChild size="lg" className="mt-8 h-14 rounded-xl bg-white px-10 text-base font-black text-slate-950 shadow-xl hover:bg-white/90">
-              <Link to="/register">
-                Hoziroq boshlash
-                <ArrowRight className="h-5 w-5" />
-              </Link>
-            </Button>
-          </div>
-        </div>
-      </section>
+        </section>
       </main>
 
       <SiteFooter variant="public" className="mt-auto" />

@@ -1,9 +1,13 @@
 import type { Request, Response } from 'express'
 import { env } from '../config/env.js'
-import { getTelegramBot } from '../services/bot.service.js'
+import { getTelegramBot, getTelegramBotStatus } from '../services/bot.service.js'
 import { asyncHandler } from '../utils/async-handler.js'
 
 export const telegramController = {
+  status: asyncHandler(async (_request: Request, response: Response) => {
+    response.json(await getTelegramBotStatus())
+  }),
+
   webhook: asyncHandler(async (request: Request, response: Response) => {
     const bot = getTelegramBot()
 
