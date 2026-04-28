@@ -22,13 +22,15 @@ export async function apiRequest<T>(path: string, init: RequestInit = {}) {
   const headers = new Headers(init.headers)
   headers.set('Content-Type', 'application/json')
 
-  if (data.session?.access_token) {
+  const studentToken = getStudentToken()
+  const isStudentRoute = path.startsWith('/student/')
+
+  if (isStudentRoute && studentToken && path !== '/student/login') {
+    headers.set('Authorization', `Bearer ${studentToken}`)
+  } else if (data.session?.access_token) {
     headers.set('Authorization', `Bearer ${data.session.access_token}`)
-  } else {
-    const studentToken = getStudentToken()
-    if (studentToken) {
-      headers.set('Authorization', `Bearer ${studentToken}`)
-    }
+  } else if (studentToken) {
+    headers.set('Authorization', `Bearer ${studentToken}`)
   }
 
   const response = await fetch(`${env.apiUrl}${path}`, {
