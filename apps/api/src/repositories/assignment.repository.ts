@@ -10,7 +10,7 @@ import type {
 } from '@teacher-assistant/shared'
 import { getSupabaseAdminClient } from '../config/supabase.js'
 import { ApiError } from '../utils/api-error.js'
-import { classRepository } from './class.repository.js'
+import { classRepository, classSchemaMigrationError, isClassSchemaMissing } from './class.repository.js'
 
 const AUTO_GRADED_TYPES = new Set<AssignmentType>(['multiple_choice', 'variant_test', 'mini_game'])
 
@@ -841,6 +841,9 @@ export const assignmentRepository = {
       .order('submitted_at', { ascending: false })
 
     if (error) {
+      if (isClassSchemaMissing(error)) {
+        throw classSchemaMigrationError()
+      }
       throw new ApiError(500, 'Unable to load pending submissions.')
     }
 

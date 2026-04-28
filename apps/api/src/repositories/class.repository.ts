@@ -24,6 +24,15 @@ const CLASS_LIMITS: Record<PlanKey, number | null> = {
 
 const MANUAL_ASSIGNMENT_TYPES = new Set<AssignmentType>(['open_question', 'writing', 'speaking'])
 
+export function isClassSchemaMissing(error: unknown) {
+  const maybeError = error as { code?: string; message?: string } | null
+  return maybeError?.code === 'PGRST205' || maybeError?.message?.includes("Could not find the table 'public.classes'")
+}
+
+export function classSchemaMigrationError() {
+  return new ApiError(503, 'Class database tables are not created yet. Apply supabase/migrations/20260428_class_management.sql.')
+}
+
 function currentMonthStart() {
   const now = new Date()
   return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1)).toISOString().slice(0, 10)
@@ -164,6 +173,9 @@ export const classRepository = {
     ])
 
     if (error) {
+      if (isClassSchemaMissing(error)) {
+        throw classSchemaMigrationError()
+      }
       throw new ApiError(500, 'Unable to load classes.')
     }
 
@@ -221,6 +233,10 @@ export const classRepository = {
         .eq('assignments.teacher_id', teacherId),
       supabase.from('assignments').select('id, status').eq('teacher_id', teacherId),
     ])
+
+    if ([classes.error, students.error, submissions.error, assignments.error].some(isClassSchemaMissing)) {
+      throw classSchemaMigrationError()
+    }
 
     if (classes.error || students.error || submissions.error || assignments.error) {
       throw new ApiError(500, 'Unable to load class dashboard summary.')
