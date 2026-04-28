@@ -492,9 +492,41 @@ export const classRepository = {
       throw new ApiError(400, error?.message ?? 'Unable to add student.')
     }
 
+    await this.assignExistingClassAssignmentsToStudent(classId, data.id as string)
+
     return {
       student: toStudentRecord(data),
       credentials: { login, password },
+    }
+  },
+
+  async assignExistingClassAssignmentsToStudent(classId: string, studentId: string) {
+    const supabase = getSupabaseAdminClient()
+    const { data: assignments, error } = await supabase
+      .from('assignments')
+      .select('id')
+      .eq('class_id', classId)
+      .eq('status', 'sent')
+
+    if (error) {
+      throw new ApiError(500, 'Unable to load existing class assignments.')
+    }
+
+    const assignmentIds = (assignments ?? []).map((row: any) => row.id as string)
+    if (assignmentIds.length === 0) {
+      return
+    }
+
+    const { error: recipientError } = await supabase.from('assignment_recipients').upsert(
+      assignmentIds.map((assignmentId: string) => ({
+        assignment_id: assignmentId,
+        student_id: studentId,
+      })),
+      { onConflict: 'assignment_id,student_id' },
+    )
+
+    if (recipientError) {
+      throw new ApiError(500, 'Unable to assign existing class tasks to student.')
     }
   },
 
