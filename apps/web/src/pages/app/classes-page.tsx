@@ -1,7 +1,8 @@
 import { useMemo, useState } from 'react'
+import type { ReactNode } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import type { ClassDetailPayload, ClassesPayload, AssignmentType } from '@teacher-assistant/shared'
-import { CheckCircle2, Copy, Crown, KeyRound, Plus, RefreshCw, Send, ShieldAlert, Sparkles, Users, type LucideIcon } from 'lucide-react'
+import { Award, CalendarDays, CheckCircle2, Clock3, Copy, Crown, KeyRound, Plus, RefreshCw, Send, ShieldAlert, Sparkles, Users, type LucideIcon } from 'lucide-react'
 import { toast } from 'sonner'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -32,7 +33,8 @@ export function ClassesPage() {
   const [credentials, setCredentials] = useState<{ login: string; password: string } | null>(null)
   const [assignmentTitle, setAssignmentTitle] = useState('')
   const [assignmentType, setAssignmentType] = useState<AssignmentType>('multiple_choice')
-  const [deadlineAt, setDeadlineAt] = useState('')
+  const [deadlineDate, setDeadlineDate] = useState('')
+  const [deadlineTime, setDeadlineTime] = useState('18:00')
   const [timeLimitMinutes, setTimeLimitMinutes] = useState('30')
   const [pointsPerCorrect, setPointsPerCorrect] = useState('5')
   const [questionText, setQuestionText] = useState('')
@@ -125,7 +127,7 @@ export function ClassesPage() {
           prompt: aiPrompt,
           title: aiTitle || null,
           pointsPerCorrect: Number(pointsPerCorrect),
-          deadlineAt: deadlineAt ? new Date(deadlineAt).toISOString() : null,
+          deadlineAt: getDeadlineIso(deadlineDate, deadlineTime),
           timeLimitMinutes: timeLimitMinutes ? Number(timeLimitMinutes) : null,
           maxAttempts: 2,
           randomizeQuestions: true,
@@ -168,7 +170,7 @@ export function ClassesPage() {
       title: assignmentTitle,
       type: assignmentType,
       pointsPerCorrect: Number(pointsPerCorrect),
-      deadlineAt: deadlineAt ? new Date(deadlineAt).toISOString() : null,
+      deadlineAt: getDeadlineIso(deadlineDate, deadlineTime),
       timeLimitMinutes: timeLimitMinutes ? Number(timeLimitMinutes) : null,
       maxAttempts: 2,
       randomizeQuestions: assignmentType === 'variant_test',
@@ -353,12 +355,16 @@ export function ClassesPage() {
                   <Input value={aiTitle} onChange={(event) => setAiTitle(event.target.value)} placeholder="Test title optional" />
                 </div>
                 <div className="space-y-3">
-                  <Label>Deadline, time limit, points</Label>
-                  <div className="grid gap-3 sm:grid-cols-3">
-                    <Input type="datetime-local" value={deadlineAt} onChange={(event) => setDeadlineAt(event.target.value)} />
-                    <Input value={timeLimitMinutes} onChange={(event) => setTimeLimitMinutes(event.target.value)} placeholder="Minutes" />
-                    <Input value={pointsPerCorrect} onChange={(event) => setPointsPerCorrect(event.target.value)} placeholder="Points" />
-                  </div>
+                  <AssignmentSettings
+                    deadlineDate={deadlineDate}
+                    deadlineTime={deadlineTime}
+                    timeLimitMinutes={timeLimitMinutes}
+                    pointsPerCorrect={pointsPerCorrect}
+                    onDeadlineDateChange={setDeadlineDate}
+                    onDeadlineTimeChange={setDeadlineTime}
+                    onTimeLimitChange={setTimeLimitMinutes}
+                    onPointsChange={setPointsPerCorrect}
+                  />
                   <Button className="w-full" disabled={!aiPrompt || createAiAssignmentMutation.isPending || !activeClassId} onClick={() => createAiAssignmentMutation.mutate()}>
                     <Sparkles className="h-4 w-4" />
                     Generate and send test
@@ -386,11 +392,16 @@ export function ClassesPage() {
                       </option>
                     ))}
                   </select>
-                  <div className="grid grid-cols-3 gap-3">
-                    <Input type="datetime-local" value={deadlineAt} onChange={(event) => setDeadlineAt(event.target.value)} />
-                    <Input value={timeLimitMinutes} onChange={(event) => setTimeLimitMinutes(event.target.value)} placeholder="Minutes" />
-                    <Input value={pointsPerCorrect} onChange={(event) => setPointsPerCorrect(event.target.value)} placeholder="Points" />
-                  </div>
+                  <AssignmentSettings
+                    deadlineDate={deadlineDate}
+                    deadlineTime={deadlineTime}
+                    timeLimitMinutes={timeLimitMinutes}
+                    pointsPerCorrect={pointsPerCorrect}
+                    onDeadlineDateChange={setDeadlineDate}
+                    onDeadlineTimeChange={setDeadlineTime}
+                    onTimeLimitChange={setTimeLimitMinutes}
+                    onPointsChange={setPointsPerCorrect}
+                  />
                 </div>
                 <div className="space-y-3">
                   <Label>Question or prompt</Label>
@@ -472,6 +483,110 @@ function ActiveBucket({ title, count }: { title: string; count: number }) {
   )
 }
 
+function AssignmentSettings({
+  deadlineDate,
+  deadlineTime,
+  timeLimitMinutes,
+  pointsPerCorrect,
+  onDeadlineDateChange,
+  onDeadlineTimeChange,
+  onTimeLimitChange,
+  onPointsChange,
+}: {
+  deadlineDate: string
+  deadlineTime: string
+  timeLimitMinutes: string
+  pointsPerCorrect: string
+  onDeadlineDateChange: (value: string) => void
+  onDeadlineTimeChange: (value: string) => void
+  onTimeLimitChange: (value: string) => void
+  onPointsChange: (value: string) => void
+}) {
+  const deadlinePreview = formatDeadlinePreview(deadlineDate, deadlineTime)
+
+  return (
+    <div className="rounded-xl border border-border bg-secondary/40 p-4">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <div className="text-sm font-black">Topshiriq sozlamalari</div>
+          <div className="mt-1 text-xs text-muted-foreground">{deadlinePreview}</div>
+        </div>
+        {deadlineDate ? (
+          <Button size="sm" variant="ghost" onClick={() => onDeadlineDateChange('')}>
+            Clear
+          </Button>
+        ) : null}
+      </div>
+
+      <div className="mt-4 flex flex-wrap gap-2">
+        <Button size="sm" variant="outline" onClick={() => setDeadlinePreset(0, '18:00', onDeadlineDateChange, onDeadlineTimeChange)}>
+          Bugun 18:00
+        </Button>
+        <Button size="sm" variant="outline" onClick={() => setDeadlinePreset(1, '09:00', onDeadlineDateChange, onDeadlineTimeChange)}>
+          Ertaga 09:00
+        </Button>
+        <Button size="sm" variant="outline" onClick={() => setDeadlinePreset(7, '18:00', onDeadlineDateChange, onDeadlineTimeChange)}>
+          1 hafta
+        </Button>
+      </div>
+
+      <div className="mt-4 grid gap-3 sm:grid-cols-2">
+        <SettingField icon={CalendarDays} label="Deadline sana">
+          <Input
+            type="date"
+            min={toDateInputValue(new Date())}
+            value={deadlineDate}
+            onChange={(event) => onDeadlineDateChange(event.target.value)}
+            className="h-11 bg-background"
+          />
+        </SettingField>
+        <SettingField icon={Clock3} label="Deadline vaqt">
+          <Input
+            type="time"
+            value={deadlineTime}
+            onChange={(event) => onDeadlineTimeChange(event.target.value)}
+            className="h-11 bg-background"
+          />
+        </SettingField>
+        <SettingField icon={Clock3} label="Test vaqti">
+          <div className="flex h-11 items-center rounded-xl border border-input bg-background px-3">
+            <Input
+              value={timeLimitMinutes}
+              onChange={(event) => onTimeLimitChange(event.target.value)}
+              inputMode="numeric"
+              className="h-9 border-0 bg-transparent px-0 focus-visible:ring-0"
+            />
+            <span className="shrink-0 text-sm text-muted-foreground">min</span>
+          </div>
+        </SettingField>
+        <SettingField icon={Award} label="Har togri javob">
+          <div className="flex h-11 items-center rounded-xl border border-input bg-background px-3">
+            <Input
+              value={pointsPerCorrect}
+              onChange={(event) => onPointsChange(event.target.value)}
+              inputMode="decimal"
+              className="h-9 border-0 bg-transparent px-0 focus-visible:ring-0"
+            />
+            <span className="shrink-0 text-sm text-muted-foreground">ball</span>
+          </div>
+        </SettingField>
+      </div>
+    </div>
+  )
+}
+
+function SettingField({ icon: Icon, label, children }: { icon: LucideIcon; label: string; children: ReactNode }) {
+  return (
+    <label className="block">
+      <div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase text-muted-foreground">
+        <Icon className="h-4 w-4" />
+        {label}
+      </div>
+      {children}
+    </label>
+  )
+}
+
 function ReviewRow({
   submission,
 }: {
@@ -536,6 +651,53 @@ function parseOptions(optionsText: string, correctLetters: string) {
         isCorrect: correct.has(letter),
       }
     })
+}
+
+function getDeadlineIso(deadlineDate: string, deadlineTime: string) {
+  if (!deadlineDate) {
+    return null
+  }
+
+  const dateTime = new Date(`${deadlineDate}T${deadlineTime || '23:59'}`)
+  return Number.isNaN(dateTime.getTime()) ? null : dateTime.toISOString()
+}
+
+function setDeadlinePreset(
+  dayOffset: number,
+  time: string,
+  onDeadlineDateChange: (value: string) => void,
+  onDeadlineTimeChange: (value: string) => void,
+) {
+  const nextDate = new Date()
+  nextDate.setDate(nextDate.getDate() + dayOffset)
+  onDeadlineDateChange(toDateInputValue(nextDate))
+  onDeadlineTimeChange(time)
+}
+
+function toDateInputValue(value: Date) {
+  const year = value.getFullYear()
+  const month = String(value.getMonth() + 1).padStart(2, '0')
+  const day = String(value.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
+function formatDeadlinePreview(deadlineDate: string, deadlineTime: string) {
+  if (!deadlineDate) {
+    return 'Deadline belgilanmagan'
+  }
+
+  const value = new Date(`${deadlineDate}T${deadlineTime || '23:59'}`)
+  if (Number.isNaN(value.getTime())) {
+    return 'Deadline sanasi notogri'
+  }
+
+  return `Deadline: ${new Intl.DateTimeFormat('uz-UZ', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  }).format(value)}`
 }
 
 function rankClass(rank: number) {
