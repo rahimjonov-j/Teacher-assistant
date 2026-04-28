@@ -4,8 +4,11 @@ import {
   ArrowRight,
   Clock3,
   FileText,
+  GraduationCap,
   MessageSquareText,
   Sparkles,
+  Trophy,
+  Users,
   Wallet,
 } from 'lucide-react'
 import { Link } from 'react-router-dom'
@@ -88,6 +91,30 @@ export function DashboardPage() {
           value={data.recentContent.length}
           hint={t('dashboard.recentOutputs')}
           icon={Wallet}
+        />
+        <StatCard
+          label="Classes"
+          value={data.classSummary?.totalClasses ?? 0}
+          hint="Managed groups"
+          icon={GraduationCap}
+        />
+        <StatCard
+          label="Students"
+          value={data.classSummary?.totalStudents ?? 0}
+          hint={`${data.classSummary?.activeStudents ?? 0} active`}
+          icon={Users}
+        />
+        <StatCard
+          label="Pending"
+          value={data.classSummary?.pendingSubmissions ?? 0}
+          hint="Manual reviews"
+          icon={MessageSquareText}
+        />
+        <StatCard
+          label="Top"
+          value={data.classSummary?.monthlyTopStudent?.fullName ?? '-'}
+          hint={`${data.classSummary?.monthlyTopStudent?.totalMonthlyScore ?? 0} points`}
+          icon={Trophy}
         />
       </div>
 

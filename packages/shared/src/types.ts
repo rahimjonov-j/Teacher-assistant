@@ -14,6 +14,27 @@ export type PlanKey = (typeof planKeys)[number]
 
 export type AppRole = 'teacher' | 'admin'
 
+export const assignmentTypes = [
+  'multiple_choice',
+  'variant_test',
+  'open_question',
+  'writing',
+  'speaking',
+  'mini_game',
+] as const
+
+export type AssignmentType = (typeof assignmentTypes)[number]
+
+export const assignmentStatuses = ['draft', 'sent', 'closed'] as const
+
+export type AssignmentStatus = (typeof assignmentStatuses)[number]
+
+export const submissionStatuses = ['assigned', 'in_progress', 'submitted', 'graded', 'blocked'] as const
+
+export type SubmissionStatus = (typeof submissionStatuses)[number]
+
+export type StudentStatus = 'active' | 'inactive' | 'transferred'
+
 export interface PlanDefinition {
   key: PlanKey
   name: string
@@ -98,6 +119,147 @@ export interface TeacherDashboardPayload {
     mostUsedFeature: FeatureKey | null
     creditsRemaining: number
   }
+  classSummary?: TeacherClassSummary
+}
+
+export interface TeacherClassSummary {
+  totalClasses: number
+  totalStudents: number
+  activeStudents: number
+  pendingSubmissions: number
+  monthlyTopStudent: {
+    studentId: string
+    fullName: string
+    totalMonthlyScore: number
+  } | null
+  assignmentsSent: number
+  averageCompletionRate: number
+}
+
+export interface ClassRecord {
+  id: string
+  name: string
+  gradeLevel: string | null
+  groupName: string
+  status: 'active' | 'archived'
+  studentCount: number
+  monthlyScore: number
+  createdAt: string
+}
+
+export interface StudentRecord {
+  id: string
+  classId: string
+  fullName: string
+  login: string
+  status: StudentStatus
+  totalMonthlyScore: number
+  allTimeScore: number
+  completedAssignments: number
+  lastActiveAt: string | null
+  createdAt: string
+}
+
+export interface LeaderboardEntry {
+  rank: number
+  studentId: string
+  fullName: string
+  totalMonthlyScore: number
+  allTimeScore: number
+  completedTasksCount: number
+}
+
+export interface ActiveStudentBuckets {
+  today: StudentRecord[]
+  week: StudentRecord[]
+  month: StudentRecord[]
+}
+
+export interface ClassDetailPayload {
+  class: ClassRecord
+  leaderboard: LeaderboardEntry[]
+  allStudents: StudentRecord[]
+  activeStudents: ActiveStudentBuckets
+  assignments: AssignmentRecord[]
+}
+
+export interface ClassesPayload {
+  classes: ClassRecord[]
+  limits: {
+    planKey: PlanKey
+    current: number
+    max: number | null
+    canCreate: boolean
+  }
+}
+
+export interface StudentCredentials {
+  login: string
+  password: string
+}
+
+export interface AssignmentRecord {
+  id: string
+  classId: string | null
+  title: string
+  description: string | null
+  type: AssignmentType
+  status: AssignmentStatus
+  pointsPerCorrect: number
+  deadlineAt: string | null
+  timeLimitMinutes: number | null
+  maxAttempts: number
+  randomizeQuestions: boolean
+  randomizeOptions: boolean
+  recipientsCount: number
+  submittedCount: number
+  gradedCount: number
+  createdAt: string
+}
+
+export interface AssignmentQuestionRecord {
+  id: string
+  assignmentId: string
+  questionText: string
+  variantKey: string | null
+  position: number
+  points: number | null
+  options: AssignmentOptionRecord[]
+}
+
+export interface AssignmentOptionRecord {
+  id: string
+  questionId: string
+  optionText: string
+  isCorrect: boolean
+  position: number
+}
+
+export interface StudentAssignmentRecord extends AssignmentRecord {
+  attemptCount: number
+  attemptsRemaining: number
+  studentSubmissionStatus: SubmissionStatus | null
+  scoreAwarded: number
+}
+
+export interface StudentDashboardPayload {
+  student: StudentRecord & {
+    className: string
+    groupName: string
+    teacherName: string | null
+    telegramConnected: boolean
+  }
+  rank: number | null
+  activeAssignments: StudentAssignmentRecord[]
+  completedAssignments: StudentAssignmentRecord[]
+  leaderboard: LeaderboardEntry[]
+  feedback: Array<{
+    submissionId: string
+    assignmentTitle: string
+    scoreAwarded: number
+    feedback: string | null
+    gradedAt: string | null
+  }>
 }
 
 export interface AnalyticsKpi {

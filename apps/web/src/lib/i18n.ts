@@ -194,6 +194,7 @@ export const messages: Record<AppLanguage, Record<string, string>> = {
     'routes.billingLoading': "To'lov sahifasi yuklanmoqda",
 
     'teacher.nav.dashboard': 'Dashboard',
+    'teacher.nav.classes': 'Sinflar',
     'teacher.nav.messenger': 'Messenger',
     'teacher.nav.calendar': 'Kalendar',
     'teacher.nav.database': 'Baza',
@@ -507,6 +508,7 @@ export const messages: Record<AppLanguage, Record<string, string>> = {
     'routes.billingLoading': 'Loading billing page',
 
     'teacher.nav.dashboard': 'Dashboard',
+    'teacher.nav.classes': 'Classes',
     'teacher.nav.messenger': 'Messenger',
     'teacher.nav.calendar': 'Calendar',
     'teacher.nav.database': 'Database',

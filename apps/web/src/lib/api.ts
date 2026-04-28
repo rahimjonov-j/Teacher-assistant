@@ -1,4 +1,5 @@
 import { env } from './env'
+import { getStudentToken } from './student-auth'
 import { supabase } from './supabase'
 
 interface ApiErrorBody {
@@ -23,6 +24,11 @@ export async function apiRequest<T>(path: string, init: RequestInit = {}) {
 
   if (data.session?.access_token) {
     headers.set('Authorization', `Bearer ${data.session.access_token}`)
+  } else {
+    const studentToken = getStudentToken()
+    if (studentToken) {
+      headers.set('Authorization', `Bearer ${studentToken}`)
+    }
   }
 
   const response = await fetch(`${env.apiUrl}${path}`, {

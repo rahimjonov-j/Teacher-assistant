@@ -77,6 +77,9 @@ export function LoginPage() {
             {t('public.login.register')}
           </Link>
         </div>
+        <Button asChild variant="outline" className="w-full">
+          <Link to="/student-login">Student login</Link>
+        </Button>
       </CardContent>
     </Card>
   )

@@ -7,8 +7,10 @@ import { errorHandler } from './middleware/error-handler.js'
 import { notFoundHandler } from './middleware/not-found.js'
 import { adminRouter } from './routes/admin.routes.js'
 import { authRouter } from './routes/auth.routes.js'
+import { classesRouter } from './routes/classes.routes.js'
 import { healthRouter } from './routes/health.routes.js'
 import { plansRouter } from './routes/plans.routes.js'
+import { studentRouter } from './routes/student.routes.js'
 import { teacherRouter } from './routes/teacher.routes.js'
 import { telegramRouter } from './routes/telegram.routes.js'
 
@@ -36,6 +38,8 @@ export function createApp() {
   app.use('/api/plans', plansRouter)
   app.use('/api/auth', authRouter)
   app.use('/api/teacher', teacherRouter)
+  app.use('/api/classes', classesRouter)
+  app.use('/api/student', studentRouter)
   app.use('/api/admin', adminRouter)
   app.use('/api/telegram', telegramRouter)
 

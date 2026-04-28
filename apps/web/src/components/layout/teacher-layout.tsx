@@ -5,6 +5,7 @@ import {
   ClipboardCheck,
   CreditCard,
   Database,
+  GraduationCap,
   KeyRound,
   LayoutDashboard,
   LogOut,
@@ -22,6 +23,7 @@ import { cn } from '@/lib/utils'
 
 const navItems = [
   { to: '/app/dashboard', labelKey: 'teacher.nav.dashboard', icon: LayoutDashboard },
+  { to: '/app/classes', labelKey: 'teacher.nav.classes', icon: GraduationCap },
   { to: '/app/messenger', labelKey: 'teacher.nav.messenger', icon: MessageSquare },
   { to: '/app/calendar', labelKey: 'teacher.nav.calendar', icon: CalendarDays },
   { to: '/app/database', labelKey: 'teacher.nav.database', icon: Database },
@@ -33,6 +35,7 @@ const navItems = [
 
 const pageMeta: Array<{ pattern: string; titleKey: string; actionTo?: string }> = [
   { pattern: '/app/dashboard', titleKey: 'teacher.nav.dashboard', actionTo: '/app/generator' },
+  { pattern: '/app/classes', titleKey: 'teacher.nav.classes' },
   { pattern: '/app/messenger', titleKey: 'teacher.nav.messenger', actionTo: '/app/generator' },
   { pattern: '/app/calendar', titleKey: 'teacher.nav.calendar', actionTo: '/app/generator' },
   { pattern: '/app/database', titleKey: 'teacher.nav.database', actionTo: '/app/generator' },

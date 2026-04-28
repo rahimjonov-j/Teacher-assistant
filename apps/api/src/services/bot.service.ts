@@ -6,6 +6,8 @@ import {
 } from '@teacher-assistant/shared'
 import { Markup, Telegraf, type Context } from 'telegraf'
 import { env, hasTelegramConfig } from '../config/env.js'
+import { assignmentRepository } from '../repositories/assignment.repository.js'
+import { classRepository } from '../repositories/class.repository.js'
 import { plansRepository } from '../repositories/plans.repository.js'
 import { telegramRepository } from '../repositories/telegram.repository.js'
 import { dashboardService } from './dashboard.service.js'
@@ -20,6 +22,10 @@ const uzsFormatter = new Intl.NumberFormat('uz-UZ', {
 })
 
 const TELEGRAM_MENU_COMMANDS = [
+  { command: 'login', description: 'Student login' },
+  { command: 'tasks', description: 'Student tasks' },
+  { command: 'top', description: 'Class top 10' },
+  { command: 'profile', description: 'Student profile' },
   { command: 'start', description: '🚀 Botni ishga tushirish' },
   { command: 'menu', description: '🏠 Asosiy menyu' },
   { command: 'quiz', description: '📝 Test yaratish' },
@@ -42,6 +48,9 @@ type PendingAction =
     }
   | {
       type: 'link'
+    }
+  | {
+      type: 'student_login'
     }
 
 type InlineKeyboard = ReturnType<typeof Markup.inlineKeyboard>
@@ -247,6 +256,50 @@ function registerHandlers(instance: Telegraf) {
 
     pendingActions.set(context.from.id, { type: 'link' })
     await context.reply(linkPrompt(), linkCodeKeyboard())
+  })
+
+  instance.command('login', async (context) => {
+    if (!context.from) {
+      return
+    }
+
+    const credentials = extractCommandArgument(context.message.text, 'login')
+    if (!credentials) {
+      pendingActions.set(context.from.id, { type: 'student_login' })
+      await context.reply('Student login uchun: /login LOGIN PASSWORD')
+      return
+    }
+
+    await loginStudentFromTelegram(context.from.id, context.from.username, credentials, (message) =>
+      context.reply(message),
+    )
+  })
+
+  instance.command('tasks', async (context) => {
+    if (!context.from) {
+      return
+    }
+
+    pendingActions.delete(context.from.id)
+    await replyStudentTasks(context.from.id, (message) => context.reply(message))
+  })
+
+  instance.command('top', async (context) => {
+    if (!context.from) {
+      return
+    }
+
+    pendingActions.delete(context.from.id)
+    await replyStudentTop(context.from.id, (message) => context.reply(message))
+  })
+
+  instance.command('profile', async (context) => {
+    if (!context.from) {
+      return
+    }
+
+    pendingActions.delete(context.from.id)
+    await replyStudentProfile(context.from.id, (message) => context.reply(message))
   })
 
   instance.command('plans', async (context) => {
@@ -458,6 +511,14 @@ function registerHandlers(instance: Telegraf) {
       return
     }
 
+    if (pendingAction?.type === 'student_login') {
+      pendingActions.delete(context.from.id)
+      await loginStudentFromTelegram(context.from.id, context.from.username, text, (message) =>
+        context.reply(message),
+      )
+      return
+    }
+
     if (pendingAction?.type === 'feature') {
       pendingActions.delete(context.from.id)
       await runFeatureGeneration({
@@ -476,6 +537,28 @@ function registerHandlers(instance: Telegraf) {
     }
 
     await context.reply(menuMessage('✨ Boshlash uchun bo\'lim tanlang.'), mainMenuKeyboard())
+  })
+  instance.on('voice', async (context) => {
+    if (!context.from) {
+      return
+    }
+
+    const student = await classRepository.findStudentByTelegramUserId(context.from.id)
+    if (!student) {
+      await context.reply('Avval /login LOGIN PASSWORD orqali student hisobingizni ulang.')
+      return
+    }
+
+    const assignment = await assignmentRepository.firstActiveSpeakingAssignment(student.id)
+    if (!assignment) {
+      await context.reply('Faol speaking task topilmadi.')
+      return
+    }
+
+    await assignmentRepository.submitAssignment(student.id, assignment.id, {
+      telegramFileId: context.message.voice.file_id,
+    })
+    await context.reply('Speaking audio qabul qilindi. Oqituvchi tekshirgandan keyin ball qoshiladi.')
   })
 }
 
@@ -503,6 +586,97 @@ function registerQuickAction(instance: Telegraf, command: string, featureKey: Bo
       reply: (message, keyboard) => context.reply(message, keyboard),
     })
   })
+}
+
+async function loginStudentFromTelegram(
+  telegramUserId: number,
+  telegramUsername: string | undefined,
+  credentialsText: string,
+  reply: (message: string) => Promise<unknown>,
+) {
+  const [login, password] = credentialsText.trim().split(/\s+/, 2)
+
+  if (!login || !password) {
+    await reply('Student login uchun: /login LOGIN PASSWORD')
+    return
+  }
+
+  try {
+    const student = await classRepository.verifyStudentCredentials(login, password)
+    await classRepository.linkTelegramStudent(student.id, telegramUserId, telegramUsername)
+    await reply(`Hisob ulandi: ${student.fullName}\n/tasks - topshiriqlar\n/top - class top 10\n/profile - profil`)
+  } catch {
+    await reply('Login yoki parol notogri. Oqituvchingiz bergan malumotni tekshiring.')
+  }
+}
+
+async function replyStudentTasks(telegramUserId: number, reply: (message: string) => Promise<unknown>) {
+  const student = await classRepository.findStudentByTelegramUserId(telegramUserId)
+  if (!student) {
+    await reply('Avval /login LOGIN PASSWORD orqali student hisobingizni ulang.')
+    return
+  }
+
+  const dashboard = await assignmentRepository.getStudentDashboard(student.id)
+  const active = dashboard.activeAssignments.slice(0, 10)
+
+  if (active.length === 0) {
+    await reply('Hozircha faol topshiriq yoq.')
+    return
+  }
+
+  await reply(
+    [
+      'Faol topshiriqlar:',
+      '',
+      ...active.map((assignment, index) => {
+        const deadline = assignment.deadlineAt ? new Date(assignment.deadlineAt).toLocaleString('uz-UZ') : 'deadline yoq'
+        return `${index + 1}. ${assignment.title} - ${assignment.type} - ${deadline}`
+      }),
+      '',
+      'Testlarni web ilovada ishlang. Writing matnini bot orqali yuborishingiz ham mumkin.',
+    ].join('\n'),
+  )
+}
+
+async function replyStudentTop(telegramUserId: number, reply: (message: string) => Promise<unknown>) {
+  const student = await classRepository.findStudentByTelegramUserId(telegramUserId)
+  if (!student) {
+    await reply('Avval /login LOGIN PASSWORD orqali student hisobingizni ulang.')
+    return
+  }
+
+  const leaderboard = await assignmentRepository.topForTelegram(student.id)
+  if (leaderboard.length === 0) {
+    await reply('Leaderboard hali bosh.')
+    return
+  }
+
+  await reply(
+    leaderboard
+      .slice(0, 10)
+      .map((entry) => `${entry.rank <= 3 ? 'CROWN ' : ''}${entry.rank}. ${entry.fullName} - ${entry.totalMonthlyScore} points`)
+      .join('\n'),
+  )
+}
+
+async function replyStudentProfile(telegramUserId: number, reply: (message: string) => Promise<unknown>) {
+  const student = await classRepository.findStudentByTelegramUserId(telegramUserId)
+  if (!student) {
+    await reply('Avval /login LOGIN PASSWORD orqali student hisobingizni ulang.')
+    return
+  }
+
+  const dashboard = await assignmentRepository.getStudentDashboard(student.id)
+  await reply(
+    [
+      dashboard.student.fullName,
+      `${dashboard.student.className} / ${dashboard.student.groupName}`,
+      `Rank: ${dashboard.rank ?? '-'}`,
+      `Monthly score: ${dashboard.student.totalMonthlyScore}`,
+      `Completed: ${dashboard.student.completedAssignments}`,
+    ].join('\n'),
+  )
 }
 
 async function updateTelegramMessage(context: Context, message: string, keyboard?: InlineKeyboard) {

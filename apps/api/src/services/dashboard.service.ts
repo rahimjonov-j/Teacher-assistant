@@ -3,14 +3,16 @@ import { contentRepository } from '../repositories/content.repository.js'
 import { profilesRepository } from '../repositories/profiles.repository.js'
 import { subscriptionsRepository } from '../repositories/subscriptions.repository.js'
 import { usageRepository } from '../repositories/usage.repository.js'
+import { classRepository } from '../repositories/class.repository.js'
 
 export const dashboardService = {
   async getTeacherDashboard(userId: string): Promise<TeacherDashboardPayload> {
-    const [profile, subscription, recentContent, usageRows] = await Promise.all([
+    const [profile, subscription, recentContent, usageRows, classSummary] = await Promise.all([
       profilesRepository.getById(userId),
       subscriptionsRepository.getActiveByUserId(userId),
       contentRepository.listByUserId(userId),
       usageRepository.listAll(),
+      classRepository.getTeacherClassSummary(userId),
     ])
 
     const userUsage = usageRows.filter((row) => row.userId === userId)
@@ -44,6 +46,7 @@ export const dashboardService = {
         mostUsedFeature: mostUsedFeature as TeacherDashboardPayload['usageSummary']['mostUsedFeature'],
         creditsRemaining: subscription?.creditsRemaining ?? 0,
       },
+      classSummary,
     }
   },
 }

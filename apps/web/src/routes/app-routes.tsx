@@ -22,6 +22,9 @@ const LandingPage = lazy(async () => ({
 const DashboardPage = lazy(async () => ({
   default: (await import('@/pages/app/dashboard-page')).DashboardPage,
 }))
+const ClassesPage = lazy(async () => ({
+  default: (await import('@/pages/app/classes-page')).ClassesPage,
+}))
 const MessengerPage = lazy(async () => ({
   default: (await import('@/pages/app/messenger-page')).MessengerPage,
 }))
@@ -66,6 +69,15 @@ const AdminSubscriptionsPage = lazy(async () => ({
 }))
 const AdminActivityPage = lazy(async () => ({
   default: (await import('@/pages/admin/activity-page')).AdminActivityPage,
+}))
+const StudentLoginPage = lazy(async () => ({
+  default: (await import('@/pages/student/student-login-page')).StudentLoginPage,
+}))
+const StudentDashboardPage = lazy(async () => ({
+  default: (await import('@/pages/student/student-dashboard-page')).StudentDashboardPage,
+}))
+const StudentAssignmentPage = lazy(async () => ({
+  default: (await import('@/pages/student/student-assignment-page')).StudentAssignmentPage,
 }))
 
 function LazyRoute({ children, label = 'Sahifa yuklanmoqda' }: { children: ReactNode; label?: string }) {
@@ -191,6 +203,31 @@ export function AppRoutes() {
         </Route>
       </Route>
 
+      <Route
+        path="/student-login"
+        element={
+          <LazyRoute label="Student login loading">
+            <StudentLoginPage />
+          </LazyRoute>
+        }
+      />
+      <Route
+        path="/student/dashboard"
+        element={
+          <LazyRoute label="Student dashboard loading">
+            <StudentDashboardPage />
+          </LazyRoute>
+        }
+      />
+      <Route
+        path="/student/assignments/:id"
+        element={
+          <LazyRoute label="Assignment loading">
+            <StudentAssignmentPage />
+          </LazyRoute>
+        }
+      />
+
       <Route element={<ProtectedGate />}>
         <Route element={<TeacherLayout />}>
           <Route path="/app" element={<Navigate to="/app/dashboard" replace />} />
@@ -199,6 +236,14 @@ export function AppRoutes() {
             element={
               <LazyRoute label={t('routes.dashboardLoading')}>
                 <DashboardPage />
+              </LazyRoute>
+            }
+          />
+          <Route
+            path="/app/classes"
+            element={
+              <LazyRoute label="Classes loading">
+                <ClassesPage />
               </LazyRoute>
             }
           />
