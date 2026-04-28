@@ -3,6 +3,18 @@ import { env } from '../config/env.js'
 import { getOpenAiClient } from '../config/openai.js'
 import { ApiError } from '../utils/api-error.js'
 
+export interface GeneratedQuizAssignment {
+  title: string
+  description: string | null
+  questions: Array<{
+    questionText: string
+    options: Array<{
+      optionText: string
+      isCorrect: boolean
+    }>
+  }>
+}
+
 export const openAiService = {
   resolveModel(featureKey: FeatureKey) {
     const tier = DEFAULT_MODEL_STRATEGY[featureKey]
@@ -108,6 +120,113 @@ export const openAiService = {
       usage: extractTokenUsage(response),
     }
   },
+
+  async generateQuizAssignment(input: {
+    prompt: string
+    className?: string | null
+    groupName?: string | null
+    gradeLevel?: string | null
+  }) {
+    const client = getOpenAiClient()
+    const model = env.OPENAI_MODEL_LIGHT
+
+    const response = await client.responses.create({
+      model,
+      temperature: 0.35,
+      instructions: [
+        'You are an expert classroom test designer for school teachers.',
+        'Primary language: Uzbek (Latin), unless the teacher explicitly requests another language.',
+        'Return only valid JSON. Do not wrap it in markdown. Do not add comments.',
+        'The JSON shape must be: {"title": string, "description": string|null, "questions": [{"questionText": string, "options": [{"optionText": string, "isCorrect": boolean}]}]}.',
+        'Create 6-10 multiple choice questions unless the teacher asks for another count.',
+        'Each question must have 3-5 options. At least one option must be correct. Prefer one correct answer unless the prompt asks for multiple correct answers.',
+        'Do not include answer letters like A), B) inside optionText.',
+      ].join(' '),
+      input: [
+        {
+          role: 'user',
+          content: [
+            {
+              type: 'input_text',
+              text: [
+                `Class: ${input.className ?? 'Not specified'}`,
+                `Group: ${input.groupName ?? 'Not specified'}`,
+                `Grade level: ${input.gradeLevel ?? 'Not specified'}`,
+                `Teacher prompt: ${input.prompt}`,
+              ].join('\n'),
+            },
+          ],
+        },
+      ],
+    })
+
+    const output = response.output_text?.trim()
+
+    if (!output) {
+      throw new ApiError(502, 'OpenAI returned an empty quiz.')
+    }
+
+    return {
+      model,
+      quiz: parseGeneratedQuiz(output),
+      usage: extractTokenUsage(response),
+    }
+  },
+}
+
+function parseGeneratedQuiz(output: string): GeneratedQuizAssignment {
+  let parsed: unknown
+
+  try {
+    parsed = JSON.parse(output)
+  } catch {
+    const jsonMatch = output.match(/\{[\s\S]*\}/)
+    if (!jsonMatch) {
+      throw new ApiError(502, 'OpenAI returned a quiz format that could not be parsed.')
+    }
+    parsed = JSON.parse(jsonMatch[0])
+  }
+
+  if (!parsed || typeof parsed !== 'object') {
+    throw new ApiError(502, 'OpenAI returned an invalid quiz.')
+  }
+
+  const value = parsed as Record<string, unknown>
+  const questions = Array.isArray(value.questions) ? value.questions : []
+  const normalizedQuestions = questions
+    .map((question) => {
+      const questionValue = question as Record<string, unknown>
+      const options = Array.isArray(questionValue.options) ? questionValue.options : []
+      return {
+        questionText: String(questionValue.questionText ?? '').trim(),
+        options: options
+          .map((option) => {
+            const optionValue = option as Record<string, unknown>
+            return {
+              optionText: String(optionValue.optionText ?? '').trim(),
+              isCorrect: Boolean(optionValue.isCorrect),
+            }
+          })
+          .filter((option) => option.optionText.length > 0),
+      }
+    })
+    .filter((question) => question.questionText.length > 0 && question.options.length >= 2)
+
+  if (normalizedQuestions.length === 0) {
+    throw new ApiError(502, 'OpenAI did not return usable quiz questions.')
+  }
+
+  for (const question of normalizedQuestions) {
+    if (!question.options.some((option) => option.isCorrect)) {
+      question.options[0] = { ...question.options[0], isCorrect: true }
+    }
+  }
+
+  return {
+    title: String(value.title ?? 'GPT test').trim().slice(0, 180) || 'GPT test',
+    description: typeof value.description === 'string' && value.description.trim() ? value.description.trim() : null,
+    questions: normalizedQuestions,
+  }
 }
 
 function extractTokenUsage(response: unknown) {

@@ -3,6 +3,7 @@ import { z } from 'zod'
 import type { AuthenticatedRequest } from '../middleware/auth.js'
 import { assignmentRepository } from '../repositories/assignment.repository.js'
 import { classRepository } from '../repositories/class.repository.js'
+import { assignmentAiService } from '../services/assignment-ai.service.js'
 import { asyncHandler } from '../utils/async-handler.js'
 
 const classSchema = z.object({
@@ -45,6 +46,18 @@ const assignmentSchema = z.object({
     )
     .optional(),
   gameConfig: z.record(z.string(), z.unknown()).optional(),
+})
+
+const aiAssignmentSchema = z.object({
+  classId: z.string().uuid(),
+  prompt: z.string().min(5).max(4000),
+  title: z.string().min(2).max(180).optional().nullable(),
+  pointsPerCorrect: z.coerce.number().min(0).max(1000).default(1),
+  deadlineAt: z.string().datetime().optional().nullable(),
+  timeLimitMinutes: z.coerce.number().int().positive().max(240).optional().nullable(),
+  maxAttempts: z.coerce.number().int().min(1).max(10).default(2),
+  randomizeQuestions: z.boolean().default(false),
+  randomizeOptions: z.boolean().default(true),
 })
 
 const reviewSchema = z.object({
@@ -113,6 +126,37 @@ export const classesController = {
     const payload = assignmentSchema.parse(request.body)
     const assignment = await assignmentRepository.createAssignment(authenticatedRequest.auth.userId, payload)
     response.status(201).json({ assignment })
+  }),
+
+  createAiAssignment: asyncHandler(async (request: Request, response: Response) => {
+    const authenticatedRequest = request as AuthenticatedRequest
+    const payload = aiAssignmentSchema.parse(request.body)
+    const classRecord = await classRepository.getClassForTeacher(authenticatedRequest.auth.userId, payload.classId)
+    const quiz = await assignmentAiService.generateQuizForClass({
+      teacherId: authenticatedRequest.auth.userId,
+      prompt: payload.prompt,
+      className: classRecord.name,
+      groupName: classRecord.groupName,
+      gradeLevel: classRecord.gradeLevel,
+    })
+    const assignment = await assignmentRepository.createAssignment(authenticatedRequest.auth.userId, {
+      classId: payload.classId,
+      title: payload.title?.trim() || quiz.title,
+      description: quiz.description,
+      type: 'multiple_choice',
+      pointsPerCorrect: payload.pointsPerCorrect,
+      deadlineAt: payload.deadlineAt,
+      timeLimitMinutes: payload.timeLimitMinutes,
+      maxAttempts: payload.maxAttempts,
+      randomizeQuestions: payload.randomizeQuestions,
+      randomizeOptions: payload.randomizeOptions,
+      questions: quiz.questions.map((question) => ({
+        questionText: question.questionText,
+        options: question.options,
+      })),
+    })
+
+    response.status(201).json({ assignment, generated: { title: quiz.title, questionCount: quiz.questions.length } })
   }),
 
   pendingSubmissions: asyncHandler(async (request: Request, response: Response) => {

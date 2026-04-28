@@ -107,6 +107,10 @@ async function ensureTeacherOwnsClass(teacherId: string, classId: string) {
   return data
 }
 
+async function getTeacherClass(teacherId: string, classId: string) {
+  return ensureTeacherOwnsClass(teacherId, classId)
+}
+
 async function getRatingsForStudents(studentIds: string[]): Promise<Map<string, { totalScore: number; completedTasksCount: number }>> {
   if (studentIds.length === 0) {
     return new Map()
@@ -405,6 +409,11 @@ export const classRepository = {
       activeStudents,
       assignments,
     }
+  },
+
+  async getClassForTeacher(teacherId: string, classId: string) {
+    const row = await getTeacherClass(teacherId, classId)
+    return toClassRecord(row)
   },
 
   buildLeaderboard(students: StudentRecord[]): LeaderboardEntry[] {

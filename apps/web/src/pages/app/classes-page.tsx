@@ -38,6 +38,8 @@ export function ClassesPage() {
   const [questionText, setQuestionText] = useState('')
   const [optionsText, setOptionsText] = useState('A) \nB) \nC) \nD) ')
   const [correctLetters, setCorrectLetters] = useState('A')
+  const [aiPrompt, setAiPrompt] = useState('')
+  const [aiTitle, setAiTitle] = useState('')
 
   const classesQuery = useQuery({
     queryKey: ['classes'],
@@ -112,6 +114,32 @@ export function ClassesPage() {
       await queryClient.invalidateQueries({ queryKey: ['class-detail', activeClassId] })
     },
     onError: (error) => toast.error(error instanceof Error ? error.message : 'Unable to send assignment.'),
+  })
+
+  const createAiAssignmentMutation = useMutation({
+    mutationFn: () =>
+      apiRequest<{ generated: { title: string; questionCount: number } }>('/classes/assignments/ai', {
+        method: 'POST',
+        body: JSON.stringify({
+          classId: activeClassId,
+          prompt: aiPrompt,
+          title: aiTitle || null,
+          pointsPerCorrect: Number(pointsPerCorrect),
+          deadlineAt: deadlineAt ? new Date(deadlineAt).toISOString() : null,
+          timeLimitMinutes: timeLimitMinutes ? Number(timeLimitMinutes) : null,
+          maxAttempts: 2,
+          randomizeQuestions: true,
+          randomizeOptions: true,
+        }),
+      }),
+    onSuccess: async (data) => {
+      setAiPrompt('')
+      setAiTitle('')
+      toast.success(`${data.generated.questionCount} question test sent.`)
+      await queryClient.invalidateQueries({ queryKey: ['class-detail', activeClassId] })
+      await queryClient.invalidateQueries({ queryKey: ['dashboard'] })
+    },
+    onError: (error) => toast.error(error instanceof Error ? error.message : 'Unable to generate assignment.'),
   })
 
   const detail = detailQuery.data
@@ -312,7 +340,40 @@ export function ClassesPage() {
 
           <Card>
             <CardContent className="p-5">
-              <SectionTitle icon={Send} title="Create assignment" hint="Send to the selected class" />
+              <SectionTitle icon={Sparkles} title="GPT test" hint="Prompt yozing, deadline va ball belgilang, test sinfga yuboriladi" />
+              <div className="mt-4 grid gap-3 lg:grid-cols-[1.1fr_0.9fr]">
+                <div className="space-y-3">
+                  <Label>Prompt</Label>
+                  <Textarea
+                    value={aiPrompt}
+                    onChange={(event) => setAiPrompt(event.target.value)}
+                    placeholder="Masalan: 6-sinf ingliz tili Present Simple mavzusidan 10 ta test, oson va orta darajada."
+                    className="min-h-32"
+                  />
+                  <Input value={aiTitle} onChange={(event) => setAiTitle(event.target.value)} placeholder="Test title optional" />
+                </div>
+                <div className="space-y-3">
+                  <Label>Deadline, time limit, points</Label>
+                  <div className="grid gap-3 sm:grid-cols-3">
+                    <Input type="datetime-local" value={deadlineAt} onChange={(event) => setDeadlineAt(event.target.value)} />
+                    <Input value={timeLimitMinutes} onChange={(event) => setTimeLimitMinutes(event.target.value)} placeholder="Minutes" />
+                    <Input value={pointsPerCorrect} onChange={(event) => setPointsPerCorrect(event.target.value)} placeholder="Points" />
+                  </div>
+                  <Button className="w-full" disabled={!aiPrompt || createAiAssignmentMutation.isPending || !activeClassId} onClick={() => createAiAssignmentMutation.mutate()}>
+                    <Sparkles className="h-4 w-4" />
+                    Generate and send test
+                  </Button>
+                  <p className="text-xs leading-5 text-muted-foreground">
+                    GPT testni yaratadi, har bir togri javob uchun belgilangan ballni qollaydi va oquvchilarga yuboradi.
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-5">
+              <SectionTitle icon={Send} title="Manual assignment" hint="Savol va variantlarni qolda kiriting" />
               <div className="mt-4 grid gap-3 lg:grid-cols-2">
                 <div className="space-y-3">
                   <Label>Title</Label>
