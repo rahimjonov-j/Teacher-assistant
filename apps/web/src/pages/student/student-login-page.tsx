@@ -19,7 +19,7 @@ export function StudentLoginPage() {
     mutationFn: () =>
       apiRequest<{ token: string; student: StudentRecord }>('/student/login', {
         method: 'POST',
-        body: JSON.stringify({ login, password }),
+        body: JSON.stringify({ login: login.trim(), password: password.trim() }),
       }),
     onSuccess: (data) => {
       setStudentToken(data.token)

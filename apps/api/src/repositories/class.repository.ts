@@ -633,9 +633,11 @@ export const classRepository = {
   },
 
   async verifyStudentCredentials(login: string, password: string) {
-    const student = await this.findStudentByLogin(login)
+    const normalizedLogin = login.trim()
+    const normalizedPassword = password.trim()
+    const student = await this.findStudentByLogin(normalizedLogin)
 
-    if (!student || !verifyPassword(password, student.passwordSalt, student.passwordHash)) {
+    if (!student || !verifyPassword(normalizedPassword, student.passwordSalt, student.passwordHash)) {
       throw new ApiError(401, 'Invalid student login or password.')
     }
 

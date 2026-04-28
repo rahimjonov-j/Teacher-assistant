@@ -103,6 +103,18 @@ export function ClassesPage() {
     onError: (error) => toast.error(error instanceof Error ? error.message : 'Unable to add student.'),
   })
 
+  const regeneratePasswordMutation = useMutation({
+    mutationFn: (studentId: string) =>
+      apiRequest<{ credentials: { login: string; password: string } }>(`/classes/students/${studentId}/regenerate-password`, {
+        method: 'POST',
+      }),
+    onSuccess: (data) => {
+      setCredentials(data.credentials)
+      toast.success('Password regenerated.')
+    },
+    onError: (error) => toast.error(error instanceof Error ? error.message : 'Unable to regenerate password.'),
+  })
+
   const createAssignmentMutation = useMutation({
     mutationFn: () =>
       apiRequest('/classes/assignments', {
@@ -292,6 +304,16 @@ export function ClassesPage() {
                         <span>{student.completedAssignments} done</span>
                         <span>{student.lastActiveAt ? new Date(student.lastActiveAt).toLocaleDateString() : 'No activity'}</span>
                       </div>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="mt-3 w-full"
+                        onClick={() => regeneratePasswordMutation.mutate(student.id)}
+                        disabled={regeneratePasswordMutation.isPending}
+                      >
+                        <KeyRound className="h-4 w-4" />
+                        Regenerate password
+                      </Button>
                     </div>
                   ))}
                 </div>
