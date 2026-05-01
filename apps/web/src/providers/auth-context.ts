@@ -5,6 +5,7 @@ import type { TeacherProfile } from '@teacher-assistant/shared'
 export interface AuthContextValue {
   session: Session | null
   profile: TeacherProfile | null
+  initialized: boolean
   loading: boolean
   login: (email: string, password: string) => Promise<TeacherProfile>
   register: (input: {

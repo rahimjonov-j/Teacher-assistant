@@ -1,6 +1,6 @@
 import { env } from './env'
 import { getStudentToken } from './student-auth'
-import { supabase } from './supabase'
+import { getSupabaseSession } from './supabase'
 
 interface ApiErrorBody {
   error?: string
@@ -17,8 +17,6 @@ export class ApiRequestError extends Error {
 }
 
 export async function apiRequest<T>(path: string, init: RequestInit = {}) {
-  const { data } = await supabase.auth.getSession()
-
   const headers = new Headers(init.headers)
   headers.set('Content-Type', 'application/json')
 
@@ -27,10 +25,14 @@ export async function apiRequest<T>(path: string, init: RequestInit = {}) {
 
   if (isStudentRoute && studentToken && path !== '/student/login') {
     headers.set('Authorization', `Bearer ${studentToken}`)
-  } else if (data.session?.access_token) {
-    headers.set('Authorization', `Bearer ${data.session.access_token}`)
   } else if (studentToken) {
     headers.set('Authorization', `Bearer ${studentToken}`)
+  } else {
+    const session = await getSupabaseSession()
+
+    if (session?.access_token) {
+      headers.set('Authorization', `Bearer ${session.access_token}`)
+    }
   }
 
   const response = await fetch(`${env.apiUrl}${path}`, {

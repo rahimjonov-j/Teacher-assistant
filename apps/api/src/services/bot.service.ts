@@ -184,7 +184,7 @@ export async function bootstrapTelegramBot() {
   const me = await instance.telegram.getMe()
   resolvedBotUsername = me.username ?? null
 
-  await instance.telegram.setMyCommands(TELEGRAM_MENU_COMMANDS)
+  await instance.telegram.deleteMyCommands()
 
   const webhookUrl = getUsableWebhookUrl(env.TELEGRAM_WEBHOOK_URL)
   if (webhookUrl) {
@@ -861,24 +861,21 @@ function extractCommandArgument(text: string, command: string) {
 
 function startMessage() {
   return [
-    '🚀 Teacher Assistant AI',
+    'Teacher Assistant AI',
     '',
-    'Dars rejasi, test, writing feedback va speaking savollarini tez tayyorlab beraman.',
+    'Assalomu alaykum. Men darsga tayyorgarlikni tezlashtiraman.',
     '',
-    'Ishni boshlash uchun pastdagi menyudan birini tanlang yoki komandadan foydalaning:',
+    'Test, dars rejasi, writing tahlil va speaking savollarini bir necha soniyada tayyorlab beraman.',
     '',
-    '📝 /quiz mavzu',
-    '📚 /lesson mavzu',
-    '✍️ /feedback matn',
-    '🎤 /speaking mavzu',
+    'Boshlash uchun pastdagi tugmalardan birini tanlang.',
   ].join('\n')
 }
 
-function menuMessage(intro = '🏠 Asosiy menyu') {
+function menuMessage(intro = 'Asosiy menyu') {
   return [
     intro,
     '',
-    'Kerakli AI vositani tanlang. Hisobingiz ulanmagan bo\'lsa, avval "Ulanish" orqali web profilingizni bog\'lang.',
+    'Kerakli bo\'limni tanlang. Hisobingiz ulanmagan bo\'lsa, avval "Ulanish" tugmasi orqali web profilingizni bog\'lang.',
   ].join('\n')
 }
 
