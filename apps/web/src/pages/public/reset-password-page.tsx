@@ -11,7 +11,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Spinner } from '@/components/ui/spinner'
 import { useI18n } from '@/hooks/use-i18n'
-import { isSupabaseConfigured, supabase } from '@/lib/supabase'
+import { getSupabaseClient, isSupabaseConfigured, preloadSupabaseClient } from '@/lib/supabase'
 
 const requestSchema = z.object({
   email: z.string().email("Noto'g'ri email format"),
@@ -49,15 +49,20 @@ export function ResetPasswordPage() {
       return
     }
 
-    void supabase.auth.getSession().then(({ data }) => {
-      if (data.session && isRecoveryUrl()) {
-        setHasRecoverySession(true)
-      }
-    })
+    void preloadSupabaseClient()
+
+    void getSupabaseClient().then((supabase) =>
+      supabase.auth.getSession().then(({ data }) => {
+        if (data.session && isRecoveryUrl()) {
+          setHasRecoverySession(true)
+        }
+      }),
+    )
   }, [])
 
   const onRequestReset = requestForm.handleSubmit(async (values) => {
     try {
+      const supabase = await getSupabaseClient()
       const { error } = await supabase.auth.resetPasswordForEmail(values.email, {
         redirectTo: `${window.location.origin}/reset-password`,
       })
@@ -75,6 +80,7 @@ export function ResetPasswordPage() {
 
   const onUpdatePassword = updateForm.handleSubmit(async (values) => {
     try {
+      const supabase = await getSupabaseClient()
       const { error } = await supabase.auth.updateUser({ password: values.password })
 
       if (error) {

@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -10,7 +11,7 @@ import { Label } from '@/components/ui/label'
 import { Spinner } from '@/components/ui/spinner'
 import { useAuth } from '@/hooks/use-auth'
 import { useI18n } from '@/hooks/use-i18n'
-import { isSupabaseConfigured } from '@/lib/supabase'
+import { isSupabaseConfigured, preloadSupabaseClient } from '@/lib/supabase'
 
 const schema = z.object({
   fullName: z.string().min(2, "Ism kamida 2 ta belgidan iborat bo'lishi kerak"),
@@ -26,6 +27,10 @@ export function RegisterPage() {
   const { register } = useAuth()
   const { t } = useI18n()
   const form = useForm<FormValues>({ resolver: zodResolver(schema) })
+
+  useEffect(() => {
+    void preloadSupabaseClient()
+  }, [])
 
   const onSubmit = form.handleSubmit(async (values) => {
     try {

@@ -3,12 +3,13 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { Session } from '@supabase/supabase-js'
 import type { TeacherProfile } from '@teacher-assistant/shared'
 import { apiRequest } from '@/lib/api'
-import { isSupabaseConfigured, supabase } from '@/lib/supabase'
+import { getSupabaseClient, isSupabaseConfigured } from '@/lib/supabase'
 import { AuthContext, type AuthContextValue } from '@/providers/auth-context'
 
 export function AuthProvider({ children }: PropsWithChildren) {
   const [session, setSession] = useState<Session | null>(null)
   const [profile, setProfile] = useState<TeacherProfile | null>(null)
+  const [initialized, setInitialized] = useState(!isSupabaseConfigured)
   const [loading, setLoading] = useState(isSupabaseConfigured)
   const profileRef = useRef<TeacherProfile | null>(null)
 
@@ -33,6 +34,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
     }
 
     try {
+      const supabase = await getSupabaseClient()
       const { error } = await supabase.auth.signInWithPassword({ email, password })
       if (error) {
         throw new Error(error.message)
@@ -51,6 +53,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
     }
 
     try {
+      const supabase = await getSupabaseClient()
       const { data, error } = await supabase.auth.signUp({
         email: input.email,
         password: input.password,
@@ -87,6 +90,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
       return
     }
 
+    const supabase = await getSupabaseClient()
     const { error } = await supabase.auth.signOut()
     if (error) {
       throw new Error(error.message)
@@ -101,61 +105,82 @@ export function AuthProvider({ children }: PropsWithChildren) {
 
   useEffect(() => {
     if (!isSupabaseConfigured) {
+      setInitialized(true)
+      setLoading(false)
       return
     }
 
-    const syncSession = async () => {
+    let active = true
+    let unsubscribe: (() => void) | undefined
+
+    void (async () => {
       try {
+        const supabase = await getSupabaseClient()
+        if (!active) {
+          return
+        }
+
         const { data } = await supabase.auth.getSession()
+        if (!active) {
+          return
+        }
+
         setSession(data.session)
 
         if (data.session) {
           await loadProfile()
         }
+
+        const {
+          data: { subscription },
+        } = supabase.auth.onAuthStateChange((event, nextSession) => {
+          setSession(nextSession)
+
+          if (nextSession) {
+            // Keep auth refresh non-blocking to prevent full-screen loader flicker.
+            if (event === 'TOKEN_REFRESHED' && profileRef.current) {
+              return
+            }
+
+            void loadProfile().catch((error) => {
+              console.error('Unable to sync auth profile', error)
+              clearAuthState()
+            })
+          } else {
+            setProfile(null)
+          }
+        })
+
+        unsubscribe = () => subscription.unsubscribe()
       } catch (error) {
         console.error('Unable to restore auth session', error)
         clearAuthState()
       } finally {
-        setLoading(false)
-      }
-    }
-
-    void syncSession()
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, nextSession) => {
-      setSession(nextSession)
-
-      if (nextSession) {
-        // Keep auth refresh non-blocking to prevent full-screen loader flicker.
-        if (event === 'TOKEN_REFRESHED' && profileRef.current) {
-          return
+        if (active) {
+          setInitialized(true)
+          setLoading(false)
         }
-
-        void loadProfile().catch((error) => {
-          console.error('Unable to sync auth profile', error)
-          clearAuthState()
-        })
-      } else {
-        setProfile(null)
       }
-    })
+    })()
 
-    return () => subscription.unsubscribe()
+    return () => {
+      active = false
+      unsubscribe?.()
+    }
   }, [clearAuthState, loadProfile])
 
   const value = useMemo<AuthContextValue>(
     () => ({
       session,
       profile,
+      initialized,
       loading,
       login,
       register,
       logout,
       refreshProfile: loadProfile,
     }),
-    [loading, profile, session, login, register, logout, loadProfile],
+    [initialized, loading, profile, session, login, register, logout, loadProfile],
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

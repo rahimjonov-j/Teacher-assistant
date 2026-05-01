@@ -1,12 +1,18 @@
 import { Suspense, lazy, type ReactNode } from 'react'
 import { Navigate, Outlet, Route, Routes } from 'react-router-dom'
-import { AdminLayout } from '@/components/layout/admin-layout'
-import { PublicLayout } from '@/components/layout/public-layout'
-import { TeacherLayout } from '@/components/layout/teacher-layout'
 import { FullScreenLoader } from '@/components/shared/loading-state'
 import { useAuth } from '@/hooks/use-auth'
 import { useI18n } from '@/hooks/use-i18n'
 
+const PublicLayout = lazy(async () => ({
+  default: (await import('@/components/layout/public-layout')).PublicLayout,
+}))
+const TeacherLayout = lazy(async () => ({
+  default: (await import('@/components/layout/teacher-layout')).TeacherLayout,
+}))
+const AdminLayout = lazy(async () => ({
+  default: (await import('@/components/layout/admin-layout')).AdminLayout,
+}))
 const LoginPage = lazy(async () => ({
   default: (await import('@/pages/public/login-page')).LoginPage,
 }))
@@ -85,10 +91,10 @@ function LazyRoute({ children, label = 'Sahifa yuklanmoqda' }: { children: React
 }
 
 function ProtectedGate() {
-  const { session, profile, loading } = useAuth()
+  const { initialized, session, profile, loading } = useAuth()
   const { t } = useI18n()
 
-  if (loading || (session && !profile)) {
+  if (!initialized || loading || (session && !profile)) {
     return <FullScreenLoader label={t('routes.panelLoading')} />
   }
 
@@ -100,10 +106,10 @@ function ProtectedGate() {
 }
 
 function AdminGate() {
-  const { session, profile, loading } = useAuth()
+  const { initialized, session, profile, loading } = useAuth()
   const { t } = useI18n()
 
-  if (loading || (session && !profile)) {
+  if (!initialized || loading || (session && !profile)) {
     return <FullScreenLoader label={t('routes.adminLoading')} />
   }
 
@@ -119,16 +125,11 @@ function AdminGate() {
 }
 
 function GuestGate() {
-  const { session, profile, loading } = useAuth()
-  const { t } = useI18n()
-
-  if (loading) {
-    return <FullScreenLoader label={t('routes.homeLoading')} />
-  }
+  const { session, profile } = useAuth()
 
   if (session) {
     if (!profile) {
-      return <FullScreenLoader label={t('routes.redirecting')} />
+      return <FullScreenLoader label="Redirecting" />
     }
 
     return <Navigate to={profile.role === 'admin' ? '/admin/dashboard' : '/app/dashboard'} replace />
@@ -138,16 +139,11 @@ function GuestGate() {
 }
 
 function HomeGate() {
-  const { session, profile, loading } = useAuth()
-  const { t } = useI18n()
-
-  if (loading) {
-    return <FullScreenLoader label={t('routes.homeLoading')} />
-  }
+  const { session, profile } = useAuth()
 
   if (session) {
     if (!profile) {
-      return <FullScreenLoader label={t('routes.redirecting')} />
+      return <FullScreenLoader label="Redirecting" />
     }
 
     return <Navigate to={profile.role === 'admin' ? '/admin/dashboard' : '/app/dashboard'} replace />
@@ -165,7 +161,13 @@ export function AppRoutes() {
 
   return (
     <Routes>
-      <Route element={<PublicLayout />}>
+      <Route
+        element={
+          <LazyRoute label={t('routes.homeLoading')}>
+            <PublicLayout />
+          </LazyRoute>
+        }
+      >
         <Route path="/" element={<HomeGate />} />
         <Route
           path="/pricing"
@@ -229,7 +231,13 @@ export function AppRoutes() {
       />
 
       <Route element={<ProtectedGate />}>
-        <Route element={<TeacherLayout />}>
+        <Route
+          element={
+            <LazyRoute label={t('routes.panelLoading')}>
+              <TeacherLayout />
+            </LazyRoute>
+          }
+        >
           <Route path="/app" element={<Navigate to="/app/dashboard" replace />} />
           <Route
             path="/app/dashboard"
@@ -323,7 +331,13 @@ export function AppRoutes() {
         </Route>
 
         <Route element={<AdminGate />}>
-          <Route element={<AdminLayout />}>
+          <Route
+            element={
+              <LazyRoute label={t('routes.adminLoading')}>
+                <AdminLayout />
+              </LazyRoute>
+            }
+          >
             <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
             <Route
             path="/admin/dashboard"
