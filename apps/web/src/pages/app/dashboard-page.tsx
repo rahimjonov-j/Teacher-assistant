@@ -55,10 +55,10 @@ export function DashboardPage() {
 
   return (
     <div className="grid gap-5 animate-in lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
-      <Card className="lg:col-span-2">
+      <Card className="min-w-0 lg:col-span-2">
         <CardContent className="space-y-4 p-5">
           <div className="flex items-start justify-between gap-4">
-            <div>
+            <div className="min-w-0">
               <div className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">{t('dashboard.welcome')}</div>
               <h1 className="mt-2 text-2xl font-black tracking-tight">
                 {firstName}
@@ -73,12 +73,12 @@ export function DashboardPage() {
           </div>
 
           <div className="rounded-2xl bg-secondary p-4">
-            <div className="flex items-center justify-between gap-4">
-              <div>
+            <div className="flex flex-col gap-3 min-[420px]:flex-row min-[420px]:items-center min-[420px]:justify-between">
+              <div className="min-w-0">
                 <div className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">{t('dashboard.currentPlan')}</div>
-                <div className="mt-1 text-lg font-black">{currentPlanName}</div>
+                <div className="mt-1 break-words text-lg font-black">{currentPlanName}</div>
               </div>
-              <div className="text-right">
+              <div className="min-w-0 min-[420px]:text-right">
                 <div className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">{t('dashboard.creditsLeft')}</div>
                 <div className="mt-1 text-lg font-black">{data.subscription?.creditsRemaining ?? 0}</div>
               </div>
@@ -87,7 +87,7 @@ export function DashboardPage() {
         </CardContent>
       </Card>
 
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-3 min-[420px]:grid-cols-[repeat(2,minmax(0,1fr))]">
         <StatCard
           label={t('dashboard.requests')}
           value={data.usageSummary.totalRequestsThisMonth}
@@ -126,23 +126,23 @@ export function DashboardPage() {
         />
       </div>
 
-      <Card>
+      <Card className="min-w-0">
         <CardContent className="p-5">
-          <div className="mb-4 flex items-center justify-between">
-            <div>
+          <div className="mb-4 flex flex-col gap-3 min-[420px]:flex-row min-[420px]:items-center min-[420px]:justify-between">
+            <div className="min-w-0">
               <div className="text-lg font-black tracking-tight">{t('dashboard.shortcuts')}</div>
               <p className="text-sm text-muted-foreground">{t('dashboard.shortcutsHint')}</p>
             </div>
-            <Button asChild variant="ghost" size="sm">
+            <Button asChild variant="ghost" size="sm" className="self-start">
               <Link to="/app/generator">{t('common.open')}</Link>
             </Button>
           </div>
-          <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
+          <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-3 min-[420px]:grid-cols-[repeat(2,minmax(0,1fr))] xl:grid-cols-[repeat(4,minmax(0,1fr))]">
             {data.quickActions.map((feature) => {
               const Icon = featureIcons[feature.key]
 
               return (
-                <Link key={feature.key} to={`/app/generator?feature=${feature.key}`}>
+                <Link key={feature.key} to={`/app/generator?feature=${feature.key}`} className="min-w-0">
                   <div className="rounded-2xl border border-border bg-card p-4 transition-colors hover:bg-secondary">
                     <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-secondary">
                       <Icon className="h-5 w-5" />
@@ -159,14 +159,14 @@ export function DashboardPage() {
         </CardContent>
       </Card>
 
-      <Card className="lg:col-start-2 lg:row-span-2 lg:row-start-2">
+      <Card className="min-w-0 lg:col-start-2 lg:row-span-2 lg:row-start-2">
         <CardContent className="p-5">
-          <div className="mb-4 flex items-center justify-between">
-            <div>
+          <div className="mb-4 flex flex-col gap-3 min-[420px]:flex-row min-[420px]:items-center min-[420px]:justify-between">
+            <div className="min-w-0">
               <div className="text-lg font-black tracking-tight">{t('dashboard.recentActivities')}</div>
               <p className="text-sm text-muted-foreground">{t('dashboard.recentActivitiesHint')}</p>
             </div>
-            <Button asChild variant="ghost" size="sm">
+            <Button asChild variant="ghost" size="sm" className="self-start">
               <Link to="/app/messenger">{t('dashboard.viewAll')}</Link>
             </Button>
           </div>

@@ -17,20 +17,20 @@ export const StatCard = memo(function StatCard({
   icon: Icon = ArrowUpRight,
 }: StatCardProps) {
   return (
-    <Card className="h-full">
-      <CardContent className="p-4">
+    <Card className="h-full min-w-0">
+      <CardContent className="p-4 sm:p-5">
         <div className="flex items-start justify-between gap-3">
-          <div className="space-y-1">
+          <div className="min-w-0 flex-1 space-y-1">
             <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">{label}</p>
-            <p className="text-xl font-black tracking-tight text-foreground">{value}</p>
+            <p className="break-words text-xl font-black tracking-tight text-foreground">{value}</p>
           </div>
-          <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-secondary text-foreground">
-            <Icon className="h-5 w-5" />
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-secondary text-foreground sm:h-11 sm:w-11">
+            <Icon className="h-5 w-5 sm:h-5 sm:w-5" />
           </div>
         </div>
         <div className="mt-5 flex items-center gap-2">
-          <div className="h-1.5 w-1.5 rounded-full bg-foreground/30" />
-          <p className="text-xs font-medium text-muted-foreground">{hint}</p>
+          <div className="h-1.5 w-1.5 shrink-0 rounded-full bg-foreground/30" />
+          <p className="min-w-0 break-words text-xs font-medium text-muted-foreground">{hint}</p>
         </div>
       </CardContent>
     </Card>

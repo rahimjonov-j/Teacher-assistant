@@ -25,9 +25,7 @@ export async function apiRequest<T>(path: string, init: RequestInit = {}) {
 
   if (isStudentRoute && studentToken && path !== '/student/login') {
     headers.set('Authorization', `Bearer ${studentToken}`)
-  } else if (studentToken) {
-    headers.set('Authorization', `Bearer ${studentToken}`)
-  } else {
+  } else if (!isStudentRoute) {
     const session = await getSupabaseSession()
 
     if (session?.access_token) {
