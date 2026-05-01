@@ -126,10 +126,11 @@ function AdminGate() {
 
 function GuestGate() {
   const { session, profile } = useAuth()
+  const { t } = useI18n()
 
   if (session) {
     if (!profile) {
-      return <FullScreenLoader label="Redirecting" />
+      return <FullScreenLoader label={t('routes.redirecting')} />
     }
 
     return <Navigate to={profile.role === 'admin' ? '/admin/dashboard' : '/app/dashboard'} replace />
@@ -140,10 +141,11 @@ function GuestGate() {
 
 function HomeGate() {
   const { session, profile } = useAuth()
+  const { t } = useI18n()
 
   if (session) {
     if (!profile) {
-      return <FullScreenLoader label="Redirecting" />
+      return <FullScreenLoader label={t('routes.redirecting')} />
     }
 
     return <Navigate to={profile.role === 'admin' ? '/admin/dashboard' : '/app/dashboard'} replace />

@@ -40,8 +40,12 @@ export default defineConfig(({ mode }) => {
               return 'vendor-charts'
             }
 
-            if (moduleId.includes('@supabase/supabase-js') || moduleId.includes('@tanstack/react-query')) {
+            if (moduleId.includes('@supabase/supabase-js')) {
               return 'vendor-supabase'
+            }
+
+            if (moduleId.includes('@tanstack/react-query')) {
+              return 'vendor-query'
             }
 
             if (moduleId.includes('react-router-dom') || moduleId.includes('/react/') || moduleId.includes('/react-dom/')) {

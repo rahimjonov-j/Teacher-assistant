@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import type { FeatureKey, TeacherDashboardPayload } from '@teacher-assistant/shared'
 import {
@@ -38,6 +39,15 @@ export function DashboardPage() {
   })
 
   const data = query.data
+  const firstName = useMemo(
+    () => data?.profile.fullName?.split(' ')[0] ?? t('dashboard.teacherFallback'),
+    [data?.profile.fullName, t],
+  )
+  const currentPlanName = useMemo(
+    () => (data?.subscription?.planKey ? getPlanName(data.subscription.planKey) : t('billing.noSubscription')),
+    [data?.subscription?.planKey, t],
+  )
+  const recentItems = useMemo(() => data?.recentContent.slice(0, 4) ?? [], [data?.recentContent])
 
   if (!data) {
     return <CardLoader />
@@ -51,7 +61,7 @@ export function DashboardPage() {
             <div>
               <div className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">{t('dashboard.welcome')}</div>
               <h1 className="mt-2 text-2xl font-black tracking-tight">
-                {data.profile.fullName?.split(' ')[0] ?? t('dashboard.teacherFallback')}
+                {firstName}
               </h1>
               <p className="mt-2 text-sm leading-6 text-muted-foreground">
                 {data.profile.schoolName ?? t('dashboard.schoolFallback')}
@@ -66,9 +76,7 @@ export function DashboardPage() {
             <div className="flex items-center justify-between gap-4">
               <div>
                 <div className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">{t('dashboard.currentPlan')}</div>
-                <div className="mt-1 text-lg font-black">
-                  {data.subscription?.planKey ? getPlanName(data.subscription.planKey) : t('billing.noSubscription')}
-                </div>
+                <div className="mt-1 text-lg font-black">{currentPlanName}</div>
               </div>
               <div className="text-right">
                 <div className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">{t('dashboard.creditsLeft')}</div>
@@ -165,7 +173,7 @@ export function DashboardPage() {
 
           {data.recentContent.length > 0 ? (
             <div className="space-y-3">
-              {data.recentContent.slice(0, 4).map((item) => (
+              {recentItems.map((item) => (
                 <Link key={item.id} to={`/app/history/${item.id}`} className="block rounded-2xl border border-border p-4 transition-colors hover:bg-secondary">
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">

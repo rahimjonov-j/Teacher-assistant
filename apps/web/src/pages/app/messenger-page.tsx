@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useDeferredValue, useMemo, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import type { GeneratedContentRecord } from '@teacher-assistant/shared'
 import { ArrowRight, Search, Sparkles } from 'lucide-react'
@@ -18,16 +18,24 @@ function toPreview(markdown: string) {
 export function MessengerPage() {
   const { t } = useI18n()
   const [search, setSearch] = useState('')
-  const deferredSearch = useMemo(() => search.trim(), [search])
+  const deferredSearch = useDeferredValue(search.trim())
   const query = useQuery({
     queryKey: ['messenger-history', deferredSearch],
     queryFn: () =>
       apiRequest<{ items: GeneratedContentRecord[] }>(
         `/teacher/history?search=${encodeURIComponent(deferredSearch)}&feature=`,
       ),
+    placeholderData: (previousData) => previousData,
   })
 
-  const items = query.data?.items ?? []
+  const items = useMemo(
+    () =>
+      (query.data?.items ?? []).map((item) => ({
+        ...item,
+        preview: toPreview(item.outputMarkdown).slice(0, 92),
+      })),
+    [query.data?.items],
+  )
 
   if (!query.data) {
     return <CardLoader />
@@ -47,8 +55,6 @@ export function MessengerPage() {
 
       <div className="space-y-3">
         {items.map((item) => {
-          const preview = toPreview(item.outputMarkdown).slice(0, 92)
-
           return (
             <Link key={item.id} to={`/app/history/${item.id}`}>
               <Card className="transition-colors hover:bg-secondary">
@@ -62,7 +68,7 @@ export function MessengerPage() {
                         <div className="truncate text-sm font-black">{item.title}</div>
                         <div className="shrink-0 text-xs text-muted-foreground">{formatRelativeDate(item.createdAt)}</div>
                       </div>
-                      <p className="mt-1 line-clamp-2 text-sm leading-6 text-muted-foreground">{preview || t('messenger.noPreview')}</p>
+                      <p className="mt-1 line-clamp-2 text-sm leading-6 text-muted-foreground">{item.preview || t('messenger.noPreview')}</p>
                       <div className="mt-3 flex items-center justify-between gap-3">
                         <Badge variant="outline">{getFeatureLabel(item.featureKey)}</Badge>
                         <ArrowRight className="h-4 w-4 text-muted-foreground" />
