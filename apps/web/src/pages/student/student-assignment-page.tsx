@@ -1,10 +1,11 @@
 import { useMemo, useState } from 'react'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import type { AssignmentQuestionRecord, StudentAssignmentRecord } from '@teacher-assistant/shared'
-import { ArrowLeft, CheckCircle2, Clock3, Send, type LucideIcon } from 'lucide-react'
+import { CheckCircle2, Clock3, Send, type LucideIcon } from 'lucide-react'
 import type { ReactNode } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { toast } from 'sonner'
+import { BackButton } from '@/components/shared/back-button'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Textarea } from '@/components/ui/textarea'
@@ -75,12 +76,7 @@ export function StudentAssignmentPage() {
   return (
     <Shell>
       <div className="space-y-5 animate-in">
-        <Button asChild variant="ghost">
-          <Link to="/student/dashboard">
-            <ArrowLeft className="h-4 w-4" />
-            Dashboard
-          </Link>
-        </Button>
+        <BackButton />
 
         <Card>
           <CardContent className="space-y-4 p-5">
@@ -91,7 +87,7 @@ export function StudentAssignmentPage() {
                 {data.assignment.deadlineAt ? `Deadline: ${new Date(data.assignment.deadlineAt).toLocaleString()}` : 'No deadline'}
               </p>
             </div>
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 gap-3 min-[420px]:grid-cols-[repeat(3,minmax(0,1fr))]">
               <Info icon={Clock3} label="Time" value={timeLabel} />
               <Info icon={Send} label="Attempts" value={data.assignment.attemptsRemaining} />
               <Info icon={CheckCircle2} label="Points" value={data.assignment.pointsPerCorrect} />
@@ -172,10 +168,10 @@ function Shell({ children }: { children: ReactNode }) {
 
 function Info({ icon: Icon, label, value }: { icon: LucideIcon; label: string; value: string | number }) {
   return (
-    <div className="rounded-xl bg-secondary p-3">
+    <div className="min-w-0 rounded-xl bg-secondary p-3">
       <Icon className="h-4 w-4 text-muted-foreground" />
       <div className="mt-2 text-xs text-muted-foreground">{label}</div>
-      <div className="font-black">{value}</div>
+      <div className="break-words font-black">{value}</div>
     </div>
   )
 }

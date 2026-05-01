@@ -13,6 +13,7 @@ import {
   Users,
 } from 'lucide-react'
 import { Link, NavLink, Outlet } from 'react-router-dom'
+import { BackButton } from '@/components/shared/back-button'
 import { ThemeToggle } from '@/components/shared/theme-toggle'
 import { Button } from '@/components/ui/button'
 import { useAuth } from '@/hooks/use-auth'
@@ -179,6 +180,9 @@ export function AdminLayout() {
 
       <main className="min-h-screen px-4 pb-8 pt-20 lg:pl-[368px] lg:pr-8 lg:pt-8">
         <div className="mx-auto w-full max-w-[1160px]">
+          <div className="mb-4">
+            <BackButton />
+          </div>
           <Outlet />
         </div>
       </main>

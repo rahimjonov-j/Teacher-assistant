@@ -1,5 +1,6 @@
 import { Link, Outlet, useLocation } from 'react-router-dom'
 import { GraduationCap } from 'lucide-react'
+import { BackButton } from '@/components/shared/back-button'
 import { useI18n } from '@/hooks/use-i18n'
 
 export function PublicLayout() {
@@ -17,6 +18,9 @@ export function PublicLayout() {
   return (
     <div className="min-h-screen bg-background">
       <main className="mobile-container flex min-h-screen flex-col py-6">
+        <div className="mb-4">
+          <BackButton />
+        </div>
         <Link to="/login" className="mx-auto flex items-center gap-3 py-2">
           <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-foreground text-background">
             <GraduationCap className="h-5 w-5" />

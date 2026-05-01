@@ -3,6 +3,7 @@ import type { StudentDashboardPayload } from '@teacher-assistant/shared'
 import { ArrowRight, Crown, LogOut, Medal, MessageSquareText, Send, Trophy, type LucideIcon } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { BackButton } from '@/components/shared/back-button'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -43,10 +44,12 @@ export function StudentDashboardPage() {
   return (
     <StudentShell>
       <div className="space-y-5 animate-in">
+        <BackButton />
+
         <Card>
           <CardContent className="space-y-4 p-5">
             <div className="flex items-start justify-between gap-4">
-              <div>
+              <div className="min-w-0">
                 <div className="text-xs font-semibold uppercase text-muted-foreground">{data.student.className} / {data.student.groupName}</div>
                 <h1 className="mt-2 text-2xl font-black tracking-tight">{data.student.fullName}</h1>
                 <p className="mt-2 text-sm text-muted-foreground">Teacher: {data.student.teacherName ?? 'Teacher'}</p>
@@ -62,7 +65,7 @@ export function StudentDashboardPage() {
                 <LogOut className="h-5 w-5" />
               </Button>
             </div>
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 gap-3 min-[420px]:grid-cols-[repeat(3,minmax(0,1fr))]">
               <Metric icon={Trophy} label="Rating" value={data.student.totalMonthlyScore} />
               <Metric icon={Medal} label="Rank" value={data.rank ?? '-'} />
               <Metric icon={Send} label="Active" value={data.activeAssignments.length} />
@@ -152,10 +155,10 @@ function StudentShell({ children }: { children: ReactNode }) {
 
 function Metric({ icon: Icon, label, value }: { icon: LucideIcon; label: string; value: string | number }) {
   return (
-    <div className="rounded-xl bg-secondary p-3">
+    <div className="min-w-0 rounded-xl bg-secondary p-3">
       <Icon className="h-4 w-4 text-muted-foreground" />
       <div className="mt-2 text-xs text-muted-foreground">{label}</div>
-      <div className="text-lg font-black">{value}</div>
+      <div className="break-words text-lg font-black">{value}</div>
     </div>
   )
 }

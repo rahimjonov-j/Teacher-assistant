@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
+import { getFallbackBackPath } from '@/lib/back-navigation'
 
-const EDGE_THRESHOLD_PX = 44
 const MIN_SWIPE_DISTANCE_PX = 72
 const MAX_VERTICAL_DRIFT_PX = 72
 
@@ -15,30 +15,6 @@ function isInteractiveTarget(target: EventTarget | null) {
   }
 
   return Boolean(target.closest('input, textarea, select, button, a, [role="button"]'))
-}
-
-function getFallbackPath(pathname: string) {
-  if (pathname.startsWith('/app/history/')) {
-    return '/app/messenger'
-  }
-
-  if (pathname === '/app/generator' || pathname === '/app/billing' || pathname === '/app/settings') {
-    return '/app/dashboard'
-  }
-
-  if (pathname.startsWith('/admin/') && pathname !== '/admin/dashboard') {
-    return '/admin/dashboard'
-  }
-
-  if (pathname === '/register' || pathname === '/reset-password') {
-    return '/login'
-  }
-
-  if (pathname === '/login') {
-    return '/'
-  }
-
-  return null
 }
 
 export function useSwipeBack() {
@@ -59,8 +35,8 @@ export function useSwipeBack() {
       const touch = event.touches[0]
       touchStartX.current = touch.clientX
       touchStartY.current = touch.clientY
-      eligible.current = touch.clientX <= EDGE_THRESHOLD_PX
       targetBlocked.current = isInteractiveTarget(event.target)
+      eligible.current = !targetBlocked.current
     }
 
     const onTouchEnd = (event: TouchEvent) => {
@@ -79,7 +55,7 @@ export function useSwipeBack() {
       const deltaY = Math.abs(touch.clientY - touchStartY.current)
 
       if (deltaX >= MIN_SWIPE_DISTANCE_PX && deltaY <= MAX_VERTICAL_DRIFT_PX) {
-        const fallbackPath = getFallbackPath(location.pathname)
+        const fallbackPath = getFallbackBackPath(location.pathname)
 
         if (location.key === 'default' && fallbackPath) {
           navigate(fallbackPath)

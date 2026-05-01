@@ -1,8 +1,8 @@
 import { useRef } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import type { GeneratedContentRecord } from '@teacher-assistant/shared'
-import { ArrowLeft, Copy, FileDown } from 'lucide-react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { Copy, FileDown } from 'lucide-react'
+import { useNavigate, useParams } from 'react-router-dom'
 import { toast } from 'sonner'
 import { CardLoader } from '@/components/shared/loading-state'
 import { MarkdownRenderer } from '@/components/shared/markdown-renderer'
@@ -90,13 +90,6 @@ export function ContentDetailPage() {
 
   return (
     <div className="space-y-4 animate-in pb-8">
-      <Button asChild variant="ghost" size="sm" className="w-fit">
-        <Link to="/app/messenger">
-          <ArrowLeft className="h-4 w-4" />
-          {t('common.back')}
-        </Link>
-      </Button>
-
       <Card>
         <CardContent className="space-y-4 p-5">
           <div className="flex flex-wrap items-center gap-2">

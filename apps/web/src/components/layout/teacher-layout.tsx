@@ -16,6 +16,7 @@ import {
   X,
 } from 'lucide-react'
 import { Link, NavLink, Outlet, matchPath, useLocation } from 'react-router-dom'
+import { BackButton } from '@/components/shared/back-button'
 import { useAuth } from '@/hooks/use-auth'
 import { useI18n } from '@/hooks/use-i18n'
 import { Button } from '@/components/ui/button'
@@ -174,6 +175,9 @@ export function TeacherLayout() {
         </header>
 
         <main>
+          <div className="mb-4">
+            <BackButton />
+          </div>
           <Outlet />
         </main>
       </div>
