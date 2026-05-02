@@ -12,6 +12,7 @@ import { Spinner } from '@/components/ui/spinner'
 import { useAuth } from '@/hooks/use-auth'
 import { useI18n } from '@/hooks/use-i18n'
 import { isSupabaseConfigured, preloadSupabaseClient } from '@/lib/supabase'
+import { getUzToastError } from '@/lib/toast'
 
 const schema = z.object({
   email: z.string().email("Noto'g'ri email format"),
@@ -33,10 +34,10 @@ export function LoginPage() {
   const onSubmit = form.handleSubmit(async (values) => {
     try {
       const profile = await login(values.email, values.password)
-      toast.success(t('public.login.welcomeBack'))
+      toast.success('Xush kelibsiz.')
       navigate(profile.role === 'admin' ? '/admin/dashboard' : '/app/dashboard')
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : t('public.login.failed'))
+      toast.error(getUzToastError(error, 'Tizimga kirib bo\'lmadi.'))
     }
   })
 

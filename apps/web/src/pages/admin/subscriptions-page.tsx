@@ -18,6 +18,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { useI18n } from '@/hooks/use-i18n'
 import { apiRequest } from '@/lib/api'
 import { sortPlans, type PlanConfig, type PlanKey } from '@/lib/plans'
+import { getUzToastError } from '@/lib/toast'
 import { cn } from '@/lib/utils'
 
 interface SubscriptionsResponse {
@@ -155,7 +156,7 @@ export function AdminSubscriptionsPage() {
       ])
     },
     onError: (error) => {
-      toast.error(error instanceof Error ? error.message : "Tarifni yangilab bo'lmadi.")
+      toast.error(getUzToastError(error, "Tarifni yangilab bo'lmadi."))
     },
   })
 

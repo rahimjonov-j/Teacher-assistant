@@ -12,6 +12,7 @@ import { Spinner } from '@/components/ui/spinner'
 import { useAuth } from '@/hooks/use-auth'
 import { useI18n } from '@/hooks/use-i18n'
 import { isSupabaseConfigured, preloadSupabaseClient } from '@/lib/supabase'
+import { getUzToastError } from '@/lib/toast'
 
 const schema = z.object({
   fullName: z.string().min(2, "Ism kamida 2 ta belgidan iborat bo'lishi kerak"),
@@ -37,15 +38,15 @@ export function RegisterPage() {
       const result = await register(values)
 
       if (result.emailConfirmationRequired) {
-        toast.success(t('public.register.confirmEmail'))
+        toast.success('Tasdiqlash havolasi emailingizga yuborildi.')
         navigate('/login')
         return
       }
 
-      toast.success(t('public.register.created'))
+      toast.success("Ro'yxatdan o'tish yakunlandi.")
       navigate(result.profile?.role === 'admin' ? '/admin/dashboard' : '/app/dashboard')
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : t('public.register.failed'))
+      toast.error(getUzToastError(error, "Ro'yxatdan o'tib bo'lmadi."))
     }
   })
 

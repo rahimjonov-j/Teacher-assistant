@@ -12,6 +12,7 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { CardLoader } from '@/components/shared/loading-state'
 import { apiRequest } from '@/lib/api'
+import { getUzToastError } from '@/lib/toast'
 import { cn } from '@/lib/utils'
 
 const assignmentTypes: Array<{ value: AssignmentType; label: string }> = [
@@ -22,47 +23,6 @@ const assignmentTypes: Array<{ value: AssignmentType; label: string }> = [
   { value: 'speaking', label: 'Speaking' },
   { value: 'mini_game', label: 'Mini game' },
 ]
-
-function classToastError(error: unknown, fallback: string) {
-  if (!(error instanceof Error)) {
-    return fallback
-  }
-
-  const message = error.message
-
-  if (message.includes('Class limit reached')) {
-    return "Sinf limiti tugagan. Ko'proq sinf uchun tarifni yangilang."
-  }
-  if (message.includes('Class not found')) {
-    return 'Sinf topilmadi.'
-  }
-  if (message.includes('Student not found')) {
-    return "O'quvchi topilmadi."
-  }
-  if (message.includes('Unable to regenerate password')) {
-    return "Parolni yangilab bo'lmadi."
-  }
-  if (message.includes('Unable to add student')) {
-    return "O'quvchini qo'shib bo'lmadi."
-  }
-  if (message.includes('Unable to create class')) {
-    return 'Sinf yaratib bo‘lmadi.'
-  }
-  if (message.includes('Unable to send assignment')) {
-    return "Topshiriqni yuborib bo'lmadi."
-  }
-  if (message.includes('Unable to generate assignment')) {
-    return "AI orqali topshiriq yaratib bo'lmadi."
-  }
-  if (message.includes('Unable to review submission')) {
-    return "Ishni tekshirib bo'lmadi."
-  }
-  if (message.includes('Class database tables are not created yet')) {
-    return "Class bazasi to'liq tayyor emas. Migrationni ishga tushirish kerak."
-  }
-
-  return fallback
-}
 
 export function ClassesPage() {
   const queryClient = useQueryClient()
@@ -128,7 +88,7 @@ export function ClassesPage() {
       toast.success('Sinf yaratildi.')
       await queryClient.invalidateQueries({ queryKey: ['classes'] })
     },
-    onError: (error) => toast.error(classToastError(error, 'Sinf yaratib bo‘lmadi.')),
+    onError: (error) => toast.error(getUzToastError(error, "Sinf yaratib bo'lmadi.")),
   })
 
   const addStudentMutation = useMutation({
@@ -145,7 +105,7 @@ export function ClassesPage() {
       toast.success("O'quvchi qo'shildi.")
       await queryClient.invalidateQueries({ queryKey: ['class-detail', activeClassId] })
     },
-    onError: (error) => toast.error(classToastError(error, "O'quvchini qo'shib bo'lmadi.")),
+    onError: (error) => toast.error(getUzToastError(error, "O'quvchini qo'shib bo'lmadi.")),
   })
 
   const regeneratePasswordMutation = useMutation({
@@ -160,7 +120,7 @@ export function ClassesPage() {
       toast.success('Parol yangilandi.')
       void queryClient.invalidateQueries({ queryKey: ['class-detail', activeClassId] })
     },
-    onError: (error) => toast.error(classToastError(error, "Parolni yangilab bo'lmadi.")),
+    onError: (error) => toast.error(getUzToastError(error, "Parolni yangilab bo'lmadi.")),
   })
 
   const createAssignmentMutation = useMutation({
@@ -175,7 +135,7 @@ export function ClassesPage() {
       toast.success("Topshiriq yuborildi.")
       await queryClient.invalidateQueries({ queryKey: ['class-detail', activeClassId] })
     },
-    onError: (error) => toast.error(classToastError(error, "Topshiriqni yuborib bo'lmadi.")),
+    onError: (error) => toast.error(getUzToastError(error, "Topshiriqni yuborib bo'lmadi.")),
   })
 
   const createAiAssignmentMutation = useMutation({
@@ -201,7 +161,7 @@ export function ClassesPage() {
       await queryClient.invalidateQueries({ queryKey: ['class-detail', activeClassId] })
       await queryClient.invalidateQueries({ queryKey: ['dashboard'] })
     },
-    onError: (error) => toast.error(classToastError(error, "AI orqali topshiriq yaratib bo'lmadi.")),
+    onError: (error) => toast.error(getUzToastError(error, "AI orqali topshiriq yaratib bo'lmadi.")),
   })
 
   const detail = detailQuery.data
@@ -732,7 +692,7 @@ function ReviewRow({
       toast.success("Ish tekshirildi.")
       await queryClient.invalidateQueries({ queryKey: ['pending-submissions'] })
     },
-    onError: (error) => toast.error(classToastError(error, "Ishni tekshirib bo'lmadi.")),
+    onError: (error) => toast.error(getUzToastError(error, "Ishni tekshirib bo'lmadi.")),
   })
 
   return (

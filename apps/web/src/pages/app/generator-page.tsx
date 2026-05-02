@@ -22,6 +22,7 @@ import { useI18n } from '@/hooks/use-i18n'
 import { ApiRequestError, apiRequest } from '@/lib/api'
 import { featureDescriptions, featureHelperTexts, featureInputLabels } from '@/lib/i18n'
 import { getFeatureLabel } from '@/lib/format'
+import { getUzToastError } from '@/lib/toast'
 
 const generatorFeatures = FEATURE_DEFINITIONS.filter((feature) => feature.key !== 'pdf_export')
 
@@ -52,16 +53,16 @@ export function GeneratorPage() {
         }),
       }),
     onSuccess: () => {
-      toast.success(t('generator.created'))
+      toast.success('Kontent yaratildi.')
     },
     onError: (error) => {
       if (error instanceof ApiRequestError && error.statusCode === 402) {
-        toast.error(t('generator.creditEnded'))
+        toast.error('Kredit yetarli emas.')
         navigate('/app/billing')
         return
       }
 
-      toast.error(error instanceof Error ? error.message : t('generator.failed'))
+      toast.error(getUzToastError(error, 'Kontent yaratib bo\'lmadi.'))
     },
   })
 
@@ -159,7 +160,7 @@ export function GeneratorPage() {
                 size="sm"
                 onClick={() => {
                   navigator.clipboard.writeText(result.outputMarkdown)
-                  toast.success(t('generator.copied'))
+                  toast.success('Matn nusxalandi.')
                 }}
               >
                 <Copy className="h-4 w-4" />

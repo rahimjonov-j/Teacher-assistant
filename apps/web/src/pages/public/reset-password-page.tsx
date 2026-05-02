@@ -12,6 +12,7 @@ import { Label } from '@/components/ui/label'
 import { Spinner } from '@/components/ui/spinner'
 import { useI18n } from '@/hooks/use-i18n'
 import { getSupabaseClient, isSupabaseConfigured, preloadSupabaseClient } from '@/lib/supabase'
+import { getUzToastError } from '@/lib/toast'
 
 const requestSchema = z.object({
   email: z.string().email("Noto'g'ri email format"),
@@ -72,9 +73,9 @@ export function ResetPasswordPage() {
       }
 
       setResetEmailSent(true)
-      toast.success(t('public.reset.sent'))
+      toast.success('Tiklash havolasi emailingizga yuborildi.')
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : t('public.reset.failed'))
+      toast.error(getUzToastError(error, 'Tiklash havolasini yuborib bo\'lmadi.'))
     }
   })
 
@@ -87,11 +88,11 @@ export function ResetPasswordPage() {
         throw new Error(error.message)
       }
 
-      toast.success(t('public.reset.updated'))
+      toast.success('Parol yangilandi.')
       await supabase.auth.signOut()
       navigate('/login')
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : t('public.reset.updateFailed'))
+      toast.error(getUzToastError(error, 'Parolni yangilab bo\'lmadi.'))
     }
   })
 

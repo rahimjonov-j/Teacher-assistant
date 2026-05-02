@@ -21,6 +21,7 @@ import { useAuth } from '@/hooks/use-auth'
 import { useI18n } from '@/hooks/use-i18n'
 import { apiRequest } from '@/lib/api'
 import { env } from '@/lib/env'
+import { getUzToastError } from '@/lib/toast'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -87,10 +88,10 @@ export function SettingsPage() {
       }),
     onSuccess: async () => {
       await refreshProfile()
-      toast.success(t('settings.profileSaved'))
+      toast.success('Profil saqlandi.')
     },
     onError: (error) => {
-      toast.error(error instanceof Error ? error.message : t('settings.profileSaveFailed'))
+      toast.error(getUzToastError(error, "Profilni saqlab bo'lmadi."))
     },
   })
 
@@ -98,10 +99,10 @@ export function SettingsPage() {
     mutationFn: () => apiRequest<LinkCodeResponse>('/teacher/telegram/link-code', { method: 'POST' }),
     onSuccess: (data) => {
       setLinkData(data)
-      toast.success(t('settings.linkCreated'))
+      toast.success('Telegram ulanish kodi yaratildi.')
     },
     onError: (error) => {
-      toast.error(error instanceof Error ? error.message : t('settings.linkFailed'))
+      toast.error(getUzToastError(error, 'Telegram ulanish kodi yaratilmadi.'))
     },
   })
 

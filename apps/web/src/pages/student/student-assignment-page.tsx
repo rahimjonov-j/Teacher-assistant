@@ -11,6 +11,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Textarea } from '@/components/ui/textarea'
 import { CardLoader } from '@/components/shared/loading-state'
 import { apiRequest } from '@/lib/api'
+import { getUzToastError } from '@/lib/toast'
 
 export function StudentAssignmentPage() {
   const navigate = useNavigate()
@@ -37,9 +38,9 @@ export function StudentAssignmentPage() {
       }),
     onSuccess: (data) => {
       setAttemptId(data.attempt.attemptId)
-      toast.success('Attempt started.')
+      toast.success('Urinish boshlandi.')
     },
-    onError: (error) => toast.error(error instanceof Error ? error.message : 'Unable to start attempt.'),
+    onError: (error) => toast.error(getUzToastError(error, "Urinishni boshlab bo'lmadi.")),
   })
 
   const submitMutation = useMutation({
@@ -54,10 +55,14 @@ export function StudentAssignmentPage() {
         }),
       }),
     onSuccess: (result) => {
-      toast.success(result.status === 'graded' ? `Score: ${result.scoreAwarded}/${result.maxScore}` : 'Submitted for teacher review.')
+      toast.success(
+        result.status === 'graded'
+          ? `Ball: ${result.scoreAwarded}/${result.maxScore}`
+          : "Topshiriq o'qituvchi tekshiruviga yuborildi.",
+      )
       navigate('/student/dashboard')
     },
-    onError: (error) => toast.error(error instanceof Error ? error.message : 'Unable to submit assignment.'),
+    onError: (error) => toast.error(getUzToastError(error, "Topshiriqni yuborib bo'lmadi.")),
   })
 
   const data = query.data

@@ -13,6 +13,7 @@ import { Spinner } from '@/components/ui/spinner'
 import { useI18n } from '@/hooks/use-i18n'
 import { ApiRequestError, apiRequest } from '@/lib/api'
 import { formatDate, getFeatureLabel } from '@/lib/format'
+import { getUzToastError } from '@/lib/toast'
 
 export function ContentDetailPage() {
   const navigate = useNavigate()
@@ -55,7 +56,7 @@ export function ContentDetailPage() {
         window.open(data.pdfUrl, '_blank', 'noopener,noreferrer')
       }
 
-      toast.success(t('detail.exportDone'))
+      toast.success('PDF tayyor bo\'ldi.')
     },
     onError: (error) => {
       if (pdfWindowRef.current && !pdfWindowRef.current.closed) {
@@ -64,12 +65,12 @@ export function ContentDetailPage() {
       }
 
       if (error instanceof ApiRequestError && error.statusCode === 402) {
-        toast.error(t('detail.creditEnded'))
+        toast.error('Kredit yetarli emas.')
         navigate('/app/billing')
         return
       }
 
-      toast.error(error instanceof Error ? error.message : t('detail.exportFailed'))
+      toast.error(getUzToastError(error, 'PDF eksport qilib bo\'lmadi.'))
     },
   })
 
@@ -106,7 +107,7 @@ export function ContentDetailPage() {
               size="sm"
               onClick={() => {
                 navigator.clipboard.writeText(item.outputMarkdown)
-                toast.success(t('detail.copied'))
+                toast.success('Matn nusxalandi.')
               }}
             >
               <Copy className="h-4 w-4" />

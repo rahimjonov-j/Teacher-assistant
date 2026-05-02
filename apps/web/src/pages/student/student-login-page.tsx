@@ -11,6 +11,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { apiRequest } from '@/lib/api'
 import { setStudentToken } from '@/lib/student-auth'
+import { getUzToastError } from '@/lib/toast'
 
 export function StudentLoginPage() {
   const navigate = useNavigate()
@@ -24,10 +25,10 @@ export function StudentLoginPage() {
       }),
     onSuccess: (data) => {
       setStudentToken(data.token)
-      toast.success(`Welcome, ${data.student.fullName}.`)
+      toast.success(`Xush kelibsiz, ${data.student.fullName}.`)
       navigate('/student/dashboard', { replace: true })
     },
-    onError: (error) => toast.error(error instanceof Error ? error.message : 'Student login failed.'),
+    onError: (error) => toast.error(getUzToastError(error, "Student login qilib bo'lmadi.")),
   })
 
   return (
