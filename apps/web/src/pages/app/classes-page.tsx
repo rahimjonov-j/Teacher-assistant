@@ -1,8 +1,8 @@
 import { useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import type { ClassDetailPayload, ClassesPayload, AssignmentType } from '@teacher-assistant/shared'
-import { Award, CalendarDays, CheckCircle2, Clock3, Copy, Crown, KeyRound, Plus, RefreshCw, Send, ShieldAlert, Sparkles, Users, type LucideIcon } from 'lucide-react'
+import type { ClassDetailPayload, ClassesPayload, AssignmentType, StudentCredentials, StudentRecord } from '@teacher-assistant/shared'
+import { Award, CalendarDays, CheckCircle2, Clock3, Copy, Crown, Eye, KeyRound, Plus, RefreshCw, Send, ShieldAlert, Sparkles, Users, type LucideIcon } from 'lucide-react'
 import { toast } from 'sonner'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -30,7 +30,9 @@ export function ClassesPage() {
   const [groupName, setGroupName] = useState('')
   const [gradeLevel, setGradeLevel] = useState('')
   const [studentName, setStudentName] = useState('')
-  const [credentials, setCredentials] = useState<{ login: string; password: string } | null>(null)
+  const [credentials, setCredentials] = useState<StudentCredentials | null>(null)
+  const [studentCredentials, setStudentCredentials] = useState<Record<string, StudentCredentials>>({})
+  const [openCredentialStudentId, setOpenCredentialStudentId] = useState<string | null>(null)
   const [assignmentTitle, setAssignmentTitle] = useState('')
   const [assignmentType, setAssignmentType] = useState<AssignmentType>('multiple_choice')
   const [deadlineDate, setDeadlineDate] = useState('')
@@ -90,29 +92,33 @@ export function ClassesPage() {
 
   const addStudentMutation = useMutation({
     mutationFn: () =>
-      apiRequest<{ credentials: { login: string; password: string } }>(`/classes/${activeClassId}/students`, {
+      apiRequest<{ student: StudentRecord; credentials: StudentCredentials }>(`/classes/${activeClassId}/students`, {
         method: 'POST',
         body: JSON.stringify({ fullName: studentName }),
       }),
     onSuccess: async (data) => {
       setStudentName('')
       setCredentials(data.credentials)
-      toast.success('Student added.')
+      setStudentCredentials((current) => ({ ...current, [data.student.id]: data.credentials }))
+      setOpenCredentialStudentId(data.student.id)
+      toast.success("O'quvchi qo'shildi.")
       await queryClient.invalidateQueries({ queryKey: ['class-detail', activeClassId] })
     },
-    onError: (error) => toast.error(error instanceof Error ? error.message : 'Unable to add student.'),
+    onError: (error) => toast.error(error instanceof Error ? error.message : "O'quvchini qo'shib bo'lmadi."),
   })
 
   const regeneratePasswordMutation = useMutation({
     mutationFn: (studentId: string) =>
-      apiRequest<{ credentials: { login: string; password: string } }>(`/classes/students/${studentId}/regenerate-password`, {
+      apiRequest<{ credentials: StudentCredentials }>(`/classes/students/${studentId}/regenerate-password`, {
         method: 'POST',
       }),
-    onSuccess: (data) => {
+    onSuccess: (data, studentId) => {
       setCredentials(data.credentials)
-      toast.success('Password regenerated.')
+      setStudentCredentials((current) => ({ ...current, [studentId]: data.credentials }))
+      setOpenCredentialStudentId(studentId)
+      toast.success('Parol yangilandi.')
     },
-    onError: (error) => toast.error(error instanceof Error ? error.message : 'Unable to regenerate password.'),
+    onError: (error) => toast.error(error instanceof Error ? error.message : "Parolni yangilab bo'lmadi."),
   })
 
   const createAssignmentMutation = useMutation({
@@ -295,7 +301,7 @@ export function ClassesPage() {
                       <div className="flex items-start justify-between gap-3">
                         <div className="min-w-0">
                           <div className="truncate font-black">{student.fullName}</div>
-                          <div className="mt-1 text-xs text-muted-foreground">{student.login}</div>
+                          <div className="mt-1 text-xs text-muted-foreground">Login: {student.login}</div>
                         </div>
                         <Badge variant={student.status === 'active' ? 'default' : 'outline'}>{student.status}</Badge>
                       </div>
@@ -304,16 +310,36 @@ export function ClassesPage() {
                         <span>{student.completedAssignments} done</span>
                         <span>{student.lastActiveAt ? new Date(student.lastActiveAt).toLocaleDateString() : 'No activity'}</span>
                       </div>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="mt-3 w-full"
-                        onClick={() => regeneratePasswordMutation.mutate(student.id)}
-                        disabled={regeneratePasswordMutation.isPending}
-                      >
-                        <KeyRound className="h-4 w-4" />
-                        Regenerate password
-                      </Button>
+                      <div className="mt-3 grid grid-cols-2 gap-2">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="w-full"
+                          onClick={() =>
+                            setOpenCredentialStudentId((current) => (current === student.id ? null : student.id))
+                          }
+                        >
+                          <Eye className="h-4 w-4" />
+                          Parollar
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="w-full"
+                          onClick={() => regeneratePasswordMutation.mutate(student.id)}
+                          disabled={regeneratePasswordMutation.isPending}
+                        >
+                          <KeyRound className="h-4 w-4" />
+                          Parolni yangilash
+                        </Button>
+                      </div>
+                      {openCredentialStudentId === student.id ? (
+                        <StudentCredentialsPanel
+                          className="mt-3"
+                          credentials={studentCredentials[student.id] ?? null}
+                          fallbackLogin={student.login}
+                        />
+                      ) : null}
                     </div>
                   ))}
                 </div>
@@ -338,23 +364,11 @@ export function ClassesPage() {
                       Add student
                     </Button>
                     {credentials ? (
-                      <div className="rounded-xl border border-green-300 bg-green-50 p-4 text-sm text-black">
-                        <div className="font-black">Credentials</div>
-                        <div className="mt-2">Login: {credentials.login}</div>
-                        <div>Password: {credentials.password}</div>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="mt-3"
-                          onClick={async () => {
-                            await navigator.clipboard.writeText(`${credentials.login} / ${credentials.password}`)
-                            toast.success('Credentials copied.')
-                          }}
-                        >
-                          <Copy className="h-4 w-4" />
-                          Copy
-                        </Button>
-                      </div>
+                      <StudentCredentialsPanel
+                        className="rounded-xl border border-green-300 bg-green-50 p-4 text-sm text-black"
+                        credentials={credentials}
+                        variant="success"
+                      />
                     ) : null}
                   </div>
                 </div>
@@ -501,6 +515,53 @@ function ActiveBucket({ title, count }: { title: string; count: number }) {
     <div className="flex items-center justify-between rounded-xl border border-border p-4">
       <span className="font-semibold">{title}</span>
       <Badge>{count}</Badge>
+    </div>
+  )
+}
+
+function StudentCredentialsPanel({
+  credentials,
+  fallbackLogin,
+  className,
+  variant = 'default',
+}: {
+  credentials: StudentCredentials | null
+  fallbackLogin?: string
+  className?: string
+  variant?: 'default' | 'success'
+}) {
+  const panelClassName =
+    variant === 'success'
+      ? className ?? ''
+      : cn('rounded-xl border border-border bg-secondary/40 p-4 text-sm', className)
+
+  const login = credentials?.login ?? fallbackLogin ?? '-'
+
+  return (
+    <div className={panelClassName}>
+      <div className="font-black">Parollar</div>
+      <div className="mt-2">Login: {login}</div>
+      {credentials ? (
+        <>
+          <div>Parol: {credentials.password}</div>
+          <Button
+            size="sm"
+            variant="outline"
+            className="mt-3"
+            onClick={async () => {
+              await navigator.clipboard.writeText(`${credentials.login} / ${credentials.password}`)
+              toast.success("Login va parol nusxalandi.")
+            }}
+          >
+            <Copy className="h-4 w-4" />
+            Nusxalash
+          </Button>
+        </>
+      ) : (
+        <div className="mt-1 text-muted-foreground">
+          Joriy parol xavfsizlik sabab ochiq saqlanmaydi. Ko'rish uchun Parolni yangilash tugmasini bosing.
+        </div>
+      )}
     </div>
   )
 }
