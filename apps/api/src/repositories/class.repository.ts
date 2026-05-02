@@ -33,6 +33,15 @@ export function classSchemaMigrationError() {
   return new ApiError(503, 'Class database tables are not created yet. Apply supabase/migrations/20260428_class_management.sql.')
 }
 
+function isPasswordCiphertextColumnMissing(error: unknown) {
+  const maybeError = error as { code?: string; message?: string } | null
+  return (
+    maybeError?.code === '42703' ||
+    maybeError?.message?.includes('password_ciphertext') ||
+    maybeError?.message?.includes("Could not find the 'password_ciphertext' column")
+  )
+}
+
 function currentMonthStart() {
   const now = new Date()
   return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1)).toISOString().slice(0, 10)
@@ -481,19 +490,29 @@ export const classRepository = {
     const credentials = hashPassword(password)
     const login = await this.generateUniqueLogin(fullName)
 
-    const { data, error } = await supabase
+    const baseInsertPayload = {
+      teacher_id: teacherId,
+      class_id: classId,
+      full_name: fullName,
+      login,
+      password_hash: credentials.hash,
+      password_salt: credentials.salt,
+    }
+
+    let { data, error } = await supabase
       .from('students')
       .insert({
-        teacher_id: teacherId,
-        class_id: classId,
-        full_name: fullName,
-        login,
-        password_hash: credentials.hash,
-        password_salt: credentials.salt,
+        ...baseInsertPayload,
         password_ciphertext: encryptPassword(password),
       })
       .select('*')
       .single()
+
+    if (error && isPasswordCiphertextColumnMissing(error)) {
+      const retry = await supabase.from('students').insert(baseInsertPayload).select('*').single()
+      data = retry.data
+      error = retry.error
+    }
 
     if (error || !data) {
       throw new ApiError(400, error?.message ?? 'Unable to add student.')
@@ -571,7 +590,7 @@ export const classRepository = {
     const password = generatePassword()
     const credentials = hashPassword(password)
     const supabase = getSupabaseAdminClient()
-    const { error } = await supabase
+    let { error } = await supabase
       .from('students')
       .update({
         password_hash: credentials.hash,
@@ -579,6 +598,17 @@ export const classRepository = {
         password_ciphertext: encryptPassword(password),
       })
       .eq('id', student.id)
+
+    if (error && isPasswordCiphertextColumnMissing(error)) {
+      const retry = await supabase
+        .from('students')
+        .update({
+          password_hash: credentials.hash,
+          password_salt: credentials.salt,
+        })
+        .eq('id', student.id)
+      error = retry.error
+    }
 
     if (error) {
       throw new ApiError(500, 'Unable to regenerate password.')
