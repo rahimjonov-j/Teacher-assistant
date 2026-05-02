@@ -1,4 +1,4 @@
-import { createHmac, randomBytes, timingSafeEqual, pbkdf2Sync } from 'node:crypto'
+import { createCipheriv, createDecipheriv, createHash, createHmac, pbkdf2Sync, randomBytes, timingSafeEqual } from 'node:crypto'
 import { env } from '../config/env.js'
 import { ApiError } from './api-error.js'
 
@@ -8,6 +8,10 @@ const TOKEN_TTL_SECONDS = 60 * 60 * 24 * 14
 
 function tokenSecret() {
   return env.SUPABASE_SERVICE_ROLE_KEY ?? env.SUPABASE_ANON_KEY ?? 'teacher-assistant-local-secret'
+}
+
+function passwordSecret() {
+  return env.STUDENT_PASSWORD_SECRET ?? tokenSecret()
 }
 
 function base64Url(input: Buffer | string) {
@@ -26,6 +30,41 @@ export function hashPassword(password: string) {
   const salt = randomBytes(16).toString('base64url')
   const hash = pbkdf2Sync(password, salt, PASSWORD_ITERATIONS, PASSWORD_KEY_LENGTH, 'sha256').toString('base64url')
   return { hash, salt }
+}
+
+function passwordKey() {
+  return createHash('sha256').update(passwordSecret()).digest()
+}
+
+export function encryptPassword(password: string) {
+  const iv = randomBytes(12)
+  const cipher = createCipheriv('aes-256-gcm', passwordKey(), iv)
+  const encrypted = Buffer.concat([cipher.update(password, 'utf8'), cipher.final()])
+  const authTag = cipher.getAuthTag()
+  return [base64Url(iv), base64Url(authTag), base64Url(encrypted)].join('.')
+}
+
+export function decryptPassword(payload?: string | null) {
+  if (!payload) {
+    return null
+  }
+
+  const [ivPart, authTagPart, encryptedPart] = payload.split('.')
+  if (!ivPart || !authTagPart || !encryptedPart) {
+    return null
+  }
+
+  try {
+    const decipher = createDecipheriv('aes-256-gcm', passwordKey(), Buffer.from(ivPart, 'base64url'))
+    decipher.setAuthTag(Buffer.from(authTagPart, 'base64url'))
+    const decrypted = Buffer.concat([
+      decipher.update(Buffer.from(encryptedPart, 'base64url')),
+      decipher.final(),
+    ])
+    return decrypted.toString('utf8')
+  } catch {
+    return null
+  }
 }
 
 export function verifyPassword(password: string, salt: string, expectedHash: string) {

@@ -12,7 +12,7 @@ import type {
 } from '@teacher-assistant/shared'
 import { getSupabaseAdminClient } from '../config/supabase.js'
 import { ApiError } from '../utils/api-error.js'
-import { generatePassword, hashPassword, verifyPassword } from '../utils/student-security.js'
+import { decryptPassword, encryptPassword, generatePassword, hashPassword, verifyPassword } from '../utils/student-security.js'
 import { subscriptionsRepository } from './subscriptions.repository.js'
 
 const CLASS_LIMITS: Record<PlanKey, number | null> = {
@@ -51,12 +51,13 @@ function toClassRecord(row: any, studentCount = 0, monthlyScore = 0): ClassRecor
   }
 }
 
-function toStudentRecord(row: any, monthlyScore = 0, completedTasksCount?: number): StudentRecord {
+function toStudentRecord(row: any, monthlyScore = 0, completedTasksCount?: number, password?: string | null): StudentRecord {
   return {
     id: row.id as string,
     classId: row.class_id as string,
     fullName: row.full_name as string,
     login: row.login as string,
+    password: password ?? null,
     status: row.status as StudentRecord['status'],
     totalMonthlyScore: monthlyScore,
     allTimeScore: Number(row.all_time_score ?? 0),
@@ -384,7 +385,12 @@ export const classRepository = {
 
     const allStudents = studentRows.map((row: any) => {
       const rating = ratings.get(row.id as string)
-      return toStudentRecord(row, rating?.totalScore ?? 0, rating?.completedTasksCount)
+      return toStudentRecord(
+        row,
+        rating?.totalScore ?? 0,
+        rating?.completedTasksCount,
+        decryptPassword((row.password_ciphertext as string | null) ?? null),
+      )
     })
 
     const leaderboard = this.buildLeaderboard(allStudents)
@@ -484,6 +490,7 @@ export const classRepository = {
         login,
         password_hash: credentials.hash,
         password_salt: credentials.salt,
+        password_ciphertext: encryptPassword(password),
       })
       .select('*')
       .single()
@@ -566,7 +573,11 @@ export const classRepository = {
     const supabase = getSupabaseAdminClient()
     const { error } = await supabase
       .from('students')
-      .update({ password_hash: credentials.hash, password_salt: credentials.salt })
+      .update({
+        password_hash: credentials.hash,
+        password_salt: credentials.salt,
+        password_ciphertext: encryptPassword(password),
+      })
       .eq('id', student.id)
 
     if (error) {

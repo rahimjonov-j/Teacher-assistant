@@ -338,6 +338,7 @@ export function ClassesPage() {
                           className="mt-3"
                           credentials={studentCredentials[student.id] ?? null}
                           fallbackLogin={student.login}
+                          fallbackPassword={student.password}
                         />
                       ) : null}
                     </div>
@@ -522,11 +523,13 @@ function ActiveBucket({ title, count }: { title: string; count: number }) {
 function StudentCredentialsPanel({
   credentials,
   fallbackLogin,
+  fallbackPassword,
   className,
   variant = 'default',
 }: {
   credentials: StudentCredentials | null
   fallbackLogin?: string
+  fallbackPassword?: string | null
   className?: string
   variant?: 'default' | 'success'
 }) {
@@ -536,32 +539,24 @@ function StudentCredentialsPanel({
       : cn('rounded-xl border border-border bg-secondary/40 p-4 text-sm', className)
 
   const login = credentials?.login ?? fallbackLogin ?? '-'
+  const password = credentials?.password ?? fallbackPassword ?? '-'
 
   return (
     <div className={panelClassName}>
-      <div className="font-black">Parollar</div>
-      <div className="mt-2">Login: {login}</div>
-      {credentials ? (
-        <>
-          <div>Parol: {credentials.password}</div>
-          <Button
-            size="sm"
-            variant="outline"
-            className="mt-3"
-            onClick={async () => {
-              await navigator.clipboard.writeText(`${credentials.login} / ${credentials.password}`)
-              toast.success("Login va parol nusxalandi.")
-            }}
-          >
-            <Copy className="h-4 w-4" />
-            Nusxalash
-          </Button>
-        </>
-      ) : (
-        <div className="mt-1 text-muted-foreground">
-          Joriy parol xavfsizlik sabab ochiq saqlanmaydi. Ko'rish uchun Parolni yangilash tugmasini bosing.
-        </div>
-      )}
+      <div>Login: {login}</div>
+      <div className="mt-1">Parol: {password}</div>
+      <Button
+        size="sm"
+        variant="outline"
+        className="mt-3"
+        onClick={async () => {
+          await navigator.clipboard.writeText(`${login} / ${password}`)
+          toast.success("Login va parol nusxalandi.")
+        }}
+      >
+        <Copy className="h-4 w-4" />
+        Nusxalash
+      </Button>
     </div>
   )
 }

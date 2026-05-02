@@ -18,6 +18,7 @@ const envSchema = z.object({
   TELEGRAM_BOT_TOKEN: z.string().optional(),
   TELEGRAM_BOT_USERNAME: z.string().optional(),
   TELEGRAM_WEBHOOK_URL: z.string().url().optional(),
+  STUDENT_PASSWORD_SECRET: z.string().optional(),
   PDF_STORAGE_BUCKET: z.string().default('generated-pdfs'),
   SUPER_ADMIN_EMAILS: z.string().default('javohirrahimjonov546@gmail.com'),
 })

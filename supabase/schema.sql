@@ -352,6 +352,7 @@ create table if not exists public.students (
   login text not null unique,
   password_hash text not null,
   password_salt text not null,
+  password_ciphertext text,
   status public.student_status not null default 'active',
   last_active_at timestamptz,
   completed_assignments_count integer not null default 0 check (completed_assignments_count >= 0),

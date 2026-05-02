@@ -152,6 +152,7 @@ export interface StudentRecord {
   classId: string
   fullName: string
   login: string
+  password?: string | null
   status: StudentStatus
   totalMonthlyScore: number
   allTimeScore: number
