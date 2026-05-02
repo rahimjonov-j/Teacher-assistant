@@ -54,6 +54,7 @@ export function TeacherLayout() {
   const [drawerOpen, setDrawerOpen] = useState(false)
   const { logout } = useAuth()
   const { t } = useI18n()
+  const showBackButton = location.pathname !== '/app/dashboard'
 
   const currentPage = useMemo(
     () => pageMeta.find((item) => matchPath({ path: item.pattern, end: true }, location.pathname)) ?? pageMeta[0],
@@ -175,9 +176,11 @@ export function TeacherLayout() {
         </header>
 
         <main>
-          <div className="mb-4">
-            <BackButton />
-          </div>
+          {showBackButton ? (
+            <div className="mb-4">
+              <BackButton />
+            </div>
+          ) : null}
           <Outlet />
         </main>
       </div>

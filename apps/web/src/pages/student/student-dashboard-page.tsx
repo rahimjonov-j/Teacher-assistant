@@ -3,7 +3,6 @@ import type { StudentDashboardPayload } from '@teacher-assistant/shared'
 import { ArrowRight, Crown, LogOut, Medal, MessageSquareText, Send, Trophy, type LucideIcon } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { BackButton } from '@/components/shared/back-button'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -44,8 +43,6 @@ export function StudentDashboardPage() {
   return (
     <StudentShell>
       <div className="space-y-5 animate-in">
-        <BackButton />
-
         <Card>
           <CardContent className="space-y-4 p-5">
             <div className="flex items-start justify-between gap-4">

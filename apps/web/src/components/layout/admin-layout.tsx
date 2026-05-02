@@ -12,7 +12,7 @@ import {
   X,
   Users,
 } from 'lucide-react'
-import { Link, NavLink, Outlet } from 'react-router-dom'
+import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
 import { BackButton } from '@/components/shared/back-button'
 import { ThemeToggle } from '@/components/shared/theme-toggle'
 import { Button } from '@/components/ui/button'
@@ -142,6 +142,8 @@ function AdminSidebarContent({
 export function AdminLayout() {
   const { logout } = useAuth()
   const [drawerOpen, setDrawerOpen] = useState(false)
+  const location = useLocation()
+  const showBackButton = location.pathname !== '/admin/dashboard'
 
   useEffect(() => lockBodyScroll(drawerOpen), [drawerOpen])
 
@@ -180,9 +182,11 @@ export function AdminLayout() {
 
       <main className="min-h-screen px-4 pb-8 pt-20 lg:pl-[368px] lg:pr-8 lg:pt-8">
         <div className="mx-auto w-full max-w-[1160px]">
-          <div className="mb-4">
-            <BackButton />
-          </div>
+          {showBackButton ? (
+            <div className="mb-4">
+              <BackButton />
+            </div>
+          ) : null}
           <Outlet />
         </div>
       </main>
