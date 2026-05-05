@@ -20,6 +20,7 @@ const envSchema = z.object({
   TELEGRAM_WEBHOOK_URL: z.string().url().optional(),
   STUDENT_PASSWORD_SECRET: z.string().optional(),
   PDF_STORAGE_BUCKET: z.string().default('generated-pdfs'),
+  SPEAKING_AUDIO_STORAGE_BUCKET: z.string().default('speaking-audio'),
   SUPER_ADMIN_EMAILS: z.string().default('javohirrahimjonov546@gmail.com'),
 })
 

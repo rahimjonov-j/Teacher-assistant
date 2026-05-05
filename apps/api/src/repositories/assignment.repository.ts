@@ -8,11 +8,19 @@ import type {
   StudentRecord,
   SubmissionStatus,
 } from '@teacher-assistant/shared'
+import { env } from '../config/env.js'
 import { getSupabaseAdminClient } from '../config/supabase.js'
 import { ApiError } from '../utils/api-error.js'
 import { classRepository, classSchemaMigrationError, isClassSchemaMissing } from './class.repository.js'
 
 const AUTO_GRADED_TYPES = new Set<AssignmentType>(['multiple_choice', 'variant_test', 'mini_game'])
+const AUDIO_MIME_EXTENSIONS: Record<string, string> = {
+  'audio/webm': 'webm',
+  'audio/mp4': 'm4a',
+  'audio/mpeg': 'mp3',
+  'audio/ogg': 'ogg',
+  'audio/wav': 'wav',
+}
 
 function currentMonthStart() {
   const now = new Date()
@@ -704,6 +712,56 @@ export const assignmentRepository = {
     }
   },
 
+  async uploadSpeakingAudio(
+    studentId: string,
+    assignmentId: string,
+    input: { audioBase64: string; mimeType: string },
+  ) {
+    const detail = await this.getStudentAssignment(studentId, assignmentId)
+
+    if (detail.assignment.type !== 'speaking') {
+      throw new ApiError(400, 'Audio upload is only available for speaking assignments.')
+    }
+
+    const mimeType = input.mimeType.split(';')[0]
+    const extension = AUDIO_MIME_EXTENSIONS[mimeType]
+
+    if (!extension) {
+      throw new ApiError(400, 'Unsupported audio format.')
+    }
+
+    const base64 = input.audioBase64.includes(',') ? input.audioBase64.split(',').pop()! : input.audioBase64
+    const audioBuffer = Buffer.from(base64, 'base64')
+
+    if (audioBuffer.length === 0) {
+      throw new ApiError(400, 'Audio recording is empty.')
+    }
+
+    if (audioBuffer.length > 6 * 1024 * 1024) {
+      throw new ApiError(413, 'Audio recording is too large.')
+    }
+
+    const supabase = getSupabaseAdminClient()
+    await ensureSpeakingAudioBucket()
+
+    const storagePath = `${assignmentId}/${studentId}/${Date.now()}.${extension}`
+    const { error } = await supabase.storage.from(env.SPEAKING_AUDIO_STORAGE_BUCKET).upload(storagePath, audioBuffer, {
+      contentType: mimeType,
+      upsert: false,
+    })
+
+    if (error) {
+      throw new ApiError(500, `Unable to upload speaking audio: ${error.message}`)
+    }
+
+    const { data } = supabase.storage.from(env.SPEAKING_AUDIO_STORAGE_BUCKET).getPublicUrl(storagePath)
+
+    return {
+      audioUrl: data.publicUrl,
+      storagePath,
+    }
+  },
+
   async getAttempt(studentId: string, assignmentId: string, attemptId: string) {
     const supabase = getSupabaseAdminClient()
     const { data, error } = await supabase
@@ -847,6 +905,27 @@ export const assignmentRepository = {
       throw new ApiError(500, 'Unable to load pending submissions.')
     }
 
+    const submissionIds = (data ?? []).map((row: any) => row.id as string)
+    const speakingBySubmissionId = new Map<string, { audioUrl: string | null; telegramFileId: string | null }>()
+
+    if (submissionIds.length > 0) {
+      const { data: speakingRows, error: speakingError } = await supabase
+        .from('speaking_submissions')
+        .select('submission_id, audio_url, telegram_file_id')
+        .in('submission_id', submissionIds)
+
+      if (speakingError) {
+        throw new ApiError(500, 'Unable to load speaking submissions.')
+      }
+
+      for (const row of speakingRows ?? []) {
+        speakingBySubmissionId.set(row.submission_id as string, {
+          audioUrl: (row.audio_url as string | null) ?? null,
+          telegramFileId: (row.telegram_file_id as string | null) ?? null,
+        })
+      }
+    }
+
     return (data ?? []).map((row: any) => ({
       id: row.id as string,
       assignmentId: row.assignment_id as string,
@@ -857,6 +936,8 @@ export const assignmentRepository = {
       submittedAt: row.submitted_at as string,
       scoreAwarded: Number(row.score_awarded ?? 0),
       maxScore: Number(row.max_score ?? 0),
+      audioUrl: speakingBySubmissionId.get(row.id as string)?.audioUrl ?? null,
+      telegramFileId: speakingBySubmissionId.get(row.id as string)?.telegramFileId ?? null,
     }))
   },
 
@@ -873,6 +954,37 @@ export const assignmentRepository = {
   async ensureTeacherOwnsAssignment(teacherId: string, assignmentId: string) {
     return ensureTeacherOwnsAssignment(teacherId, assignmentId)
   },
+}
+
+async function ensureSpeakingAudioBucket() {
+  const supabase = getSupabaseAdminClient()
+  const { data, error } = await supabase.storage.getBucket(env.SPEAKING_AUDIO_STORAGE_BUCKET)
+
+  if (error || !data) {
+    const { error: createError } = await supabase.storage.createBucket(env.SPEAKING_AUDIO_STORAGE_BUCKET, {
+      public: true,
+      fileSizeLimit: '6MB',
+      allowedMimeTypes: Object.keys(AUDIO_MIME_EXTENSIONS),
+    })
+
+    if (createError) {
+      throw new ApiError(500, `Unable to prepare speaking audio storage: ${createError.message}`)
+    }
+
+    return
+  }
+
+  if (!data.public) {
+    const { error: updateError } = await supabase.storage.updateBucket(env.SPEAKING_AUDIO_STORAGE_BUCKET, {
+      public: true,
+      fileSizeLimit: data.file_size_limit ?? '6MB',
+      allowedMimeTypes: Object.keys(AUDIO_MIME_EXTENSIONS),
+    })
+
+    if (updateError) {
+      throw new ApiError(500, `Unable to publish speaking audio storage: ${updateError.message}`)
+    }
+  }
 }
 
 function shuffle<T>(items: T[]) {

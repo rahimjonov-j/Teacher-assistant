@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import type { ClassDetailPayload, ClassesPayload, AssignmentType, StudentCredentials, StudentRecord } from '@teacher-assistant/shared'
-import { Award, CalendarDays, CheckCircle2, Clock3, Copy, Crown, Eye, KeyRound, Plus, RefreshCw, Send, ShieldAlert, Sparkles, Users, type LucideIcon } from 'lucide-react'
+import { Award, CalendarDays, CheckCircle2, Clock3, Copy, Crown, Eye, KeyRound, Mic2, Plus, RefreshCw, Send, ShieldAlert, Sparkles, Users, type LucideIcon } from 'lucide-react'
 import { toast } from 'sonner'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -77,6 +77,8 @@ export function ClassesPage() {
           studentName: string
           submittedAt: string
           maxScore: number
+          audioUrl?: string | null
+          telegramFileId?: string | null
         }>
       }>('/classes/submissions/pending'),
   })
@@ -688,6 +690,8 @@ function ReviewRow({
     studentName: string
     submittedAt: string
     maxScore: number
+    audioUrl?: string | null
+    telegramFileId?: string | null
   }
 }) {
   const queryClient = useQueryClient()
@@ -717,6 +721,21 @@ function ReviewRow({
         </div>
         <Badge variant="outline">{new Date(submission.submittedAt).toLocaleDateString()}</Badge>
       </div>
+      {submission.assignmentType === 'speaking' ? (
+        <div className="mt-4 rounded-2xl border border-accent/20 bg-accent/10 p-3">
+          <div className="mb-2 flex items-center gap-2 text-sm font-black">
+            <Mic2 className="h-4 w-4" />
+            Student audio javobi
+          </div>
+          {submission.audioUrl ? (
+            <audio className="w-full" src={submission.audioUrl} controls />
+          ) : (
+            <div className="text-sm text-muted-foreground">
+              Audio web playerda topilmadi. {submission.telegramFileId ? 'Bu javob Telegram voice orqali yuborilgan.' : 'Student audio yubormagan.'}
+            </div>
+          )}
+        </div>
+      ) : null}
       <div className="mt-4 grid gap-4">
         <div className="grid gap-2 sm:grid-cols-[120px_1fr]">
           <label className="block">

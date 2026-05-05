@@ -20,6 +20,11 @@ const submitSchema = z.object({
   gameScore: z.coerce.number().min(0).max(10000).optional().nullable(),
 })
 
+const audioUploadSchema = z.object({
+  audioBase64: z.string().min(1),
+  mimeType: z.string().min(3).max(120),
+})
+
 export const studentController = {
   login: asyncHandler(async (request: Request, response: Response) => {
     const payload = loginSchema.parse(request.body)
@@ -52,6 +57,17 @@ export const studentController = {
       String(request.params.id),
     )
     response.status(201).json({ attempt })
+  }),
+
+  uploadAudio: asyncHandler(async (request: Request, response: Response) => {
+    const authenticatedRequest = request as StudentAuthenticatedRequest
+    const payload = audioUploadSchema.parse(request.body)
+    const audio = await assignmentRepository.uploadSpeakingAudio(
+      authenticatedRequest.studentAuth.studentId,
+      String(request.params.id),
+      payload,
+    )
+    response.status(201).json(audio)
   }),
 
   submit: asyncHandler(async (request: Request, response: Response) => {
