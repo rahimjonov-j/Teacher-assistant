@@ -24,6 +24,12 @@ const assignmentTypes: Array<{ value: AssignmentType; label: string }> = [
   { value: 'mini_game', label: 'Mini game' },
 ]
 
+const feedbackTemplates = [
+  "Yaxshi harakat qilding. Fikring aniq, faqat ayrim joylarda grammatikani yana mustahkamlash kerak.",
+  "Javobing yaxshi tuzilgan. Keyingi safar misollarni koproq ishlatsang, natija yanada kuchli boladi.",
+  "Progress bor. Xatolarni tekshirib, shu mavzuni yana bir marta takrorlasang, keyingi ish ancha yaxshilanadi.",
+]
+
 export function ClassesPage() {
   const queryClient = useQueryClient()
   const [selectedClassId, setSelectedClassId] = useState<string | null>(null)
@@ -464,6 +470,11 @@ export function ClassesPage() {
           <Card>
             <CardContent className="p-5">
               <SectionTitle icon={ShieldAlert} title="Pending manual review" hint="Writing, speaking and open answers" />
+              <div className="mt-4 rounded-2xl border border-primary/10 bg-primary/5 p-4 text-sm text-muted-foreground">
+                Shu yerdan oquvchiga feedback yoziladi. Tekshirilgan ishga ball va izoh yuborilgandan keyin u student dashboardidagi
+                <span className="font-bold text-foreground"> Teacher feedback </span>
+                bolimida korinadi.
+              </div>
               <div className="mt-4 space-y-3">
                 {(pendingQuery.data?.submissions ?? []).slice(0, 6).map((submission) => (
                   <ReviewRow key={submission.id} submission={submission} />
@@ -696,7 +707,7 @@ function ReviewRow({
   })
 
   return (
-    <div className="rounded-xl border border-border p-4">
+    <div className="rounded-2xl border border-border bg-card/80 p-4 shadow-sm">
       <div className="flex items-start justify-between gap-3">
         <div>
           <div className="font-black">{submission.studentName}</div>
@@ -706,12 +717,34 @@ function ReviewRow({
         </div>
         <Badge variant="outline">{new Date(submission.submittedAt).toLocaleDateString()}</Badge>
       </div>
-      <div className="mt-3 grid gap-2 sm:grid-cols-[90px_1fr_auto]">
-        <Input value={score} onChange={(event) => setScore(event.target.value)} />
-        <Input value={feedback} onChange={(event) => setFeedback(event.target.value)} placeholder="Feedback" />
-        <Button onClick={() => mutation.mutate()} disabled={mutation.isPending}>
+      <div className="mt-4 grid gap-4">
+        <div className="grid gap-2 sm:grid-cols-[120px_1fr]">
+          <label className="block">
+            <div className="mb-2 text-xs font-semibold uppercase text-muted-foreground">Ball</div>
+            <Input value={score} onChange={(event) => setScore(event.target.value)} inputMode="decimal" />
+          </label>
+          <label className="block">
+            <div className="mb-2 text-xs font-semibold uppercase text-muted-foreground">Oquvchiga feedback</div>
+            <Textarea
+              value={feedback}
+              onChange={(event) => setFeedback(event.target.value)}
+              placeholder="Masalan: Yaxshi ish! Fikring aniq. Keyingi safar grammar va misollarga koproq e'tibor ber."
+              className="min-h-[120px]"
+            />
+          </label>
+        </div>
+
+        <div className="flex flex-wrap gap-2">
+          {feedbackTemplates.map((template) => (
+            <Button key={template} type="button" variant="outline" size="sm" onClick={() => setFeedback(template)}>
+              Namuna
+            </Button>
+          ))}
+        </div>
+
+        <Button className="w-full sm:w-fit" onClick={() => mutation.mutate()} disabled={mutation.isPending}>
           <RefreshCw className="h-4 w-4" />
-          Grade
+          Feedback yuborish
         </Button>
       </div>
     </div>
