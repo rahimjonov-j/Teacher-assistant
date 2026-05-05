@@ -11,12 +11,13 @@ import { Label } from '@/components/ui/label'
 import { Spinner } from '@/components/ui/spinner'
 import { useAuth } from '@/hooks/use-auth'
 import { useI18n } from '@/hooks/use-i18n'
+import { GMAIL_DOMAIN, normalizeGmailUsername, toGmailAddress } from '@/lib/gmail'
 import { isSupabaseConfigured, preloadSupabaseClient } from '@/lib/supabase'
 import { getUzToastError } from '@/lib/toast'
 
 const schema = z.object({
   fullName: z.string().min(2, "Ism kamida 2 ta belgidan iborat bo'lishi kerak"),
-  email: z.string().email("Noto'g'ri email format"),
+  email: z.string().min(1, 'Gmail nomini kiriting.').regex(/^[a-z0-9._%+-]+$/i, "Gmail nomi noto'g'ri."),
   password: z.string().min(6, "Parol kamida 6 ta belgidan iborat bo'lishi kerak"),
   schoolName: z.string().min(2, "Maktab nomi kamida 2 ta belgidan iborat bo'lishi kerak"),
 })
@@ -35,7 +36,10 @@ export function RegisterPage() {
 
   const onSubmit = form.handleSubmit(async (values) => {
     try {
-      const result = await register(values)
+      const result = await register({
+        ...values,
+        email: toGmailAddress(values.email),
+      })
 
       if (result.emailConfirmationRequired) {
         toast.success('Tasdiqlash havolasi emailingizga yuborildi.')
@@ -75,8 +79,26 @@ export function RegisterPage() {
             <Input id="schoolName" placeholder="21-maktab" {...form.register('schoolName')} />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
-            <Input id="email" type="email" placeholder="teacher@school.uz" {...form.register('email')} />
+            <Label htmlFor="email">Gmail</Label>
+            <div className="flex overflow-hidden rounded-2xl border border-input bg-card/80 shadow-sm focus-within:border-primary focus-within:ring-4 focus-within:ring-primary/10">
+              <Input
+                id="email"
+                type="text"
+                inputMode="email"
+                autoComplete="username"
+                placeholder="username"
+                className="h-12 rounded-none border-0 bg-transparent shadow-none focus-visible:ring-0"
+                {...form.register('email', {
+                  onChange: (event) => {
+                    event.target.value = normalizeGmailUsername(event.target.value)
+                  },
+                })}
+              />
+              <div className="flex shrink-0 items-center border-l border-border bg-secondary px-3 text-sm font-bold text-secondary-foreground">
+                {GMAIL_DOMAIN}
+              </div>
+            </div>
+            {form.formState.errors.email ? <p className="text-xs text-muted-foreground">{form.formState.errors.email.message}</p> : null}
           </div>
           <div className="space-y-2">
             <Label htmlFor="password">{t('common.password')}</Label>
