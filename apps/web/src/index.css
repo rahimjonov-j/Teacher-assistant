@@ -92,7 +92,7 @@
   }
 
   .app-shell {
-    @apply mx-auto min-h-screen w-full max-w-md px-4 pb-24 pt-3 lg:max-w-6xl lg:px-6 lg:pb-10;
+    @apply mx-auto min-h-screen w-full max-w-md px-4 pb-24 pt-24 lg:max-w-6xl lg:px-6 lg:pb-10;
   }
 
   .app-shell > main {
@@ -104,7 +104,7 @@
   }
 
   .app-topbar {
-    @apply sticky top-0 z-40 -mx-4 mb-5 flex items-center justify-between border-b border-white/60 bg-background/80 px-4 py-3 backdrop-blur-xl lg:-mx-6 lg:px-6;
+    @apply fixed left-0 right-0 top-0 z-40 mx-auto flex w-full max-w-md items-center justify-between border-b border-white/60 bg-background/90 px-4 py-3 shadow-[0_12px_34px_-30px_rgba(30,41,88,0.45)] backdrop-blur-xl lg:max-w-6xl lg:px-6;
   }
 
   .app-bottom-nav {

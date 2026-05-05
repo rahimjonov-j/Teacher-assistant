@@ -157,7 +157,7 @@ export function StudentDashboardPage() {
 function StudentShell({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen bg-background">
-      <div className="mx-auto min-h-screen w-full max-w-md px-4 pb-24 pt-0 lg:max-w-4xl lg:pb-10">{children}</div>
+      <div className="mx-auto min-h-screen w-full max-w-md px-4 pb-24 pt-24 lg:max-w-4xl lg:pb-10">{children}</div>
       <nav className="app-bottom-nav">
         <Link to="/student/dashboard" className="app-nav-item app-nav-item-active">
           <Home className="h-5 w-5" />
