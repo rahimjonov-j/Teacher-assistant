@@ -264,6 +264,27 @@ function selectedAnswersEqual(left: string[], right: string[]) {
   return sortedLeft.every((value, index) => value === sortedRight[index])
 }
 
+function toSpeakingAnswers(
+  answers: Record<string, string[] | string> | null,
+  questions: Array<{ id: string; questionText: string }>,
+) {
+  if (!answers) {
+    return []
+  }
+
+  return questions
+    .map((question) => {
+      const value = answers[question.id]
+      const urls = Array.isArray(value) ? value : value ? [value] : []
+      return {
+        questionId: question.id,
+        questionText: question.questionText,
+        audioUrl: urls.find((url) => /^https?:\/\//i.test(url)) ?? null,
+      }
+    })
+    .filter((item) => item.audioUrl)
+}
+
 export const assignmentRepository = {
   async createAssignment(
     teacherId: string,
@@ -906,7 +927,9 @@ export const assignmentRepository = {
     }
 
     const submissionIds = (data ?? []).map((row: any) => row.id as string)
+    const assignmentIds = Array.from(new Set((data ?? []).map((row: any) => row.assignment_id as string)))
     const speakingBySubmissionId = new Map<string, { audioUrl: string | null; telegramFileId: string | null }>()
+    const questionsByAssignmentId = new Map<string, Array<{ id: string; questionText: string }>>()
 
     if (submissionIds.length > 0) {
       const { data: speakingRows, error: speakingError } = await supabase
@@ -926,6 +949,27 @@ export const assignmentRepository = {
       }
     }
 
+    if (assignmentIds.length > 0) {
+      const { data: questionRows, error: questionError } = await supabase
+        .from('assignment_questions')
+        .select('id, assignment_id, question_text, position')
+        .in('assignment_id', assignmentIds)
+        .order('position', { ascending: true })
+
+      if (questionError) {
+        throw new ApiError(500, 'Unable to load assignment questions.')
+      }
+
+      for (const row of questionRows ?? []) {
+        const assignmentQuestions = questionsByAssignmentId.get(row.assignment_id as string) ?? []
+        assignmentQuestions.push({
+          id: row.id as string,
+          questionText: row.question_text as string,
+        })
+        questionsByAssignmentId.set(row.assignment_id as string, assignmentQuestions)
+      }
+    }
+
     return (data ?? []).map((row: any) => ({
       id: row.id as string,
       assignmentId: row.assignment_id as string,
@@ -938,6 +982,10 @@ export const assignmentRepository = {
       maxScore: Number(row.max_score ?? 0),
       audioUrl: speakingBySubmissionId.get(row.id as string)?.audioUrl ?? null,
       telegramFileId: speakingBySubmissionId.get(row.id as string)?.telegramFileId ?? null,
+      speakingAnswers: toSpeakingAnswers(
+        row.answers as Record<string, string[] | string> | null,
+        questionsByAssignmentId.get(row.assignment_id as string) ?? [],
+      ),
     }))
   },
 

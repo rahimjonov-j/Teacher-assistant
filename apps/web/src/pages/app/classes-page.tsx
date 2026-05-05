@@ -80,6 +80,7 @@ export function ClassesPage() {
           maxScore: number
           audioUrl?: string | null
           telegramFileId?: string | null
+          speakingAnswers?: Array<{ questionId: string; questionText: string; audioUrl: string | null }>
         }>
       }>('/classes/submissions/pending'),
   })
@@ -722,6 +723,7 @@ function ReviewRow({
     maxScore: number
     audioUrl?: string | null
     telegramFileId?: string | null
+    speakingAnswers?: Array<{ questionId: string; questionText: string; audioUrl: string | null }>
   }
 }) {
   const queryClient = useQueryClient()
@@ -757,7 +759,18 @@ function ReviewRow({
             <Mic2 className="h-4 w-4" />
             Student audio javobi
           </div>
-          {submission.audioUrl ? (
+          {submission.speakingAnswers?.length ? (
+            <div className="space-y-3">
+              {submission.speakingAnswers.map((answer, index) => (
+                <div key={answer.questionId} className="rounded-2xl border border-border bg-card/80 p-3">
+                  <div className="mb-2 text-sm font-black">
+                    {index + 1}. {answer.questionText}
+                  </div>
+                  {answer.audioUrl ? <audio className="w-full" src={answer.audioUrl} controls /> : null}
+                </div>
+              ))}
+            </div>
+          ) : submission.audioUrl ? (
             <audio className="w-full" src={submission.audioUrl} controls />
           ) : (
             <div className="text-sm text-muted-foreground">

@@ -19,14 +19,15 @@ export function StudentAssignmentPage() {
   const [attemptId, setAttemptId] = useState<string | null>(null)
   const [answers, setAnswers] = useState<Record<string, string[]>>({})
   const [writingText, setWritingText] = useState('')
-  const [audioBlob, setAudioBlob] = useState<Blob | null>(null)
-  const [audioPreviewUrl, setAudioPreviewUrl] = useState<string | null>(null)
-  const [isRecording, setIsRecording] = useState(false)
+  const [audioBlobs, setAudioBlobs] = useState<Record<string, Blob>>({})
+  const [audioPreviewUrls, setAudioPreviewUrls] = useState<Record<string, string>>({})
+  const [activeRecordingQuestionId, setActiveRecordingQuestionId] = useState<string | null>(null)
   const [recordingSeconds, setRecordingSeconds] = useState(0)
   const recorderRef = useRef<MediaRecorder | null>(null)
   const streamRef = useRef<MediaStream | null>(null)
   const chunksRef = useRef<BlobPart[]>([])
   const timerRef = useRef<number | null>(null)
+  const audioPreviewUrlsRef = useRef<Record<string, string>>({})
 
   const query = useQuery({
     queryKey: ['student-assignment', id],
@@ -53,28 +54,38 @@ export function StudentAssignmentPage() {
   const submitMutation = useMutation({
     mutationFn: async () => {
       let uploadedAudioUrl: string | null = null
+      let submitAnswers = answers
 
       if (query.data?.assignment.type === 'speaking') {
-        if (!audioBlob) {
-          throw new Error('Avval audio yozib oling.')
+        const speakingAnswers: Record<string, string[]> = {}
+
+        for (const question of query.data.questions) {
+          const audioBlob = audioBlobs[question.id]
+          if (!audioBlob) {
+            throw new Error('Barcha savollarga audio javob yozib oling.')
+          }
+
+          const audioBase64 = await blobToDataUrl(audioBlob)
+          const audio = await apiRequest<{ audioUrl: string; storagePath: string }>(`/student/assignments/${id}/audio`, {
+            method: 'POST',
+            body: JSON.stringify({
+              audioBase64,
+              mimeType: audioBlob.type || 'audio/webm',
+            }),
+          })
+
+          speakingAnswers[question.id] = [audio.audioUrl]
+          uploadedAudioUrl ??= audio.audioUrl
         }
 
-        const audioBase64 = await blobToDataUrl(audioBlob)
-        const audio = await apiRequest<{ audioUrl: string; storagePath: string }>(`/student/assignments/${id}/audio`, {
-          method: 'POST',
-          body: JSON.stringify({
-            audioBase64,
-            mimeType: audioBlob.type || 'audio/webm',
-          }),
-        })
-        uploadedAudioUrl = audio.audioUrl
+        submitAnswers = speakingAnswers
       }
 
       return apiRequest<{ status: string; scoreAwarded: number; maxScore: number }>(`/student/assignments/${id}/submit`, {
         method: 'POST',
         body: JSON.stringify({
           attemptId,
-          answers,
+          answers: submitAnswers,
           writingText: writingText || null,
           audioUrl: uploadedAudioUrl,
         }),
@@ -108,22 +119,26 @@ export function StudentAssignmentPage() {
   }
 
   useEffect(() => {
+    audioPreviewUrlsRef.current = audioPreviewUrls
+  }, [audioPreviewUrls])
+
+  useEffect(() => {
     return () => {
       stopRecordingTimer()
       streamRef.current?.getTracks().forEach((track) => track.stop())
-      if (audioPreviewUrl) {
-        URL.revokeObjectURL(audioPreviewUrl)
-      }
+      Object.values(audioPreviewUrlsRef.current).forEach((url) => URL.revokeObjectURL(url))
     }
-  }, [audioPreviewUrl])
+  }, [])
 
   if (!data) {
     return <Shell><CardLoader /></Shell>
   }
 
   const isSpeaking = data.assignment.type === 'speaking'
+  const answeredSpeakingCount = isSpeaking ? data.questions.filter((question) => audioBlobs[question.id]).length : 0
+  const allSpeakingAnswered = !isSpeaking || answeredSpeakingCount === data.questions.length
 
-  async function startRecording() {
+  async function startRecording(questionId: string) {
     if (!navigator.mediaDevices?.getUserMedia || typeof MediaRecorder === 'undefined') {
       toast.error('Bu brauzer audio yozishni qollab-quvvatlamaydi.')
       return
@@ -146,30 +161,36 @@ export function StudentAssignmentPage() {
 
       recorder.onstop = () => {
         const blob = new Blob(chunksRef.current, { type: recorder.mimeType || 'audio/webm' })
-        setAudioBlob(blob)
-        setAudioPreviewUrl((currentUrl) => {
-          if (currentUrl) {
-            URL.revokeObjectURL(currentUrl)
+        setAudioBlobs((current) => ({ ...current, [questionId]: blob }))
+        setAudioPreviewUrls((current) => {
+          if (current[questionId]) {
+            URL.revokeObjectURL(current[questionId])
           }
-          return URL.createObjectURL(blob)
+          return { ...current, [questionId]: URL.createObjectURL(blob) }
         })
         stream.getTracks().forEach((track) => track.stop())
         streamRef.current = null
         recorderRef.current = null
-        setIsRecording(false)
+        setActiveRecordingQuestionId(null)
         stopRecordingTimer()
       }
 
-      setAudioBlob(null)
-      setAudioPreviewUrl((currentUrl) => {
-        if (currentUrl) {
-          URL.revokeObjectURL(currentUrl)
+      setAudioBlobs((current) => {
+        const next = { ...current }
+        delete next[questionId]
+        return next
+      })
+      setAudioPreviewUrls((current) => {
+        if (current[questionId]) {
+          URL.revokeObjectURL(current[questionId])
         }
-        return null
+        const next = { ...current }
+        delete next[questionId]
+        return next
       })
       setRecordingSeconds(0)
       recorder.start()
-      setIsRecording(true)
+      setActiveRecordingQuestionId(questionId)
       timerRef.current = window.setInterval(() => setRecordingSeconds((seconds) => seconds + 1), 1000)
     } catch {
       toast.error('Mikrofonga ruxsat berilmadi.')
@@ -182,13 +203,19 @@ export function StudentAssignmentPage() {
     }
   }
 
-  function removeRecording() {
-    setAudioBlob(null)
-    setAudioPreviewUrl((currentUrl) => {
-      if (currentUrl) {
-        URL.revokeObjectURL(currentUrl)
+  function removeRecording(questionId: string) {
+    setAudioBlobs((current) => {
+      const next = { ...current }
+      delete next[questionId]
+      return next
+    })
+    setAudioPreviewUrls((current) => {
+      if (current[questionId]) {
+        URL.revokeObjectURL(current[questionId])
       }
-      return null
+      const next = { ...current }
+      delete next[questionId]
+      return next
     })
     setRecordingSeconds(0)
   }
@@ -223,17 +250,52 @@ export function StudentAssignmentPage() {
           <CardContent className="space-y-5 p-5">
             {data.questions.map((question, index) => {
               if (isSpeaking) {
+                const isQuestionRecording = activeRecordingQuestionId === question.id
+                const isAnotherQuestionRecording = Boolean(activeRecordingQuestionId && activeRecordingQuestionId !== question.id)
+                const previewUrl = audioPreviewUrls[question.id]
+
                 return (
                   <div key={question.id} className="overflow-hidden rounded-3xl border border-accent/20 bg-gradient-to-br from-accent/10 via-card to-primary/5 p-4 shadow-sm">
                     <div className="flex items-start gap-3">
                       <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-accent text-accent-foreground shadow-sm">
-                        <Mic2 className="h-5 w-5" />
+                        {previewUrl ? <CheckCircle2 className="h-5 w-5" /> : <Mic2 className="h-5 w-5" />}
                       </div>
                       <div className="min-w-0">
                         <div className="text-xs font-semibold uppercase text-muted-foreground">Speaking prompt {index + 1}</div>
                         <div className="mt-1 font-black leading-6">{question.questionText}</div>
-                        <div className="mt-2 text-sm text-muted-foreground">Javobni variant tanlab emas, audio shaklida topshiring.</div>
+                        <div className="mt-2 text-sm text-muted-foreground">
+                          Shu savol uchun alohida audio yozing. Audio shu card ostida saqlanib turadi.
+                        </div>
                       </div>
+                    </div>
+
+                    <div className="mt-4 grid gap-3">
+                      <Button
+                        type="button"
+                        className={cn('h-12 rounded-2xl', isQuestionRecording && 'bg-destructive text-destructive-foreground hover:bg-destructive/90')}
+                        onClick={() => (isQuestionRecording ? stopRecording() : startRecording(question.id))}
+                        disabled={submitMutation.isPending || isAnotherQuestionRecording}
+                      >
+                        {isQuestionRecording ? <Square className="h-5 w-5" /> : <Mic2 className="h-5 w-5" />}
+                        {isQuestionRecording ? `Yozishni tugatish ${formatRecordingTime(recordingSeconds)}` : previewUrl ? 'Qayta yozish' : 'Javob yozish'}
+                      </Button>
+
+                      {previewUrl ? (
+                        <div className="rounded-2xl border border-border bg-card/80 p-3">
+                          <audio className="w-full" src={previewUrl} controls />
+                          <div className="mt-3 flex items-center justify-between gap-3">
+                            <div className="text-sm font-semibold text-muted-foreground">Bu savol uchun audio tayyor.</div>
+                            <Button type="button" variant="outline" size="sm" onClick={() => removeRecording(question.id)} disabled={submitMutation.isPending || Boolean(activeRecordingQuestionId)}>
+                              <Trash2 className="h-4 w-4" />
+                              Ochirish
+                            </Button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="rounded-2xl border border-dashed border-accent/30 bg-background/60 p-4 text-sm text-muted-foreground">
+                          Hali audio yozilmagan.
+                        </div>
+                      )}
                     </div>
                   </div>
                 )
@@ -305,49 +367,21 @@ export function StudentAssignmentPage() {
               <Textarea value={writingText} onChange={(event) => setWritingText(event.target.value)} placeholder="Matningizni shu yerga yozing..." />
             ) : null}
 
-            {data.assignment.type === 'speaking' ? (
+            {isSpeaking ? (
               <div className="rounded-3xl border border-primary/15 bg-primary/5 p-4">
-                <div className="mb-3 flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-primary text-primary-foreground">
-                    <Mic2 className="h-5 w-5" />
-                  </div>
+                <div className="flex items-center justify-between gap-3">
                   <div>
-                    <div className="font-black">Audio javob</div>
-                    <div className="text-sm text-muted-foreground">Speaking topshirigi audio shaklida yuboriladi.</div>
+                    <div className="font-black">Speaking progress</div>
+                    <div className="text-sm text-muted-foreground">
+                      {answeredSpeakingCount}/{data.questions.length} ta savolga audio javob yozildi.
+                    </div>
                   </div>
-                </div>
-                <div className="grid gap-3">
-                  <Button
-                    type="button"
-                    className={cn('h-14 rounded-2xl text-base', isRecording && 'bg-destructive text-destructive-foreground hover:bg-destructive/90')}
-                    onClick={isRecording ? stopRecording : startRecording}
-                    disabled={submitMutation.isPending}
-                  >
-                    {isRecording ? <Square className="h-5 w-5" /> : <Mic2 className="h-5 w-5" />}
-                    {isRecording ? `Yozishni tugatish ${formatRecordingTime(recordingSeconds)}` : 'Mic bosib audio yozish'}
-                  </Button>
-
-                  {audioPreviewUrl ? (
-                    <div className="rounded-2xl border border-border bg-card/80 p-3">
-                      <audio className="w-full" src={audioPreviewUrl} controls />
-                      <div className="mt-3 flex items-center justify-between gap-3">
-                        <div className="text-sm font-semibold text-muted-foreground">Audio tayyor. Xohlasangiz qayta yozishingiz mumkin.</div>
-                        <Button type="button" variant="outline" size="sm" onClick={removeRecording} disabled={submitMutation.isPending}>
-                          <Trash2 className="h-4 w-4" />
-                          Ochirish
-                        </Button>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="rounded-2xl border border-dashed border-primary/20 bg-background/60 p-4 text-sm text-muted-foreground">
-                      Student javobni shu yerda yozib oladi. Link kiritish shart emas.
-                    </div>
-                  )}
+                  <BadgeLikeDone completed={allSpeakingAnswered} />
                 </div>
               </div>
             ) : null}
 
-            <Button className="w-full rounded-2xl" onClick={() => submitMutation.mutate()} disabled={submitMutation.isPending || (!canAnswer && !attemptId) || (isSpeaking && (!audioBlob || isRecording))}>
+            <Button className="w-full rounded-2xl" onClick={() => submitMutation.mutate()} disabled={submitMutation.isPending || (!canAnswer && !attemptId) || (isSpeaking && (!allSpeakingAnswered || Boolean(activeRecordingQuestionId)))}>
               <Send className="h-4 w-4" />
               Javobni yuborish
             </Button>
@@ -360,6 +394,14 @@ export function StudentAssignmentPage() {
 
 function Shell({ children }: { children: ReactNode }) {
   return <div className="mx-auto min-h-screen w-full max-w-md bg-background px-4 py-5 lg:max-w-3xl">{children}</div>
+}
+
+function BadgeLikeDone({ completed }: { completed: boolean }) {
+  return (
+    <div className={cn('shrink-0 rounded-full px-3 py-1 text-xs font-black', completed ? 'bg-success/15 text-success' : 'bg-secondary text-muted-foreground')}>
+      {completed ? 'Tayyor' : 'Davom eting'}
+    </div>
+  )
 }
 
 function getSupportedAudioMimeType() {
