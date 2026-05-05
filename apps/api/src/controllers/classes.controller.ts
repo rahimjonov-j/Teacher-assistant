@@ -51,6 +51,7 @@ const assignmentSchema = z.object({
 const aiAssignmentSchema = z.object({
   classId: z.string().uuid(),
   prompt: z.string().min(5).max(4000),
+  type: z.enum(['multiple_choice', 'speaking']).default('multiple_choice'),
   title: z.string().min(2).max(180).optional().nullable(),
   pointsPerCorrect: z.coerce.number().min(0).max(1000).default(1),
   deadlineAt: z.string().datetime().optional().nullable(),
@@ -132,6 +133,36 @@ export const classesController = {
     const authenticatedRequest = request as AuthenticatedRequest
     const payload = aiAssignmentSchema.parse(request.body)
     const classRecord = await classRepository.getClassForTeacher(authenticatedRequest.auth.userId, payload.classId)
+
+    if (payload.type === 'speaking') {
+      const speaking = await assignmentAiService.generateSpeakingForClass({
+        teacherId: authenticatedRequest.auth.userId,
+        prompt: payload.prompt,
+        className: classRecord.name,
+        groupName: classRecord.groupName,
+        gradeLevel: classRecord.gradeLevel,
+      })
+      const assignment = await assignmentRepository.createAssignment(authenticatedRequest.auth.userId, {
+        classId: payload.classId,
+        title: payload.title?.trim() || speaking.title,
+        description: speaking.description,
+        type: 'speaking',
+        pointsPerCorrect: payload.pointsPerCorrect,
+        deadlineAt: payload.deadlineAt,
+        timeLimitMinutes: payload.timeLimitMinutes,
+        maxAttempts: payload.maxAttempts,
+        randomizeQuestions: false,
+        randomizeOptions: false,
+        questions: speaking.prompts.map((prompt) => ({
+          questionText: prompt,
+          options: [],
+        })),
+      })
+
+      response.status(201).json({ assignment, generated: { title: speaking.title, questionCount: speaking.prompts.length, type: 'speaking' } })
+      return
+    }
+
     const quiz = await assignmentAiService.generateQuizForClass({
       teacherId: authenticatedRequest.auth.userId,
       prompt: payload.prompt,
@@ -156,7 +187,7 @@ export const classesController = {
       })),
     })
 
-    response.status(201).json({ assignment, generated: { title: quiz.title, questionCount: quiz.questions.length } })
+    response.status(201).json({ assignment, generated: { title: quiz.title, questionCount: quiz.questions.length, type: 'multiple_choice' } })
   }),
 
   pendingSubmissions: asyncHandler(async (request: Request, response: Response) => {

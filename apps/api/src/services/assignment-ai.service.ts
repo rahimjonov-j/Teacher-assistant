@@ -52,6 +52,55 @@ export const assignmentAiService = {
 
     return generation.quiz
   },
+
+  async generateSpeakingForClass(input: {
+    teacherId: string
+    prompt: string
+    className?: string | null
+    groupName?: string | null
+    gradeLevel?: string | null
+  }) {
+    const generation = await openAiService.generateSpeakingAssignment({
+      prompt: input.prompt,
+      className: input.className,
+      groupName: input.groupName,
+      gradeLevel: input.gradeLevel,
+    })
+    const updatedSubscription = await subscriptionsRepository.consumeCredits(input.teacherId, 'speaking_questions')
+    const outputMarkdown = toSpeakingMarkdown(generation.speaking)
+
+    const content = await contentRepository.create({
+      userId: input.teacherId,
+      title: `Speaking - ${generation.speaking.title}`,
+      featureKey: 'speaking_questions',
+      prompt: input.prompt,
+      outputMarkdown,
+      level: input.gradeLevel ?? input.groupName ?? null,
+      additionalInstructions: 'Generated for speaking assignment delivery.',
+      modelName: generation.model,
+      creditsConsumed: updatedSubscription.creditCost,
+      source: 'web',
+    })
+
+    await usageRepository.create({
+      userId: input.teacherId,
+      featureKey: 'speaking_questions',
+      creditsConsumed: updatedSubscription.creditCost,
+      modelName: generation.model,
+      source: 'web',
+      generatedContentId: content.id,
+      metadata: {
+        title: generation.speaking.title,
+        className: input.className,
+        groupName: input.groupName,
+        inputTokens: generation.usage.inputTokens,
+        outputTokens: generation.usage.outputTokens,
+        totalTokens: generation.usage.totalTokens,
+      },
+    })
+
+    return generation.speaking
+  },
 }
 
 function toMarkdown(quiz: {
@@ -84,6 +133,25 @@ function toMarkdown(quiz: {
       .filter(Boolean)
       .join(', ')
     lines.push(`${questionIndex + 1}. ${letters}`)
+  })
+
+  return lines.join('\n')
+}
+
+function toSpeakingMarkdown(speaking: {
+  title: string
+  description: string | null
+  prompts: string[]
+}) {
+  const lines = [`# ${speaking.title}`]
+
+  if (speaking.description) {
+    lines.push('', speaking.description)
+  }
+
+  lines.push('', '## Speaking prompts')
+  speaking.prompts.forEach((prompt, index) => {
+    lines.push(`${index + 1}. ${prompt}`)
   })
 
   return lines.join('\n')

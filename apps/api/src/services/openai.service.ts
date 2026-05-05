@@ -15,6 +15,12 @@ export interface GeneratedQuizAssignment {
   }>
 }
 
+export interface GeneratedSpeakingAssignment {
+  title: string
+  description: string | null
+  prompts: string[]
+}
+
 export const openAiService = {
   resolveModel(featureKey: FeatureKey) {
     const tier = DEFAULT_MODEL_STRATEGY[featureKey]
@@ -172,6 +178,90 @@ export const openAiService = {
       usage: extractTokenUsage(response),
     }
   },
+
+  async generateSpeakingAssignment(input: {
+    prompt: string
+    className?: string | null
+    groupName?: string | null
+    gradeLevel?: string | null
+  }) {
+    const client = getOpenAiClient()
+    const model = env.OPENAI_MODEL_LIGHT
+
+    const response = await client.responses.create({
+      model,
+      temperature: 0.45,
+      instructions: [
+        'You are an expert speaking exam designer for school teachers.',
+        'Primary language: Uzbek (Latin), unless the teacher explicitly requests another language.',
+        'Return only valid JSON. Do not wrap it in markdown. Do not add comments.',
+        'The JSON shape must be: {"title": string, "description": string|null, "prompts": string[]}.',
+        'Create 3-6 speaking prompts unless the teacher asks for another count.',
+        'Do not create multiple choice options. These prompts are for students to answer by recording audio.',
+      ].join(' '),
+      input: [
+        {
+          role: 'user',
+          content: [
+            {
+              type: 'input_text',
+              text: [
+                `Class: ${input.className ?? 'Not specified'}`,
+                `Group: ${input.groupName ?? 'Not specified'}`,
+                `Grade level: ${input.gradeLevel ?? 'Not specified'}`,
+                `Teacher prompt: ${input.prompt}`,
+              ].join('\n'),
+            },
+          ],
+        },
+      ],
+    })
+
+    const output = response.output_text?.trim()
+
+    if (!output) {
+      throw new ApiError(502, 'OpenAI returned an empty speaking assignment.')
+    }
+
+    return {
+      model,
+      speaking: parseGeneratedSpeaking(output),
+      usage: extractTokenUsage(response),
+    }
+  },
+}
+
+function parseGeneratedSpeaking(output: string): GeneratedSpeakingAssignment {
+  let parsed: unknown
+
+  try {
+    parsed = JSON.parse(output)
+  } catch {
+    const jsonMatch = output.match(/\{[\s\S]*\}/)
+    if (!jsonMatch) {
+      throw new ApiError(502, 'OpenAI returned a speaking format that could not be parsed.')
+    }
+    parsed = JSON.parse(jsonMatch[0])
+  }
+
+  if (!parsed || typeof parsed !== 'object') {
+    throw new ApiError(502, 'OpenAI returned an invalid speaking assignment.')
+  }
+
+  const value = parsed as Record<string, unknown>
+  const prompts = Array.isArray(value.prompts)
+    ? value.prompts.map((prompt) => String(prompt ?? '').trim()).filter(Boolean)
+    : []
+
+  if (prompts.length === 0) {
+    throw new ApiError(502, 'OpenAI did not return usable speaking prompts.')
+  }
+
+  return {
+    title: String(value.title ?? 'Speaking assignment').trim().slice(0, 180) || 'Speaking assignment',
+    description: typeof value.description === 'string' && value.description.trim() ? value.description.trim() : null,
+    prompts,
+  }
 }
 
 function parseGeneratedQuiz(output: string): GeneratedQuizAssignment {

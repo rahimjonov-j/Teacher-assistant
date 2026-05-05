@@ -51,6 +51,7 @@ export function ClassesPage() {
   const [correctLetters, setCorrectLetters] = useState('A')
   const [aiPrompt, setAiPrompt] = useState('')
   const [aiTitle, setAiTitle] = useState('')
+  const [aiAssignmentType, setAiAssignmentType] = useState<'multiple_choice' | 'speaking'>('multiple_choice')
 
   const classesQuery = useQuery({
     queryKey: ['classes'],
@@ -148,11 +149,12 @@ export function ClassesPage() {
 
   const createAiAssignmentMutation = useMutation({
     mutationFn: () =>
-      apiRequest<{ generated: { title: string; questionCount: number } }>('/classes/assignments/ai', {
+      apiRequest<{ generated: { title: string; questionCount: number; type: 'multiple_choice' | 'speaking' } }>('/classes/assignments/ai', {
         method: 'POST',
         body: JSON.stringify({
           classId: activeClassId,
           prompt: aiPrompt,
+          type: aiAssignmentType,
           title: aiTitle || null,
           pointsPerCorrect: Number(pointsPerCorrect),
           deadlineAt: getDeadlineIso(deadlineDate, deadlineTime),
@@ -165,7 +167,11 @@ export function ClassesPage() {
     onSuccess: async (data) => {
       setAiPrompt('')
       setAiTitle('')
-      toast.success(`${data.generated.questionCount} ta savolli test yuborildi.`)
+      toast.success(
+        data.generated.type === 'speaking'
+          ? `${data.generated.questionCount} ta speaking prompt yuborildi.`
+          : `${data.generated.questionCount} ta savolli test yuborildi.`,
+      )
       await queryClient.invalidateQueries({ queryKey: ['class-detail', activeClassId] })
       await queryClient.invalidateQueries({ queryKey: ['dashboard'] })
     },
@@ -389,19 +395,41 @@ export function ClassesPage() {
 
           <Card>
             <CardContent className="p-5">
-              <SectionTitle icon={Sparkles} title="GPT test" hint="Prompt yozing, deadline va ball belgilang, test sinfga yuboriladi" />
+              <SectionTitle icon={Sparkles} title="AI assignment" hint="Test yoki speaking topshirigini AI orqali yarating" />
               <div className="mt-4 grid gap-3 lg:grid-cols-[1.1fr_0.9fr]">
                 <div className="space-y-3">
                   <Label>Prompt</Label>
                   <Textarea
                     value={aiPrompt}
-                    onChange={(event) => setAiPrompt(event.target.value)}
-                    placeholder="Masalan: 6-sinf ingliz tili Present Simple mavzusidan 10 ta test, oson va orta darajada."
+                    onChange={(event) => {
+                      const nextPrompt = event.target.value
+                      setAiPrompt(nextPrompt)
+                      const inferredType = inferAiAssignmentType(nextPrompt)
+                      if (inferredType) {
+                        setAiAssignmentType(inferredType)
+                      }
+                    }}
+                    placeholder={
+                      aiAssignmentType === 'speaking'
+                        ? 'Masalan: 6-sinf uchun Present Simple mavzusida 5 ta speaking prompt yarating.'
+                        : 'Masalan: 6-sinf ingliz tili Present Simple mavzusidan 10 ta test, oson va orta darajada.'
+                    }
                     className="min-h-32"
                   />
-                  <Input value={aiTitle} onChange={(event) => setAiTitle(event.target.value)} placeholder="Test title optional" />
+                  <Input value={aiTitle} onChange={(event) => setAiTitle(event.target.value)} placeholder="Title optional" />
                 </div>
                 <div className="space-y-3">
+                  <label className="block">
+                    <div className="mb-2 text-xs font-semibold uppercase text-muted-foreground">Topshiriq turi</div>
+                    <select
+                      className="h-12 w-full rounded-2xl border border-input bg-card/80 px-4 text-sm font-semibold shadow-sm outline-none transition-all focus:border-primary focus:ring-4 focus:ring-primary/10"
+                      value={aiAssignmentType}
+                      onChange={(event) => setAiAssignmentType(event.target.value as 'multiple_choice' | 'speaking')}
+                    >
+                      <option value="multiple_choice">Test</option>
+                      <option value="speaking">Speaking audio</option>
+                    </select>
+                  </label>
                   <AssignmentSettings
                     deadlineDate={deadlineDate}
                     deadlineTime={deadlineTime}
@@ -414,10 +442,12 @@ export function ClassesPage() {
                   />
                   <Button className="w-full" disabled={!aiPrompt || createAiAssignmentMutation.isPending || !activeClassId} onClick={() => createAiAssignmentMutation.mutate()}>
                     <Sparkles className="h-4 w-4" />
-                    Generate and send test
+                    {aiAssignmentType === 'speaking' ? 'Generate and send speaking' : 'Generate and send test'}
                   </Button>
                   <p className="text-xs leading-5 text-muted-foreground">
-                    GPT testni yaratadi, har bir togri javob uchun belgilangan ballni qollaydi va oquvchilarga yuboradi.
+                    {aiAssignmentType === 'speaking'
+                      ? 'Speaking tanlansa oquvchi variant belgilamaydi, audio yozib topshiradi.'
+                      : 'Test tanlansa AI variantli savollar yaratadi va har bir togri javob uchun ball qollanadi.'}
                   </p>
                 </div>
               </div>
@@ -830,6 +860,20 @@ function formatDeadlinePreview(deadlineDate: string, deadlineTime: string) {
     hour: '2-digit',
     minute: '2-digit',
   }).format(value)}`
+}
+
+function inferAiAssignmentType(prompt: string): 'multiple_choice' | 'speaking' | null {
+  const normalized = prompt.toLowerCase()
+
+  if (/\b(speaking|speak|oral|ogzaki|og'izaki|gapirish)\b/.test(normalized)) {
+    return 'speaking'
+  }
+
+  if (/\b(test|quiz|variant|multiple choice)\b/.test(normalized)) {
+    return 'multiple_choice'
+  }
+
+  return null
 }
 
 function rankClass(rank: number) {
