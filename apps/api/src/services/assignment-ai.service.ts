@@ -10,6 +10,7 @@ export const assignmentAiService = {
     className?: string | null
     groupName?: string | null
     gradeLevel?: string | null
+    teacherName?: string | null
   }) {
     const generation = await openAiService.generateQuizAssignment({
       prompt: input.prompt,
@@ -18,7 +19,7 @@ export const assignmentAiService = {
       gradeLevel: input.gradeLevel,
     })
     const updatedSubscription = await subscriptionsRepository.consumeCredits(input.teacherId, 'quiz')
-    const outputMarkdown = toMarkdown(generation.quiz)
+    const outputMarkdown = appendTeacherStamp(toMarkdown(generation.quiz), input.teacherName)
 
     const content = await contentRepository.create({
       userId: input.teacherId,
@@ -59,6 +60,7 @@ export const assignmentAiService = {
     className?: string | null
     groupName?: string | null
     gradeLevel?: string | null
+    teacherName?: string | null
   }) {
     const generation = await openAiService.generateSpeakingAssignment({
       prompt: input.prompt,
@@ -67,7 +69,7 @@ export const assignmentAiService = {
       gradeLevel: input.gradeLevel,
     })
     const updatedSubscription = await subscriptionsRepository.consumeCredits(input.teacherId, 'speaking_questions')
-    const outputMarkdown = toSpeakingMarkdown(generation.speaking)
+    const outputMarkdown = appendTeacherStamp(toSpeakingMarkdown(generation.speaking), input.teacherName)
 
     const content = await contentRepository.create({
       userId: input.teacherId,
@@ -111,13 +113,16 @@ function toMarkdown(quiz: {
     options: Array<{ optionText: string; isCorrect: boolean }>
   }>
 }) {
-  const lines = [`# ${quiz.title}`]
+  const lines = [
+    `TEST NOMI: ${quiz.title}`,
+  ]
 
   if (quiz.description) {
     lines.push('', quiz.description)
   }
 
-  lines.push('', '## Test')
+  lines.push('', 'YO`RIQNOMA: Har bir savol uchun bitta eng to`g`ri javobni tanlang.')
+  lines.push('', 'TEST SAVOLLARI')
 
   quiz.questions.forEach((question, questionIndex) => {
     lines.push(`${questionIndex + 1}. ${question.questionText}`)
@@ -126,7 +131,7 @@ function toMarkdown(quiz: {
     })
   })
 
-  lines.push('', '## Javoblar')
+  lines.push('', 'JAVOBLAR KALITI')
   quiz.questions.forEach((question, questionIndex) => {
     const letters = question.options
       .map((option, optionIndex) => (option.isCorrect ? String.fromCharCode(65 + optionIndex) : null))
@@ -143,16 +148,25 @@ function toSpeakingMarkdown(speaking: {
   description: string | null
   prompts: string[]
 }) {
-  const lines = [`# ${speaking.title}`]
+  const lines = [`SPEAKING ASSIGNMENT: ${speaking.title}`]
 
   if (speaking.description) {
     lines.push('', speaking.description)
   }
 
-  lines.push('', '## Speaking prompts')
+  lines.push('', 'INSTRUCTIONS: Record one audio answer for each question.')
+  lines.push('', 'SPEAKING PROMPTS')
   speaking.prompts.forEach((prompt, index) => {
     lines.push(`${index + 1}. ${prompt}`)
   })
 
   return lines.join('\n')
+}
+
+function appendTeacherStamp(output: string, teacherName?: string | null) {
+  if (!teacherName?.trim()) {
+    return output
+  }
+
+  return `${output.trim()}\n\nTayyorladi: ${teacherName.trim()}`
 }

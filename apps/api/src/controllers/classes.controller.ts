@@ -3,6 +3,7 @@ import { z } from 'zod'
 import type { AuthenticatedRequest } from '../middleware/auth.js'
 import { assignmentRepository } from '../repositories/assignment.repository.js'
 import { classRepository } from '../repositories/class.repository.js'
+import { profilesRepository } from '../repositories/profiles.repository.js'
 import { assignmentAiService } from '../services/assignment-ai.service.js'
 import { asyncHandler } from '../utils/async-handler.js'
 
@@ -133,6 +134,7 @@ export const classesController = {
     const authenticatedRequest = request as AuthenticatedRequest
     const payload = aiAssignmentSchema.parse(request.body)
     const classRecord = await classRepository.getClassForTeacher(authenticatedRequest.auth.userId, payload.classId)
+    const teacherProfile = await profilesRepository.getById(authenticatedRequest.auth.userId)
 
     if (payload.type === 'speaking') {
       const speaking = await assignmentAiService.generateSpeakingForClass({
@@ -141,6 +143,7 @@ export const classesController = {
         className: classRecord.name,
         groupName: classRecord.groupName,
         gradeLevel: classRecord.gradeLevel,
+        teacherName: teacherProfile.fullName,
       })
       const assignment = await assignmentRepository.createAssignment(authenticatedRequest.auth.userId, {
         classId: payload.classId,
@@ -169,6 +172,7 @@ export const classesController = {
       className: classRecord.name,
       groupName: classRecord.groupName,
       gradeLevel: classRecord.gradeLevel,
+      teacherName: teacherProfile.fullName,
     })
     const assignment = await assignmentRepository.createAssignment(authenticatedRequest.auth.userId, {
       classId: payload.classId,

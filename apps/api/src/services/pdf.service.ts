@@ -125,6 +125,13 @@ function renderPdfBuffer(title: string, markdown: string) {
       }
 
       const normalized = line.replace(/^#+\s*/, '').replace(/^\-\s*/, '- ')
+      if (normalized.startsWith('Tayyorladi:')) {
+        doc.moveDown(0.8)
+        doc.font('Helvetica-Bold').text(normalized, { align: 'right', lineGap: 4 })
+        doc.font('Helvetica')
+        return
+      }
+
       doc.text(normalized, { lineGap: 4 })
     })
 

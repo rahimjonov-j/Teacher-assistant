@@ -1,4 +1,3 @@
-import { useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import type { FeatureKey, TeacherDashboardPayload } from '@teacher-assistant/shared'
 import {
@@ -47,15 +46,9 @@ export function DashboardPage() {
   })
 
   const data = query.data
-  const firstName = useMemo(
-    () => data?.profile.fullName?.split(' ')[0] ?? t('dashboard.teacherFallback'),
-    [data?.profile.fullName, t],
-  )
-  const currentPlanName = useMemo(
-    () => (data?.subscription?.planKey ? getPlanName(data.subscription.planKey) : t('billing.noSubscription')),
-    [data?.subscription?.planKey, t],
-  )
-  const recentItems = useMemo(() => data?.recentContent.slice(0, 4) ?? [], [data?.recentContent])
+  const firstName = data?.profile.fullName?.split(' ')[0] ?? t('dashboard.teacherFallback')
+  const currentPlanName = data?.subscription?.planKey ? getPlanName(data.subscription.planKey) : t('billing.noSubscription')
+  const recentItems = data?.recentContent.slice(0, 4) ?? []
 
   if (!data) {
     return <CardLoader />

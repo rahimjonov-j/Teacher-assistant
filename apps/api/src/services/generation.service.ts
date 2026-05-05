@@ -1,5 +1,6 @@
 import { FEATURE_MAP, type GeneratorRequest, type GeneratorResponse } from '@teacher-assistant/shared'
 import { contentRepository } from '../repositories/content.repository.js'
+import { profilesRepository } from '../repositories/profiles.repository.js'
 import { subscriptionsRepository } from '../repositories/subscriptions.repository.js'
 import { usageRepository } from '../repositories/usage.repository.js'
 import { openAiService } from './openai.service.js'
@@ -11,11 +12,13 @@ export const generationService = {
     payload: GeneratorRequest
   }): Promise<GeneratorResponse> {
     const feature = FEATURE_MAP[input.payload.featureKey]
+    const profile = await profilesRepository.getById(input.userId)
     const generation = await openAiService.generate({
       featureKey: input.payload.featureKey,
       topic: input.payload.topic,
       gradeOrLevel: input.payload.gradeOrLevel,
       additionalInstructions: input.payload.additionalInstructions,
+      teacherName: profile.fullName,
     })
 
     const updatedSubscription = await subscriptionsRepository.consumeCredits(
@@ -29,7 +32,7 @@ export const generationService = {
       title,
       featureKey: input.payload.featureKey,
       prompt: input.payload.topic,
-      outputMarkdown: generation.output,
+      outputMarkdown: appendTeacherStamp(generation.output, profile.fullName),
       level: input.payload.gradeOrLevel ?? null,
       additionalInstructions: input.payload.additionalInstructions ?? null,
       modelName: generation.model,
@@ -66,4 +69,12 @@ export const generationService = {
       },
     }
   },
+}
+
+function appendTeacherStamp(output: string, teacherName: string | null) {
+  if (!teacherName?.trim()) {
+    return output
+  }
+
+  return `${output.trim()}\n\nTayyorladi: ${teacherName.trim()}`
 }

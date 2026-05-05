@@ -32,6 +32,7 @@ export const openAiService = {
     topic: string
     gradeOrLevel?: string
     additionalInstructions?: string
+    teacherName?: string | null
   }) {
     const client = getOpenAiClient()
     const model = this.resolveModel(input.featureKey)
@@ -42,10 +43,12 @@ export const openAiService = {
       temperature: 0.7,
       instructions: [
         'You are an expert AI teaching assistant helping classroom teachers.',
-        'Primary language: Uzbek (Latin), unless the teacher explicitly asks for another language.',
+        input.featureKey === 'speaking_questions'
+          ? 'All speaking questions and student-facing prompts must always be written in English, even if the teacher writes the request in Uzbek or another language.'
+          : 'Primary language: Uzbek (Latin), unless the teacher explicitly asks for another language.',
         'Return only the requested teaching material. Do not add greetings, introductions, explanations about what you did, disclaimers, or closing notes.',
         'Follow the selected feature exactly. If the teacher asks for a test, output the test itself and nothing outside the test format.',
-        'Use clean markdown with clear headings and classroom-ready structure.',
+        'Use clean classroom-ready structure. Do not use markdown heading markers such as #, ##, or ###.',
       ].join(' '),
       input: [
         {
@@ -57,6 +60,7 @@ export const openAiService = {
                 `Feature: ${feature.label}`,
                 `Topic/Input: ${input.topic}`,
                 `Level: ${input.gradeOrLevel ?? 'Not specified'}`,
+                `Teacher: ${input.teacherName ?? 'Not specified'}`,
                 `Additional instructions: ${input.additionalInstructions ?? 'None'}`,
                 promptTemplate(input.featureKey),
               ].join('\n\n'),
@@ -66,7 +70,7 @@ export const openAiService = {
       ],
     })
 
-    const output = response.output_text?.trim()
+    const output = normalizeGeneratedOutput(input.featureKey, response.output_text?.trim() ?? '')
 
     if (!output) {
       throw new ApiError(502, 'OpenAI returned an empty response.')
@@ -145,7 +149,9 @@ export const openAiService = {
         'Return only valid JSON. Do not wrap it in markdown. Do not add comments.',
         'The JSON shape must be: {"title": string, "description": string|null, "questions": [{"questionText": string, "options": [{"optionText": string, "isCorrect": boolean}]}]}.',
         'Create 6-10 multiple choice questions unless the teacher asks for another count.',
-        'Each question must have 3-5 options. At least one option must be correct. Prefer one correct answer unless the prompt asks for multiple correct answers.',
+        'Each question must have one clear stem and 4 options when possible. Exactly one option should be correct unless the teacher explicitly asks for multiple correct answers.',
+        'Distractors must be plausible, similar in length and style, and based on common learner mistakes. Avoid clues such as the correct answer being much longer than the distractors.',
+        'Avoid "all of the above", "none of the above", trick wording, ambiguity, and repeated wording from the stem in the options.',
         'Do not include answer letters like A), B) inside optionText.',
       ].join(' '),
       input: [
@@ -193,10 +199,12 @@ export const openAiService = {
       temperature: 0.45,
       instructions: [
         'You are an expert speaking exam designer for school teachers.',
-        'Primary language: Uzbek (Latin), unless the teacher explicitly requests another language.',
+        'All student-facing speaking prompts must always be written in English, even if the teacher request is Uzbek or another language.',
+        'The title and description must also be in English.',
         'Return only valid JSON. Do not wrap it in markdown. Do not add comments.',
         'The JSON shape must be: {"title": string, "description": string|null, "prompts": string[]}.',
         'Create 3-6 speaking prompts unless the teacher asks for another count.',
+        'Use natural exam-style English questions that encourage extended spoken answers, not one-word answers.',
         'Do not create multiple choice options. These prompts are for students to answer by recording audio.',
       ].join(' '),
       input: [
@@ -339,31 +347,67 @@ function extractTokenUsage(response: unknown) {
   }
 }
 
+function normalizeGeneratedOutput(featureKey: FeatureKey, output: string) {
+  const withoutMarkdownHeadings = output
+    .split('\n')
+    .map((line) => line.replace(/^#{1,6}\s+/, '').trimEnd())
+    .join('\n')
+    .trim()
+
+  if (featureKey !== 'quiz') {
+    return withoutMarkdownHeadings
+  }
+
+  return withoutMarkdownHeadings
+    .replace(/\n{3,}/g, '\n\n')
+    .replace(/\bAnswers\b/g, 'Javoblar')
+    .trim()
+}
+
 function promptTemplate(featureKey: FeatureKey) {
   switch (featureKey) {
     case 'quiz':
       return [
-        'Generate a classroom test only.',
-        'Required format:',
-        '# [Test title]',
-        '## Test',
-        '1. Question text',
-        '   A) Option',
-        '   B) Option',
-        '   C) Option',
-        '   D) Option',
+        'Generate a polished classroom test only.',
+        'Do not use markdown heading markers (#, ##, ###).',
+        'Use this exact premium printable structure:',
+        'TEST NOMI: [clear title]',
+        'FAN / MAVZU: [subject and topic]',
+        'SINF / DARAJA: [level if known]',
+        'YO`RIQNOMA: Har bir savol uchun bitta eng to`g`ri javobni tanlang.',
+        '',
+        'TEST SAVOLLARI',
+        '1. [Clear question stem]',
+        '   A) [plausible option]',
+        '   B) [plausible option]',
+        '   C) [plausible option]',
+        '   D) [plausible option]',
+        '',
         'Continue with 6-10 questions unless the teacher requested a different count.',
-        '## Javoblar',
+        'Question stems must be clear, direct, and free from unnecessary complexity.',
+        'Options should be similar in length and grammatical form.',
+        'Avoid all/none of the above, joke answers, and obvious distractors.',
+        '',
+        'JAVOBLAR KALITI',
         '1. A',
         '2. B',
-        'List every correct answer in this final section only. Do not explain the answers. Do not add any section after Javoblar.',
+        '',
+        'Do not explain the answers unless the teacher explicitly asks for explanations.',
+        'Do not add any section after JAVOBLAR KALITI.',
       ].join('\n')
     case 'lesson_plan':
       return 'Generate only a structured lesson plan with objective, materials, warm-up, instruction, guided practice, independent practice, differentiation, assessment, and homework. Do not add extra commentary before or after the plan.'
     case 'writing_feedback':
       return 'Generate only supportive writing feedback with strengths, growth areas, revision suggestions, rubric-style notes, and a teacher-friendly summary. Do not add extra commentary before or after the feedback.'
     case 'speaking_questions':
-      return 'Generate only speaking and discussion prompts with warm-up questions, deeper prompts, pair/group activity ideas, and language support when relevant. Do not add extra commentary before or after the prompts.'
+      return [
+        'Generate only English speaking prompts and discussion questions.',
+        'All prompts must be in English.',
+        'Use natural school speaking-test style questions.',
+        'Include warm-up questions and deeper follow-up prompts when useful.',
+        'Do not add Uzbek translations unless the teacher explicitly asks for translations.',
+        'Do not add extra commentary before or after the prompts.',
+      ].join(' ')
     case 'pdf_export':
       return 'Summarize the content clearly for printable export.'
   }

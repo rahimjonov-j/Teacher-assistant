@@ -105,8 +105,6 @@ export function AuthProvider({ children }: PropsWithChildren) {
 
   useEffect(() => {
     if (!isSupabaseConfigured) {
-      setInitialized(true)
-      setLoading(false)
       return
     }
 
