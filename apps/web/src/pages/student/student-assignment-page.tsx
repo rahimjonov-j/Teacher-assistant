@@ -5,7 +5,6 @@ import { CheckCircle2, Clock3, Send, type LucideIcon } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { toast } from 'sonner'
-import { BackButton } from '@/components/shared/back-button'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Textarea } from '@/components/ui/textarea'
@@ -81,8 +80,6 @@ export function StudentAssignmentPage() {
   return (
     <Shell>
       <div className="space-y-5 animate-in">
-        <BackButton />
-
         <Card>
           <CardContent className="space-y-4 p-5">
             <div>

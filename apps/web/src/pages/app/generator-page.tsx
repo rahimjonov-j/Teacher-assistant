@@ -71,7 +71,7 @@ export function GeneratorPage() {
 
   return (
     <div className="space-y-4 animate-in pb-8">
-      <Card>
+      <Card className="overflow-hidden bg-gradient-to-br from-primary/10 via-card to-violet-100/70 dark:to-violet-950/20">
         <CardContent className="space-y-4 p-5">
           <div>
             <div className="text-lg font-black tracking-tight">{getFeatureLabel(activeFeature.key)}</div>
@@ -123,13 +123,13 @@ export function GeneratorPage() {
             />
           </div>
 
-          <div className="rounded-2xl bg-secondary p-4">
+          <div className="rounded-2xl border border-primary/10 bg-primary/5 p-4">
             <div className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">{t('generator.telegramCommand')}</div>
             <div className="mt-2 text-base font-black">{activeTelegramCommand.usage}</div>
             <div className="mt-1 text-sm text-muted-foreground">{activeTelegramCommand.description}</div>
           </div>
 
-          <Button className="h-14 w-full" onClick={() => mutation.mutate()} disabled={mutation.isPending || !topic}>
+          <Button variant="gradient" className="h-14 w-full" onClick={() => mutation.mutate()} disabled={mutation.isPending || !topic}>
             {mutation.isPending ? <Spinner /> : <Sparkles className="h-4 w-4" />}
             {t('generator.generate')}
           </Button>

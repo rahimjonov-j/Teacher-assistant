@@ -31,6 +31,14 @@ const featureIcons: Record<FeatureKey, typeof FileText> = {
   pdf_export: FileText,
 }
 
+const featureTones: Record<FeatureKey, string> = {
+  quiz: 'bg-primary/10 text-primary ring-primary/15',
+  lesson_plan: 'bg-violet-100 text-violet-700 ring-violet-200',
+  writing_feedback: 'bg-emerald-50 text-emerald-700 ring-emerald-200',
+  speaking_questions: 'bg-orange-50 text-orange-700 ring-orange-200',
+  pdf_export: 'bg-slate-100 text-slate-700 ring-slate-200',
+}
+
 export function DashboardPage() {
   const { t } = useI18n()
   const query = useQuery({
@@ -55,7 +63,7 @@ export function DashboardPage() {
 
   return (
     <div className="grid gap-5 animate-in lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
-      <Card className="min-w-0 lg:col-span-2">
+      <Card className="min-w-0 overflow-hidden bg-gradient-to-br from-primary/12 via-card to-accent/10 lg:col-span-2">
         <CardContent className="space-y-4 p-5">
           <div className="flex items-start justify-between gap-4">
             <div className="min-w-0">
@@ -67,12 +75,12 @@ export function DashboardPage() {
                 {data.profile.schoolName ?? t('dashboard.schoolFallback')}
               </p>
             </div>
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-secondary">
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary ring-1 ring-primary/15">
               <Sparkles className="h-5 w-5" />
             </div>
           </div>
 
-          <div className="rounded-2xl bg-secondary p-4">
+          <div className="rounded-2xl border border-white/70 bg-white/70 p-4 shadow-sm dark:bg-white/5">
             <div className="flex flex-col gap-3 min-[420px]:flex-row min-[420px]:items-center min-[420px]:justify-between">
               <div className="min-w-0">
                 <div className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">{t('dashboard.currentPlan')}</div>
@@ -93,36 +101,42 @@ export function DashboardPage() {
           value={data.usageSummary.totalRequestsThisMonth}
           hint={t('dashboard.thisMonth')}
           icon={Clock3}
+          tone="primary"
         />
         <StatCard
           label={t('dashboard.stored')}
           value={data.recentContent.length}
           hint={t('dashboard.recentOutputs')}
           icon={Wallet}
+          tone="violet"
         />
         <StatCard
           label="Classes"
           value={data.classSummary?.totalClasses ?? 0}
           hint="Managed groups"
           icon={GraduationCap}
+          tone="emerald"
         />
         <StatCard
           label="Students"
           value={data.classSummary?.totalStudents ?? 0}
           hint={`${data.classSummary?.activeStudents ?? 0} active`}
           icon={Users}
+          tone="slate"
         />
         <StatCard
           label="Pending"
           value={data.classSummary?.pendingSubmissions ?? 0}
           hint="Manual reviews"
           icon={MessageSquareText}
+          tone="orange"
         />
         <StatCard
           label="Top"
           value={data.classSummary?.monthlyTopStudent?.fullName ?? '-'}
           hint={`${data.classSummary?.monthlyTopStudent?.totalMonthlyScore ?? 0} points`}
           icon={Trophy}
+          tone="primary"
         />
       </div>
 
@@ -143,8 +157,8 @@ export function DashboardPage() {
 
               return (
                 <Link key={feature.key} to={`/app/generator?feature=${feature.key}`} className="min-w-0">
-                  <div className="rounded-2xl border border-border bg-card p-4 transition-colors hover:bg-secondary">
-                    <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-secondary">
+                  <div className="rounded-2xl border border-border bg-card p-4 transition-colors hover:bg-muted">
+                    <div className={`flex h-11 w-11 items-center justify-center rounded-2xl ring-1 ${featureTones[feature.key]}`}>
                       <Icon className="h-5 w-5" />
                     </div>
                     <div className="mt-4 text-sm font-black leading-5">{getFeatureLabel(feature.key)}</div>

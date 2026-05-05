@@ -4,7 +4,6 @@ import type { StudentRecord } from '@teacher-assistant/shared'
 import { GraduationCap, LogIn } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
-import { BackButton } from '@/components/shared/back-button'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -33,9 +32,6 @@ export function StudentLoginPage() {
 
   return (
     <div className="min-h-screen bg-background px-4 py-8">
-      <div className="mx-auto w-full max-w-md">
-        <BackButton className="mb-4" />
-      </div>
       <div className="mx-auto flex min-h-[calc(100vh-4rem)] w-full max-w-md items-center">
         <Card className="w-full">
           <CardContent className="space-y-5 p-6">

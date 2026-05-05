@@ -4,56 +4,60 @@
 
 @layer base {
   :root {
-    --background: 0 0% 99%;
-    --foreground: 0 0% 7%;
+    --background: 226 56% 98%;
+    --foreground: 229 34% 11%;
 
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 7%;
+    --card-foreground: 229 34% 11%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 7%;
+    --popover-foreground: 229 34% 11%;
 
-    --primary: 0 0% 7%;
+    --primary: 231 76% 54%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 0 0% 96%;
-    --secondary-foreground: 0 0% 12%;
+    --secondary: 259 83% 95%;
+    --secondary-foreground: 262 71% 38%;
 
-    --muted: 0 0% 96%;
-    --muted-foreground: 0 0% 42%;
+    --muted: 226 36% 94%;
+    --muted-foreground: 230 12% 44%;
 
-    --accent: 0 0% 94%;
-    --accent-foreground: 0 0% 12%;
+    --accent: 174 68% 42%;
+    --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 0% 12%;
+    --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 0 0% 88%;
-    --input: 0 0% 88%;
-    --ring: 0 0% 12%;
-    --radius: 0.75rem;
+    --border: 226 25% 88%;
+    --input: 226 25% 88%;
+    --ring: 231 76% 54%;
+    --success: 151 62% 39%;
+    --warning: 30 92% 54%;
+    --radius: 1rem;
   }
 
   .dark {
-    --background: 0 0% 7%;
-    --foreground: 0 0% 96%;
-    --card: 0 0% 10%;
-    --card-foreground: 0 0% 96%;
-    --popover: 0 0% 10%;
-    --popover-foreground: 0 0% 96%;
-    --primary: 0 0% 96%;
-    --primary-foreground: 0 0% 7%;
-    --secondary: 0 0% 14%;
-    --secondary-foreground: 0 0% 96%;
-    --muted: 0 0% 14%;
-    --muted-foreground: 0 0% 66%;
-    --accent: 0 0% 16%;
-    --accent-foreground: 0 0% 96%;
-    --destructive: 0 0% 96%;
-    --destructive-foreground: 0 0% 7%;
-    --border: 0 0% 18%;
-    --input: 0 0% 18%;
-    --ring: 0 0% 82%;
+    --background: 229 34% 8%;
+    --foreground: 226 56% 96%;
+    --card: 229 30% 12%;
+    --card-foreground: 226 56% 96%;
+    --popover: 229 30% 12%;
+    --popover-foreground: 226 56% 96%;
+    --primary: 231 95% 72%;
+    --primary-foreground: 229 34% 8%;
+    --secondary: 259 34% 18%;
+    --secondary-foreground: 259 83% 90%;
+    --muted: 229 22% 17%;
+    --muted-foreground: 226 16% 70%;
+    --accent: 174 62% 48%;
+    --accent-foreground: 229 34% 8%;
+    --destructive: 0 72% 62%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 229 18% 22%;
+    --input: 229 18% 22%;
+    --ring: 231 95% 72%;
+    --success: 151 62% 48%;
+    --warning: 30 92% 60%;
   }
 
   * {
@@ -71,20 +75,24 @@
   body {
     @apply min-h-screen bg-background font-sans text-foreground antialiased;
     font-family: 'Manrope', sans-serif;
+    background:
+      radial-gradient(circle at top left, hsl(231 76% 92% / 0.8), transparent 30rem),
+      radial-gradient(circle at bottom right, hsl(174 68% 88% / 0.6), transparent 32rem),
+      hsl(var(--background));
   }
 }
 
 @layer components {
   .surface {
-    @apply rounded-xl border border-border bg-card shadow-[0_10px_30px_-24px_rgba(0,0,0,0.18)];
+    @apply rounded-3xl border border-white/70 bg-card/95 shadow-[0_18px_60px_-42px_rgba(30,41,88,0.34)] backdrop-blur;
   }
 
   .glass-card {
-    @apply rounded-xl border border-border bg-card;
+    @apply rounded-3xl border border-white/60 bg-white/80 shadow-[0_20px_70px_-46px_rgba(67,56,202,0.34)] backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.06];
   }
 
   .app-shell {
-    @apply mx-auto min-h-screen w-full max-w-md bg-background px-4 pb-8 pt-4 lg:max-w-6xl lg:px-6;
+    @apply mx-auto min-h-screen w-full max-w-md px-4 pb-24 pt-3 lg:max-w-6xl lg:px-6 lg:pb-10;
   }
 
   .app-shell > main {
@@ -93,6 +101,22 @@
 
   .markdown-body {
     @apply whitespace-pre-wrap text-[15px] leading-7 text-foreground;
+  }
+
+  .app-topbar {
+    @apply sticky top-0 z-40 -mx-4 mb-5 flex items-center justify-between border-b border-white/60 bg-background/80 px-4 py-3 backdrop-blur-xl lg:-mx-6 lg:px-6;
+  }
+
+  .app-bottom-nav {
+    @apply fixed bottom-0 left-0 z-50 flex h-[72px] w-full items-center justify-around border-t border-white/70 bg-white/90 px-2 pb-1 shadow-[0_-16px_42px_-34px_rgba(30,41,88,0.4)] backdrop-blur-xl md:hidden dark:border-white/10 dark:bg-slate-950/80;
+  }
+
+  .app-nav-item {
+    @apply relative flex min-w-14 flex-col items-center justify-center gap-1 rounded-2xl px-2 py-2 text-[10px] font-bold text-muted-foreground transition-all active:scale-95;
+  }
+
+  .app-nav-item-active {
+    @apply bg-primary/10 text-primary;
   }
 }
 

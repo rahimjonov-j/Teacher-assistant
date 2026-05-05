@@ -41,7 +41,7 @@ export function BillingPage() {
 
   return (
     <div className="space-y-4 animate-in pb-8">
-      <Card>
+      <Card className="overflow-hidden bg-gradient-to-br from-primary/10 via-card to-accent/10">
         <CardContent className="space-y-4 p-5">
           <div className="flex items-center justify-between gap-4">
             <div>
@@ -50,16 +50,16 @@ export function BillingPage() {
                 {subscription?.planKey ? getPlanName(subscription.planKey) : t('billing.noSubscription')}
               </div>
             </div>
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-secondary">
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary ring-1 ring-primary/15">
               <Zap className="h-5 w-5" />
             </div>
           </div>
           <div className="grid grid-cols-2 gap-3">
-            <div className="rounded-2xl bg-secondary p-4">
+            <div className="rounded-2xl border border-primary/10 bg-primary/5 p-4">
               <div className="text-xs text-muted-foreground">{t('dashboard.creditsLeft')}</div>
               <div className="mt-1 text-lg font-black">{subscription?.creditsRemaining ?? 0}</div>
             </div>
-            <div className="rounded-2xl bg-secondary p-4">
+            <div className="rounded-2xl border border-border bg-card/70 p-4">
               <div className="text-xs text-muted-foreground">{t('billing.renewal')}</div>
               <div className="mt-1 text-sm font-black">{subscription?.renewsAt ? formatDate(subscription.renewsAt) : t('billing.notSet')}</div>
             </div>
@@ -94,7 +94,7 @@ export function BillingPage() {
                 </div>
 
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <CheckCircle2 className="h-4 w-4" />
+                  <CheckCircle2 className="h-4 w-4 text-emerald-600" />
                   {t('billing.fullAccess')}
                 </div>
 

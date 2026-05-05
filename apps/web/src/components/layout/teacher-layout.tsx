@@ -13,10 +13,10 @@ import {
   MessageSquare,
   Settings,
   Sparkles,
+  UserRound,
   X,
 } from 'lucide-react'
 import { Link, NavLink, Outlet, matchPath, useLocation } from 'react-router-dom'
-import { BackButton } from '@/components/shared/back-button'
 import { useAuth } from '@/hooks/use-auth'
 import { useI18n } from '@/hooks/use-i18n'
 import { Button } from '@/components/ui/button'
@@ -32,6 +32,14 @@ const navItems = [
   { to: '/app/telegram-link', labelKey: 'teacher.nav.telegramLink', icon: KeyRound },
   { to: '/app/settings', labelKey: 'teacher.nav.settings', icon: Settings },
   { to: '/app/billing', labelKey: 'teacher.menu.plans', icon: CreditCard },
+] as const
+
+const bottomNavItems = [
+  { to: '/app/dashboard', labelKey: 'teacher.nav.dashboard', icon: LayoutDashboard, pattern: '/app/dashboard' },
+  { to: '/app/generator', labelKey: 'teacher.header.create', icon: Sparkles, pattern: '/app/generator' },
+  { to: '/app/classes', labelKey: 'teacher.nav.classes', icon: GraduationCap, pattern: '/app/classes' },
+  { to: '/app/messenger', labelKey: 'teacher.nav.messenger', icon: MessageSquare, pattern: '/app/messenger' },
+  { to: '/app/settings', labelKey: 'teacher.nav.settings', icon: UserRound, pattern: '/app/settings' },
 ] as const
 
 const pageMeta: Array<{ pattern: string; titleKey: string; actionTo?: string }> = [
@@ -52,9 +60,8 @@ const pageMeta: Array<{ pattern: string; titleKey: string; actionTo?: string }> 
 export function TeacherLayout() {
   const location = useLocation()
   const [drawerOpen, setDrawerOpen] = useState(false)
-  const { logout } = useAuth()
+  const { logout, profile } = useAuth()
   const { t } = useI18n()
-  const showBackButton = location.pathname !== '/app/dashboard'
 
   const currentPage = useMemo(
     () => pageMeta.find((item) => matchPath({ path: item.pattern, end: true }, location.pathname)) ?? pageMeta[0],
@@ -94,7 +101,7 @@ export function TeacherLayout() {
         <div data-no-swipe-back className="fixed inset-0 z-50 overflow-hidden bg-black/20 backdrop-blur-[1px]" onClick={() => setDrawerOpen(false)}>
           <aside
             data-no-swipe-back
-            className="flex h-[100dvh] w-[84%] max-w-[320px] flex-col rounded-r-2xl border-r border-border bg-card px-4 pb-6 pt-5 shadow-2xl"
+            className="flex h-[100dvh] w-[86%] max-w-[330px] flex-col rounded-r-[2rem] border-r border-white/70 bg-card/95 px-4 pb-6 pt-5 shadow-2xl backdrop-blur-xl"
             onClick={(event) => event.stopPropagation()}
           >
             <div className="flex items-center justify-between px-2">
@@ -116,14 +123,14 @@ export function TeacherLayout() {
                   className={({ isActive }) =>
                     cn(
                       'flex items-center justify-between rounded-2xl px-4 py-3 text-sm font-semibold transition-colors',
-                      isActive ? 'bg-secondary text-foreground' : 'text-muted-foreground hover:bg-secondary/70 hover:text-foreground',
+                      isActive ? 'bg-primary text-primary-foreground shadow-[0_16px_36px_-24px_hsl(var(--primary)/0.8)]' : 'text-muted-foreground hover:bg-muted hover:text-foreground',
                     )
                   }
                 >
                   {({ isActive }) => (
                     <>
                       <div className="flex items-center gap-3">
-                        <div className={cn('flex h-10 w-10 items-center justify-center rounded-2xl', isActive ? 'bg-background' : 'bg-secondary')}>
+                        <div className={cn('flex h-10 w-10 items-center justify-center rounded-2xl', isActive ? 'bg-white/18' : 'bg-secondary')}>
                           <item.icon className="h-5 w-5" />
                         </div>
                         <span>{t(item.labelKey)}</span>
@@ -155,17 +162,20 @@ export function TeacherLayout() {
       ) : null}
 
       <div className="app-shell">
-        <header className="sticky top-0 z-40 -mx-4 mb-6 flex items-center justify-between border-b border-border bg-background/95 px-4 py-3 backdrop-blur">
+        <header className="app-topbar">
           <Button variant="ghost" size="icon" className="rounded-full" onClick={() => setDrawerOpen(true)}>
             <Menu className="h-5 w-5" />
           </Button>
-          <div className="text-center">
-            <div className="text-sm font-black tracking-tight">
+          <div className="min-w-0 text-center">
+            <div className="truncate text-[11px] font-bold text-muted-foreground">
+              {profile?.fullName ? profile.fullName.split(' ')[0] : 'Teacher Assistant'}
+            </div>
+            <div className="truncate text-sm font-black tracking-tight">
               {t(currentPage.titleKey)}
             </div>
           </div>
           {currentPage.actionTo ? (
-            <Button asChild variant="ghost" size="icon" className="rounded-full">
+            <Button asChild variant="gradient" size="icon" className="rounded-full">
               <Link to={currentPage.actionTo}>
                 <Sparkles className="h-5 w-5" />
               </Link>
@@ -176,14 +186,26 @@ export function TeacherLayout() {
         </header>
 
         <main>
-          {showBackButton ? (
-            <div className="mb-4">
-              <BackButton />
-            </div>
-          ) : null}
           <Outlet />
         </main>
       </div>
+
+      <nav className="app-bottom-nav">
+        {bottomNavItems.map((item) => {
+          const isActive = Boolean(matchPath({ path: item.pattern, end: false }, location.pathname))
+
+          return (
+            <NavLink
+              key={item.to}
+              to={item.to}
+              className={cn('app-nav-item', isActive && 'app-nav-item-active')}
+            >
+              <item.icon className="h-5 w-5" />
+              <span>{t(item.labelKey)}</span>
+            </NavLink>
+          )
+        })}
+      </nav>
     </div>
   )
 }

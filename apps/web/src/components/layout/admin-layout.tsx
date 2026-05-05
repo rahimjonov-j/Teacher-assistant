@@ -12,8 +12,7 @@ import {
   X,
   Users,
 } from 'lucide-react'
-import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
-import { BackButton } from '@/components/shared/back-button'
+import { Link, NavLink, Outlet } from 'react-router-dom'
 import { ThemeToggle } from '@/components/shared/theme-toggle'
 import { Button } from '@/components/ui/button'
 import { useAuth } from '@/hooks/use-auth'
@@ -68,7 +67,7 @@ function AdminSidebarContent({
   const { t } = useI18n()
 
   return (
-    <div className="flex h-full min-h-0 flex-col bg-card px-4 pb-6 pt-5">
+    <div className="flex h-full min-h-0 flex-col bg-card/95 px-4 pb-6 pt-5 backdrop-blur-xl">
       <div className="flex items-center justify-between px-2">
         <Link to="/admin/dashboard" onClick={onNavigate} className="min-w-0">
           <div className="truncate text-sm font-black tracking-tight">{t('admin.layout.controlPanel')}</div>
@@ -90,14 +89,14 @@ function AdminSidebarContent({
             className={({ isActive }) =>
               cn(
                 'flex items-center justify-between rounded-2xl px-4 py-3 text-sm font-semibold transition-colors',
-                isActive ? 'bg-secondary text-foreground' : 'text-muted-foreground hover:bg-secondary/70 hover:text-foreground',
+                isActive ? 'bg-primary text-primary-foreground shadow-[0_16px_36px_-24px_hsl(var(--primary)/0.8)]' : 'text-muted-foreground hover:bg-muted hover:text-foreground',
               )
             }
           >
             {({ isActive }) => (
               <>
                 <div className="flex min-w-0 items-center gap-3">
-                  <div className={cn('flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl', isActive ? 'bg-background' : 'bg-secondary')}>
+                  <div className={cn('flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl', isActive ? 'bg-white/18' : 'bg-secondary')}>
                     <item.icon className="h-5 w-5" />
                   </div>
                   <span className="truncate">{t(item.labelKey)}</span>
@@ -113,10 +112,10 @@ function AdminSidebarContent({
         <Link
           to="/app/dashboard"
           onClick={onNavigate}
-          className="flex items-center justify-between gap-3 rounded-xl border border-border px-4 py-4 transition-colors hover:bg-secondary"
+          className="flex items-center justify-between gap-3 rounded-2xl border border-border bg-muted/40 px-4 py-4 transition-colors hover:bg-primary/5"
         >
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-secondary">
+            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-accent/10 text-accent">
               <ArrowRightLeft className="h-5 w-5" />
             </div>
             <div>
@@ -142,8 +141,6 @@ function AdminSidebarContent({
 export function AdminLayout() {
   const { logout } = useAuth()
   const [drawerOpen, setDrawerOpen] = useState(false)
-  const location = useLocation()
-  const showBackButton = location.pathname !== '/admin/dashboard'
 
   useEffect(() => lockBodyScroll(drawerOpen), [drawerOpen])
 
@@ -153,7 +150,7 @@ export function AdminLayout() {
   }
 
   return (
-    <div className="min-h-screen bg-background selection:bg-sky-500/20 selection:text-sky-500">
+    <div className="min-h-screen bg-background selection:bg-primary/20 selection:text-primary">
       <Button
         type="button"
         variant="outline"
@@ -168,7 +165,7 @@ export function AdminLayout() {
       {drawerOpen ? (
         <div className="fixed inset-0 z-50 overflow-hidden bg-black/25 backdrop-blur-[1px] lg:hidden" onClick={() => setDrawerOpen(false)}>
           <aside
-            className="h-[100dvh] w-[84%] max-w-[320px] rounded-r-2xl border-r border-border bg-card shadow-2xl"
+            className="h-[100dvh] w-[84%] max-w-[320px] rounded-r-[2rem] border-r border-white/70 bg-card shadow-2xl"
             onClick={(event) => event.stopPropagation()}
           >
             <AdminSidebarContent onClose={() => setDrawerOpen(false)} onNavigate={() => setDrawerOpen(false)} onLogout={handleLogout} />
@@ -176,17 +173,12 @@ export function AdminLayout() {
         </div>
       ) : null}
 
-      <aside className="fixed inset-y-4 left-4 z-30 hidden w-[320px] overflow-hidden rounded-2xl border border-border bg-card shadow-[0_20px_60px_-42px_rgba(0,0,0,0.25)] lg:block">
+      <aside className="fixed inset-y-4 left-4 z-30 hidden w-[320px] overflow-hidden rounded-[2rem] border border-white/70 bg-card/90 shadow-[0_24px_80px_-48px_rgba(30,41,88,0.35)] backdrop-blur-xl lg:block">
         <AdminSidebarContent onLogout={handleLogout} />
       </aside>
 
       <main className="min-h-screen px-4 pb-8 pt-20 lg:pl-[368px] lg:pr-8 lg:pt-8">
         <div className="mx-auto w-full max-w-[1160px]">
-          {showBackButton ? (
-            <div className="mb-4">
-              <BackButton />
-            </div>
-          ) : null}
           <Outlet />
         </div>
       </main>

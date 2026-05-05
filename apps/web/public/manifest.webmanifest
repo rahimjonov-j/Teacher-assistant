@@ -1,0 +1,40 @@
+{
+  "name": "Teacher Assistant AI",
+  "short_name": "Teacher AI",
+  "description": "AI-powered assistant for teachers, classes, assignments, and student progress.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#f6f8ff",
+  "theme_color": "#4f46e5",
+  "categories": ["education", "productivity"],
+  "icons": [
+    {
+      "src": "/pwa-icon.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/pwa-maskable-icon.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "AI Generator",
+      "short_name": "AI Tools",
+      "url": "/app/generator",
+      "description": "Create lesson plans, quizzes, and feedback."
+    },
+    {
+      "name": "Classes",
+      "short_name": "Classes",
+      "url": "/app/classes",
+      "description": "Manage classes, students, and assignments."
+    }
+  ]
+}

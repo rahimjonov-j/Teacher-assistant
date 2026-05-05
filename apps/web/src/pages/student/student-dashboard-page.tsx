@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import type { StudentDashboardPayload } from '@teacher-assistant/shared'
-import { ArrowRight, Crown, LogOut, Medal, MessageSquareText, Send, Trophy, type LucideIcon } from 'lucide-react'
+import { ArrowRight, Crown, Home, LogOut, Medal, MessageSquareText, Send, Trophy, type LucideIcon } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Badge } from '@/components/ui/badge'
@@ -43,24 +43,32 @@ export function StudentDashboardPage() {
   return (
     <StudentShell>
       <div className="space-y-5 animate-in">
-        <Card>
+        <header className="app-topbar">
+          <div className="min-w-0">
+            <div className="truncate text-xs font-bold text-muted-foreground">{data.student.className} / {data.student.groupName}</div>
+            <div className="truncate text-base font-black text-primary">{data.student.fullName}</div>
+          </div>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => {
+              clearStudentToken()
+              navigate('/student-login', { replace: true })
+            }}
+          >
+            <LogOut className="h-5 w-5" />
+          </Button>
+        </header>
+
+        <Card className="overflow-hidden bg-gradient-to-br from-primary/12 via-card to-accent/10">
           <CardContent className="space-y-4 p-5">
             <div className="flex items-start justify-between gap-4">
               <div className="min-w-0">
                 <div className="text-xs font-semibold uppercase text-muted-foreground">{data.student.className} / {data.student.groupName}</div>
-                <h1 className="mt-2 text-2xl font-black tracking-tight">{data.student.fullName}</h1>
+                <h1 className="mt-2 text-2xl font-black tracking-tight">Rank #{data.rank ?? '-'}</h1>
                 <p className="mt-2 text-sm text-muted-foreground">Teacher: {data.student.teacherName ?? 'Teacher'}</p>
               </div>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => {
-                  clearStudentToken()
-                  navigate('/student-login', { replace: true })
-                }}
-              >
-                <LogOut className="h-5 w-5" />
-              </Button>
+              <Badge variant="gradient">{data.student.totalMonthlyScore} pts</Badge>
             </div>
             <div className="grid grid-cols-1 gap-3 min-[420px]:grid-cols-[repeat(3,minmax(0,1fr))]">
               <Metric icon={Trophy} label="Rating" value={data.student.totalMonthlyScore} />
@@ -83,7 +91,7 @@ export function StudentDashboardPage() {
             </div>
             <div className="space-y-3">
               {data.activeAssignments.map((assignment) => (
-                <Link key={assignment.id} to={`/student/assignments/${assignment.id}`} className="block rounded-xl border border-border p-4 transition-colors hover:bg-secondary">
+                <Link key={assignment.id} to={`/student/assignments/${assignment.id}`} className="block rounded-2xl border border-border bg-card/70 p-4 transition-all hover:border-primary/25 hover:bg-primary/5">
                   <div className="flex items-center justify-between gap-3">
                     <div className="min-w-0">
                       <div className="truncate font-black">{assignment.title}</div>
@@ -107,7 +115,7 @@ export function StudentDashboardPage() {
             <div className="font-black">Top 10 leaderboard</div>
             <div className="mt-4 space-y-3">
               {data.leaderboard.map((entry) => (
-                <div key={entry.studentId} className="flex items-center justify-between rounded-xl border border-border p-4">
+                <div key={entry.studentId} className="flex items-center justify-between rounded-2xl border border-border bg-card/70 p-4">
                   <div className="flex items-center gap-3">
                     <div className={cn('flex h-9 w-9 items-center justify-center rounded-xl bg-secondary font-black', rankClass(entry.rank))}>
                       {entry.rank <= 3 ? <Crown className="h-4 w-4" /> : entry.rank}
@@ -129,7 +137,7 @@ export function StudentDashboardPage() {
             </div>
             <div className="space-y-3">
               {data.feedback.map((item) => (
-                <div key={item.submissionId} className="rounded-xl border border-border p-4">
+                <div key={item.submissionId} className="rounded-2xl border border-border bg-card/70 p-4">
                   <div className="font-black">{item.assignmentTitle}</div>
                   <div className="mt-1 text-sm text-muted-foreground">{item.feedback ?? 'Score added.'}</div>
                   <Badge className="mt-3">{item.scoreAwarded} points</Badge>
@@ -147,13 +155,35 @@ export function StudentDashboardPage() {
 }
 
 function StudentShell({ children }: { children: ReactNode }) {
-  return <div className="mx-auto min-h-screen w-full max-w-md bg-background px-4 py-5 lg:max-w-4xl">{children}</div>
+  return (
+    <div className="min-h-screen bg-background">
+      <div className="mx-auto min-h-screen w-full max-w-md px-4 pb-24 pt-0 lg:max-w-4xl lg:pb-10">{children}</div>
+      <nav className="app-bottom-nav">
+        <Link to="/student/dashboard" className="app-nav-item app-nav-item-active">
+          <Home className="h-5 w-5" />
+          <span>Home</span>
+        </Link>
+        <Link to="/student/dashboard" className="app-nav-item">
+          <Send className="h-5 w-5" />
+          <span>Tasks</span>
+        </Link>
+        <Link to="/student/dashboard" className="app-nav-item">
+          <Trophy className="h-5 w-5" />
+          <span>Rating</span>
+        </Link>
+        <Link to="/student/dashboard" className="app-nav-item">
+          <MessageSquareText className="h-5 w-5" />
+          <span>Feedback</span>
+        </Link>
+      </nav>
+    </div>
+  )
 }
 
 function Metric({ icon: Icon, label, value }: { icon: LucideIcon; label: string; value: string | number }) {
   return (
-    <div className="min-w-0 rounded-xl bg-secondary p-3">
-      <Icon className="h-4 w-4 text-muted-foreground" />
+    <div className="min-w-0 rounded-2xl bg-white/70 p-3 shadow-sm dark:bg-white/5">
+      <Icon className="h-4 w-4 text-primary" />
       <div className="mt-2 text-xs text-muted-foreground">{label}</div>
       <div className="break-words text-lg font-black">{value}</div>
     </div>

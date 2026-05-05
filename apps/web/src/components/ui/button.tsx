@@ -4,22 +4,22 @@ import { cva, type VariantProps } from 'class-variance-authority'
 import { cn } from '@/lib/utils'
 
 const buttonVariants = cva(
-  'inline-flex items-center justify-center gap-2 rounded-xl text-sm font-semibold transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 active:scale-[0.99]',
+  'inline-flex items-center justify-center gap-2 rounded-2xl text-sm font-bold transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 active:scale-[0.98]',
   {
     variants: {
       variant: {
-        default: 'bg-foreground text-background hover:bg-foreground/90',
-        secondary: 'bg-secondary text-secondary-foreground hover:bg-accent',
-        ghost: 'text-foreground hover:bg-secondary',
-        outline: 'border border-border bg-card text-foreground hover:bg-secondary',
-        destructive: 'bg-foreground text-background hover:bg-foreground/90',
-        gradient: 'bg-foreground text-background hover:bg-foreground/90',
+        default: 'bg-primary text-primary-foreground shadow-[0_14px_32px_-20px_hsl(var(--primary)/0.8)] hover:bg-primary/90',
+        secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
+        ghost: 'text-foreground hover:bg-muted/80',
+        outline: 'border border-border bg-card/80 text-foreground shadow-sm hover:border-primary/30 hover:bg-primary/5',
+        destructive: 'bg-destructive text-destructive-foreground hover:bg-destructive/90',
+        gradient: 'bg-gradient-to-r from-primary via-violet-600 to-accent text-white shadow-[0_16px_36px_-22px_rgba(79,70,229,0.85)] hover:brightness-105',
       },
       size: {
         default: 'h-12 px-6 py-3',
         sm: 'h-10 rounded-xl px-4 text-xs',
-        lg: 'h-14 rounded-xl px-8 text-base',
-        icon: 'h-11 w-11 rounded-xl',
+        lg: 'h-14 rounded-2xl px-8 text-base',
+        icon: 'h-11 w-11 rounded-2xl',
       },
     },
     defaultVariants: {
