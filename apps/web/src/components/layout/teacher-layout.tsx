@@ -144,7 +144,7 @@ export function TeacherLayout() {
               ))}
             </nav>
 
-            <div className="mt-4 space-y-3 border-t border-border pt-4">
+            <div className="mt-4 space-y-3 border-t border-border pb-3 pt-4">
               <Button
                 variant="outline"
                 className="h-12 w-full justify-start"
@@ -190,7 +190,7 @@ export function TeacherLayout() {
         </main>
       </div>
 
-      <nav className="app-bottom-nav">
+      {!drawerOpen ? <nav className="app-bottom-nav">
         {bottomNavItems.map((item) => {
           const isActive = Boolean(matchPath({ path: item.pattern, end: false }, location.pathname))
 
@@ -205,7 +205,7 @@ export function TeacherLayout() {
             </NavLink>
           )
         })}
-      </nav>
+      </nav> : null}
     </div>
   )
 }
