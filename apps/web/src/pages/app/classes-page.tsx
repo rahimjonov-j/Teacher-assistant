@@ -748,7 +748,7 @@ function ReviewRow({
         <div>
           <div className="font-black">{submission.studentName}</div>
           <div className="text-sm text-muted-foreground">
-            {submission.assignmentTitle} · {submission.assignmentType}
+            {submission.assignmentTitle} - {submission.assignmentType}
           </div>
         </div>
         <Badge variant="outline">{new Date(submission.submittedAt).toLocaleDateString()}</Badge>
@@ -790,7 +790,7 @@ function ReviewRow({
             <Textarea
               value={feedback}
               onChange={(event) => setFeedback(event.target.value)}
-              placeholder="Masalan: Yaxshi ish! Fikring aniq. Keyingi safar grammar va misollarga koproq e'tibor ber."
+              placeholder="Masalan: Yaxshi ish! Fikring aniq. Keyingi safar grammar va misollarga ko'proq e'tibor ber."
               className="min-h-[120px]"
             />
           </label>

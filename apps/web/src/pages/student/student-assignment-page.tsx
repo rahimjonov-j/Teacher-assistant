@@ -240,7 +240,7 @@ export function StudentAssignmentPage() {
             {!attemptId && ['multiple_choice', 'variant_test', 'mini_game', 'open_question'].includes(data.assignment.type) ? (
               <Button className="w-full rounded-2xl sm:w-fit" onClick={() => startMutation.mutate()} disabled={startMutation.isPending || data.assignment.attemptsRemaining <= 0}>
                 <Clock3 className="h-4 w-4" />
-                Testni boshlash
+                {startMutation.isPending ? 'Boshlanmoqda...' : 'Testni boshlash'}
               </Button>
             ) : null}
           </CardContent>

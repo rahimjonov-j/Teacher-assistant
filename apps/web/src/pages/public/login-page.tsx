@@ -41,6 +41,7 @@ export function LoginPage() {
       toast.error(getUzToastError(error, 'Tizimga kirib bo\'lmadi.'))
     }
   })
+  const emailField = form.register('email')
 
   return (
     <Card className="w-full">
@@ -68,11 +69,11 @@ export function LoginPage() {
                 autoComplete="username"
                 placeholder="username"
                 className="h-12 rounded-none border-0 bg-transparent shadow-none focus-visible:ring-0"
-                {...form.register('email', {
-                  onChange: (event) => {
-                    event.target.value = normalizeGmailUsername(event.target.value)
-                  },
-                })}
+                {...emailField}
+                onChange={(event) => {
+                  event.target.value = normalizeGmailUsername(event.target.value)
+                  void emailField.onChange(event)
+                }}
               />
               <div className="flex shrink-0 items-center border-l border-border bg-secondary px-3 text-sm font-bold text-secondary-foreground">
                 {GMAIL_DOMAIN}

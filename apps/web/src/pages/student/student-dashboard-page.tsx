@@ -96,7 +96,7 @@ export function StudentDashboardPage() {
                     <div className="min-w-0">
                       <div className="truncate font-black">{assignment.title}</div>
                       <div className="mt-1 text-xs text-muted-foreground">
-                        {assignment.type} · {assignment.attemptsRemaining} attempts left · {assignment.deadlineAt ? new Date(assignment.deadlineAt).toLocaleString() : 'No deadline'}
+                        {assignment.type} - {assignment.attemptsRemaining} attempts left - {assignment.deadlineAt ? new Date(assignment.deadlineAt).toLocaleString() : 'No deadline'}
                       </div>
                     </div>
                     <ArrowRight className="h-4 w-4 shrink-0 text-muted-foreground" />
