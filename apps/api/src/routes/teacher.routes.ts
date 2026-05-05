@@ -1,10 +1,11 @@
 import { Router } from 'express'
 import { teacherController } from '../controllers/teacher.controller.js'
 import { requireAuth } from '../middleware/auth.js'
+import { requireTeacher } from '../middleware/teacher-only.js'
 
 export const teacherRouter = Router()
 
-teacherRouter.use(requireAuth)
+teacherRouter.use(requireAuth, requireTeacher)
 teacherRouter.get('/dashboard', teacherController.dashboard)
 teacherRouter.post('/generate', teacherController.generate)
 teacherRouter.get('/history', teacherController.history)

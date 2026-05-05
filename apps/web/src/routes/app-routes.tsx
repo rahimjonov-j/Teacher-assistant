@@ -124,6 +124,25 @@ function AdminGate() {
   return <Outlet />
 }
 
+function TeacherGate() {
+  const { initialized, session, profile, loading } = useAuth()
+  const { t } = useI18n()
+
+  if (!initialized || loading || (session && !profile)) {
+    return <FullScreenLoader label={t('routes.panelLoading')} />
+  }
+
+  if (!session) {
+    return <Navigate to="/login" replace />
+  }
+
+  if (profile?.role === 'admin') {
+    return <Navigate to="/admin/dashboard" replace />
+  }
+
+  return <Outlet />
+}
+
 function GuestGate() {
   const { session, profile } = useAuth()
   const { t } = useI18n()
@@ -233,103 +252,105 @@ export function AppRoutes() {
       />
 
       <Route element={<ProtectedGate />}>
-        <Route
-          element={
-            <LazyRoute label={t('routes.panelLoading')}>
-              <TeacherLayout />
-            </LazyRoute>
-          }
-        >
-          <Route path="/app" element={<Navigate to="/app/dashboard" replace />} />
+        <Route element={<TeacherGate />}>
           <Route
-            path="/app/dashboard"
             element={
-              <LazyRoute label={t('routes.dashboardLoading')}>
-                <DashboardPage />
+              <LazyRoute label={t('routes.panelLoading')}>
+                <TeacherLayout />
               </LazyRoute>
             }
-          />
-          <Route
-            path="/app/classes"
-            element={
-              <LazyRoute label="Classes loading">
-                <ClassesPage />
-              </LazyRoute>
-            }
-          />
-          <Route
-            path="/app/messenger"
-            element={
-              <LazyRoute label={t('routes.messengerLoading')}>
-                <MessengerPage />
-              </LazyRoute>
-            }
-          />
-          <Route
-            path="/app/calendar"
-            element={
-              <LazyRoute label={t('routes.calendarLoading')}>
-                <CalendarPage />
-              </LazyRoute>
-            }
-          />
-          <Route
-            path="/app/database"
-            element={
-              <LazyRoute label={t('routes.databaseLoading')}>
-                <DatabasePage />
-              </LazyRoute>
-            }
-          />
-          <Route
-            path="/app/attendance"
-            element={
-              <LazyRoute label={t('routes.attendanceLoading')}>
-                <AttendancePage />
-              </LazyRoute>
-            }
-          />
-          <Route
-            path="/app/generator"
-            element={
-              <LazyRoute label={t('routes.generatorLoading')}>
-                <GeneratorPage />
-              </LazyRoute>
-            }
-          />
-          <Route path="/app/history" element={<Navigate to="/app/messenger" replace />} />
-          <Route
-            path="/app/history/:id"
-            element={
-              <LazyRoute label={t('routes.detailLoading')}>
-                <ContentDetailPage />
-              </LazyRoute>
-            }
-          />
-          <Route
-            path="/app/telegram-link"
-            element={
-              <LazyRoute label={t('routes.telegramLinkLoading')}>
-                <TelegramLinkPage />
-              </LazyRoute>
-            }
-          />
-          <Route
-            path="/app/settings"
-            element={
-              <LazyRoute label={t('routes.settingsLoading')}>
-                <SettingsPage />
-              </LazyRoute>
-            }
-          />
-          <Route
-            path="/app/billing"
-            element={
-              <LazyRoute label={t('routes.billingLoading')}>
-                <BillingPage />
-              </LazyRoute>
-            }
-          />
+          >
+            <Route path="/app" element={<Navigate to="/app/dashboard" replace />} />
+            <Route
+              path="/app/dashboard"
+              element={
+                <LazyRoute label={t('routes.dashboardLoading')}>
+                  <DashboardPage />
+                </LazyRoute>
+              }
+            />
+            <Route
+              path="/app/classes"
+              element={
+                <LazyRoute label="Classes loading">
+                  <ClassesPage />
+                </LazyRoute>
+              }
+            />
+            <Route
+              path="/app/messenger"
+              element={
+                <LazyRoute label={t('routes.messengerLoading')}>
+                  <MessengerPage />
+                </LazyRoute>
+              }
+            />
+            <Route
+              path="/app/calendar"
+              element={
+                <LazyRoute label={t('routes.calendarLoading')}>
+                  <CalendarPage />
+                </LazyRoute>
+              }
+            />
+            <Route
+              path="/app/database"
+              element={
+                <LazyRoute label={t('routes.databaseLoading')}>
+                  <DatabasePage />
+                </LazyRoute>
+              }
+            />
+            <Route
+              path="/app/attendance"
+              element={
+                <LazyRoute label={t('routes.attendanceLoading')}>
+                  <AttendancePage />
+                </LazyRoute>
+              }
+            />
+            <Route
+              path="/app/generator"
+              element={
+                <LazyRoute label={t('routes.generatorLoading')}>
+                  <GeneratorPage />
+                </LazyRoute>
+              }
+            />
+            <Route path="/app/history" element={<Navigate to="/app/messenger" replace />} />
+            <Route
+              path="/app/history/:id"
+              element={
+                <LazyRoute label={t('routes.detailLoading')}>
+                  <ContentDetailPage />
+                </LazyRoute>
+              }
+            />
+            <Route
+              path="/app/telegram-link"
+              element={
+                <LazyRoute label={t('routes.telegramLinkLoading')}>
+                  <TelegramLinkPage />
+                </LazyRoute>
+              }
+            />
+            <Route
+              path="/app/settings"
+              element={
+                <LazyRoute label={t('routes.settingsLoading')}>
+                  <SettingsPage />
+                </LazyRoute>
+              }
+            />
+            <Route
+              path="/app/billing"
+              element={
+                <LazyRoute label={t('routes.billingLoading')}>
+                  <BillingPage />
+                </LazyRoute>
+              }
+            />
+          </Route>
         </Route>
 
         <Route element={<AdminGate />}>
