@@ -116,7 +116,7 @@
   }
 
   .app-nav-item-active {
-    @apply text-primary;
+    @apply text-primary bg-primary/[0.08];
   }
 }
 

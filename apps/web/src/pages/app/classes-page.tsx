@@ -264,7 +264,7 @@ export function ClassesPage() {
               onClick={() => setSelectedClassId(item.id)}
               className={cn(
                 'w-full rounded-xl border p-4 text-left transition-colors',
-                activeClassId === item.id ? 'border-black bg-black text-white' : 'border-border bg-card hover:bg-secondary',
+                activeClassId === item.id ? 'border-primary/40 bg-primary/[0.08] text-foreground ring-2 ring-primary/15' : 'border-border bg-card hover:bg-secondary',
               )}
             >
               <div className="flex items-center justify-between gap-2">

@@ -36,8 +36,8 @@ const navItems = [
 
 const bottomNavItems = [
   { to: '/app/dashboard', labelKey: 'teacher.nav.dashboard', icon: LayoutDashboard, pattern: '/app/dashboard' },
-  { to: '/app/generator', labelKey: 'teacher.header.create', icon: Sparkles, pattern: '/app/generator' },
   { to: '/app/classes', labelKey: 'teacher.nav.classes', icon: GraduationCap, pattern: '/app/classes' },
+  { to: '/app/generator', labelKey: 'teacher.header.create', icon: Sparkles, pattern: '/app/generator' },
   { to: '/app/messenger', labelKey: 'teacher.nav.messenger', icon: MessageSquare, pattern: '/app/messenger' },
   { to: '/app/settings', labelKey: 'teacher.nav.settings', icon: UserRound, pattern: '/app/settings' },
 ] as const
@@ -105,9 +105,14 @@ export function TeacherLayout() {
             onClick={(event) => event.stopPropagation()}
           >
             <div className="flex items-center justify-between px-2">
-              <div>
-                <div className="text-sm font-black tracking-tight">Teacher Assistant</div>
-                <div className="text-xs text-muted-foreground">{t('teacher.menu.workspace')}</div>
+              <div className="flex min-w-0 items-center gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-accent text-sm font-black text-white">
+                  {profile?.fullName?.[0]?.toUpperCase() ?? 'T'}
+                </div>
+                <div className="min-w-0">
+                  <div className="truncate text-sm font-black tracking-tight">{profile?.fullName ?? 'Teacher Assistant'}</div>
+                  <div className="truncate text-xs text-muted-foreground">{profile?.schoolName ?? t('teacher.menu.workspace')}</div>
+                </div>
               </div>
               <Button variant="ghost" size="icon" className="rounded-full" onClick={() => setDrawerOpen(false)}>
                 <X className="h-5 w-5" />
@@ -193,15 +198,32 @@ export function TeacherLayout() {
       {!drawerOpen ? <nav className="app-bottom-nav">
         {bottomNavItems.map((item) => {
           const isActive = Boolean(matchPath({ path: item.pattern, end: false }, location.pathname))
+          const isGenerator = item.to === '/app/generator'
 
           return (
             <NavLink
               key={item.to}
               to={item.to}
-              className={cn('app-nav-item', isActive && 'app-nav-item-active')}
+              className={cn('app-nav-item', !isGenerator && isActive && 'app-nav-item-active')}
             >
-              <item.icon className="h-5 w-5" />
-              <span>{t(item.labelKey)}</span>
+              {!isGenerator && isActive ? (
+                <span className="absolute inset-x-2 top-1 h-0.5 rounded-full bg-primary" />
+              ) : null}
+              {isGenerator ? (
+                <div className={cn(
+                  'flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-primary via-violet-600 to-accent text-white transition-all duration-200',
+                  isActive
+                    ? 'shadow-[0_6px_20px_-4px_rgba(79,70,229,0.75)] scale-105'
+                    : 'shadow-[0_4px_16px_-6px_rgba(79,70,229,0.5)]',
+                )}>
+                  <Sparkles className="h-5 w-5" />
+                </div>
+              ) : (
+                <>
+                  <item.icon className="h-5 w-5" />
+                  <span>{t(item.labelKey)}</span>
+                </>
+              )}
             </NavLink>
           )
         })}

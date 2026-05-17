@@ -28,7 +28,7 @@ export const StatCard = memo(function StatCard({
   }[tone]
 
   return (
-    <Card className="h-full min-w-0">
+    <Card className="h-full min-w-0 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_24px_64px_-44px_rgba(30,41,88,0.28)]">
       <CardContent className="p-4 sm:p-5">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0 flex-1 space-y-1">

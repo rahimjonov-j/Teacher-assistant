@@ -6,7 +6,7 @@ import {
   type FeatureKey,
   type GeneratorResponse,
 } from '@teacher-assistant/shared'
-import { Copy, FileText, Sparkles } from 'lucide-react'
+import { BookOpen, ClipboardList, Copy, FileText, Mic, MessageSquareText, Sparkles } from 'lucide-react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { toast } from 'sonner'
 import { MarkdownRenderer } from '@/components/shared/markdown-renderer'
@@ -14,8 +14,8 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Select } from '@/components/ui/select'
 import { Skeleton } from '@/components/ui/skeleton'
+import { cn } from '@/lib/utils'
 import { Spinner } from '@/components/ui/spinner'
 import { Textarea } from '@/components/ui/textarea'
 import { useI18n } from '@/hooks/use-i18n'
@@ -25,6 +25,13 @@ import { getFeatureLabel } from '@/lib/format'
 import { getUzToastError } from '@/lib/toast'
 
 const generatorFeatures = FEATURE_DEFINITIONS.filter((feature) => feature.key !== 'pdf_export')
+
+const featureIcons: Record<string, typeof Sparkles> = {
+  quiz: ClipboardList,
+  lesson_plan: BookOpen,
+  writing_feedback: MessageSquareText,
+  speaking_questions: Mic,
+}
 
 export function GeneratorPage() {
   const navigate = useNavigate()
@@ -79,22 +86,34 @@ export function GeneratorPage() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="feature">{t('generator.tool')}</Label>
-            <Select
-              id="feature"
-              value={featureKey}
-              onChange={(event) => {
-                const value = event.target.value as FeatureKey
-                setFeatureKey(value)
-                setSearchParams({ feature: value })
-              }}
-            >
-              {generatorFeatures.map((feature) => (
-                <option key={feature.key} value={feature.key}>
-                  {getFeatureLabel(feature.key)}
-                </option>
-              ))}
-            </Select>
+            <Label>{t('generator.tool')}</Label>
+            <div className="grid grid-cols-2 gap-2">
+              {generatorFeatures.map((feature) => {
+                const Icon = featureIcons[feature.key] ?? Sparkles
+                const isSelected = featureKey === feature.key
+                return (
+                  <button
+                    key={feature.key}
+                    type="button"
+                    onClick={() => {
+                      setFeatureKey(feature.key as FeatureKey)
+                      setSearchParams({ feature: feature.key })
+                    }}
+                    className={cn(
+                      'flex items-center gap-2.5 rounded-2xl border p-3 text-left transition-all duration-150',
+                      isSelected
+                        ? 'border-primary/30 bg-primary/10 text-primary ring-2 ring-primary/15'
+                        : 'border-border bg-card/70 text-muted-foreground hover:bg-secondary hover:text-foreground',
+                    )}
+                  >
+                    <div className={cn('flex h-8 w-8 shrink-0 items-center justify-center rounded-xl', isSelected ? 'bg-primary/15' : 'bg-secondary')}>
+                      <Icon className="h-4 w-4" />
+                    </div>
+                    <span className="text-xs font-bold leading-4">{getFeatureLabel(feature.key)}</span>
+                  </button>
+                )
+              })}
+            </div>
           </div>
 
           <div className="space-y-2">

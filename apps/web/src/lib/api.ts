@@ -34,6 +34,7 @@ export async function apiRequest<T>(path: string, init: RequestInit = {}) {
   }
 
   const response = await fetch(`${env.apiUrl}${path}`, {
+    cache: 'no-store',
     ...init,
     headers,
   })

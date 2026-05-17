@@ -17,6 +17,8 @@ import { telegramRouter } from './routes/telegram.routes.js'
 export function createApp() {
   const app = express()
 
+  app.set('etag', false)
+
   app.use(
     cors({
       origin: env.APP_URL,
@@ -26,6 +28,11 @@ export function createApp() {
   app.use(helmet())
   app.use(express.json({ limit: '8mb' }))
   app.use(morgan(env.NODE_ENV === 'production' ? 'combined' : 'dev'))
+
+  app.use('/api', (_request, response, next) => {
+    response.setHeader('Cache-Control', 'no-store')
+    next()
+  })
 
   app.get('/', (_request, response) => {
     response.json({
