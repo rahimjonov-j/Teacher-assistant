@@ -3,7 +3,6 @@ import { z } from 'zod'
 import type { AuthenticatedRequest } from '../middleware/auth.js'
 import { contentRepository } from '../repositories/content.repository.js'
 import { subscriptionsRepository } from '../repositories/subscriptions.repository.js'
-import { telegramRepository } from '../repositories/telegram.repository.js'
 import { dashboardService } from '../services/dashboard.service.js'
 import { generationService } from '../services/generation.service.js'
 import { pdfService } from '../services/pdf.service.js'
@@ -59,11 +58,5 @@ export const teacherController = {
     const authenticatedRequest = request as AuthenticatedRequest
     const subscription = await subscriptionsRepository.getActiveByUserId(authenticatedRequest.auth.userId)
     response.json({ subscription })
-  }),
-
-  createTelegramLinkCode: asyncHandler(async (request: Request, response: Response) => {
-    const authenticatedRequest = request as AuthenticatedRequest
-    const result = await telegramRepository.createLinkCode(authenticatedRequest.auth.userId)
-    response.json(result)
   }),
 }

@@ -15,9 +15,6 @@ const envSchema = z.object({
   OPENAI_API_KEY: z.string().optional(),
   OPENAI_MODEL_LIGHT: z.string().default('gpt-4.1-mini'),
   OPENAI_MODEL_STRONG: z.string().default('gpt-4.1'),
-  TELEGRAM_BOT_TOKEN: z.string().optional(),
-  TELEGRAM_BOT_USERNAME: z.string().optional(),
-  TELEGRAM_WEBHOOK_URL: z.string().url().optional(),
   STUDENT_PASSWORD_SECRET: z.string().optional(),
   PDF_STORAGE_BUCKET: z.string().default('generated-pdfs'),
   SPEAKING_AUDIO_STORAGE_BUCKET: z.string().default('speaking-audio'),
@@ -38,7 +35,6 @@ export const hasSupabaseConfig = Boolean(
 )
 
 export const hasOpenAiConfig = Boolean(env.OPENAI_API_KEY)
-export const hasTelegramConfig = Boolean(env.TELEGRAM_BOT_TOKEN)
 export const superAdminEmails = env.SUPER_ADMIN_EMAILS
   .split(',')
   .map((email) => email.trim().toLowerCase())

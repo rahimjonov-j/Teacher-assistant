@@ -12,7 +12,6 @@ import { healthRouter } from './routes/health.routes.js'
 import { plansRouter } from './routes/plans.routes.js'
 import { studentRouter } from './routes/student.routes.js'
 import { teacherRouter } from './routes/teacher.routes.js'
-import { telegramRouter } from './routes/telegram.routes.js'
 
 export function createApp() {
   const app = express()
@@ -48,8 +47,6 @@ export function createApp() {
   app.use('/api/classes', classesRouter)
   app.use('/api/student', studentRouter)
   app.use('/api/admin', adminRouter)
-  app.use('/api/telegram', telegramRouter)
-
   app.use(notFoundHandler)
   app.use(errorHandler)
 

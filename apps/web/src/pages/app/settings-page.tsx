@@ -1,9 +1,7 @@
 import { useMemo, useState } from 'react'
 import { useMutation } from '@tanstack/react-query'
-import { TELEGRAM_COMMAND_DEFINITIONS } from '@teacher-assistant/shared'
 import {
   Bell,
-  Bot,
   ChevronRight,
   Globe,
   HelpCircle,
@@ -20,7 +18,6 @@ import { toast } from 'sonner'
 import { useAuth } from '@/hooks/use-auth'
 import { useI18n } from '@/hooks/use-i18n'
 import { apiRequest } from '@/lib/api'
-import { env } from '@/lib/env'
 import { getUzToastError } from '@/lib/toast'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -29,11 +26,6 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select } from '@/components/ui/select'
 import { Spinner } from '@/components/ui/spinner'
-
-interface LinkCodeResponse {
-  linkCode: string
-  expiresAt: string
-}
 
 type SectionKey = 'profile' | 'account' | 'notifications' | 'privacy' | 'language' | 'theme' | 'help' | 'about'
 
@@ -60,8 +52,6 @@ export function SettingsPage() {
   const [schoolName, setSchoolName] = useState(profile?.schoolName ?? '')
   const [gradeFocus, setGradeFocus] = useState(profile?.gradeFocus ?? '')
   const [timezone, setTimezone] = useState(profile?.timezone ?? '')
-  const [telegramHandle, setTelegramHandle] = useState(profile?.telegramHandle ?? '')
-  const [linkData, setLinkData] = useState<LinkCodeResponse | null>(null)
 
   const profileSnapshot = useMemo(
     () => ({
@@ -69,9 +59,8 @@ export function SettingsPage() {
       schoolName: profile?.schoolName ?? '',
       gradeFocus: profile?.gradeFocus ?? '',
       timezone: profile?.timezone ?? '',
-      telegramHandle: profile?.telegramHandle ?? '',
     }),
-    [profile?.fullName, profile?.schoolName, profile?.gradeFocus, profile?.timezone, profile?.telegramHandle],
+    [profile?.fullName, profile?.schoolName, profile?.gradeFocus, profile?.timezone],
   )
 
   const saveMutation = useMutation({
@@ -83,7 +72,6 @@ export function SettingsPage() {
           schoolName: schoolName || null,
           gradeFocus: gradeFocus || null,
           timezone: timezone || null,
-          telegramHandle: telegramHandle || null,
         }),
       }),
     onSuccess: async () => {
@@ -94,21 +82,6 @@ export function SettingsPage() {
       toast.error(getUzToastError(error, "Profilni saqlab bo'lmadi."))
     },
   })
-
-  const linkMutation = useMutation({
-    mutationFn: () => apiRequest<LinkCodeResponse>('/teacher/telegram/link-code', { method: 'POST' }),
-    onSuccess: (data) => {
-      setLinkData(data)
-      toast.success('Telegram ulanish kodi yaratildi.')
-    },
-    onError: (error) => {
-      toast.error(getUzToastError(error, 'Telegram ulanish kodi yaratilmadi.'))
-    },
-  })
-
-  const deepLink = env.telegramBotUsername && linkData
-    ? `https://t.me/${env.telegramBotUsername}?start=link_${linkData.linkCode}`
-    : null
 
   const currentTheme = resolvedTheme === 'dark' ? 'dark' : 'light'
   const currentThemeLabel = currentTheme === 'dark' ? t('common.dark') : t('common.light')
@@ -148,51 +121,18 @@ export function SettingsPage() {
 
     if (sectionKey === 'account') {
       return (
-        <div className="space-y-4 border-t border-border/70 px-4 pb-4 pt-4">
-          <div className="space-y-2">
-            <Label htmlFor="telegramHandle">{t('settings.telegramUsername')}</Label>
-            <Input
-              id="telegramHandle"
-              value={telegramHandle || profileSnapshot.telegramHandle}
-              onChange={(event) => setTelegramHandle(event.target.value)}
-              placeholder="@username"
-            />
+        <div className="space-y-3 border-t border-border/70 px-4 pb-4 pt-4">
+          <div className="rounded-2xl border border-border px-4 py-3 text-sm text-muted-foreground">
+            {t('settings.privacyEmail')}: <span className="font-semibold text-foreground">{profile?.email ?? '-'}</span>
           </div>
-          <Button variant="outline" onClick={() => linkMutation.mutate()} disabled={linkMutation.isPending} className="w-full">
-            {linkMutation.isPending ? <Spinner /> : <Bot className="h-4 w-4" />}
-            {t('settings.createLinkCode')}
-          </Button>
-
-          {linkData ? (
-            <div className="rounded-2xl border border-border p-4">
-              <div className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">{t('settings.oneTimeCode')}</div>
-              <div className="mt-3 text-2xl font-black tracking-[0.22em]">{linkData.linkCode}</div>
-              <div className="mt-2 text-xs text-muted-foreground">{t('settings.expiresAt')}: {linkData.expiresAt}</div>
-              {deepLink ? (
-                <Button asChild className="mt-4 w-full">
-                  <a href={deepLink} target="_blank" rel="noreferrer">
-                    {t('settings.openBot')}
-                  </a>
-                </Button>
-              ) : null}
-            </div>
-          ) : null}
         </div>
       )
     }
 
     if (sectionKey === 'notifications') {
       return (
-        <div className="space-y-4 border-t border-border/70 px-4 pb-4 pt-4">
+        <div className="space-y-3 border-t border-border/70 px-4 pb-4 pt-4">
           <p className="text-sm leading-6 text-muted-foreground">{t('settings.notificationsHint')}</p>
-          <div className="grid gap-2">
-            {TELEGRAM_COMMAND_DEFINITIONS.map((command) => (
-              <div key={command.command} className="rounded-2xl border border-border px-3 py-3">
-                <div className="text-sm font-black">{command.usage}</div>
-                <div className="mt-1 text-xs text-muted-foreground">{t(`commands.${command.command}`)}</div>
-              </div>
-            ))}
-          </div>
         </div>
       )
     }
@@ -202,9 +142,6 @@ export function SettingsPage() {
         <div className="space-y-3 border-t border-border/70 px-4 pb-4 pt-4">
           <div className="rounded-2xl border border-border px-4 py-3 text-sm text-muted-foreground">
             {t('settings.privacyEmail')}: <span className="font-semibold text-foreground">{profile?.email ?? '-'}</span>
-          </div>
-          <div className="rounded-2xl border border-border px-4 py-3 text-sm text-muted-foreground">
-            {t('settings.privacyTelegram')}: <span className="font-semibold text-foreground">{profile?.telegramHandle ?? t('settings.notLinked')}</span>
           </div>
         </div>
       )
@@ -329,7 +266,6 @@ export function SettingsPage() {
           </div>
         </CardContent>
       </Card>
-
     </div>
   )
 }

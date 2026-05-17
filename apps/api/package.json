@@ -19,8 +19,7 @@
     "morgan": "^1.10.1",
     "openai": "^6.3.0",
     "pdfkit": "^0.17.2",
-    "telegraf": "^4.16.3",
-    "zod": "^4.1.12"
+"zod": "^4.1.12"
   },
   "devDependencies": {
     "@types/cors": "^2.8.19",

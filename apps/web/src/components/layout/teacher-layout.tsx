@@ -6,7 +6,6 @@ import {
   CreditCard,
   Database,
   GraduationCap,
-  KeyRound,
   LayoutDashboard,
   LogOut,
   Menu,
@@ -29,7 +28,6 @@ const navItems = [
   { to: '/app/calendar', labelKey: 'teacher.nav.calendar', icon: CalendarDays },
   { to: '/app/database', labelKey: 'teacher.nav.database', icon: Database },
   { to: '/app/attendance', labelKey: 'teacher.nav.attendance', icon: ClipboardCheck },
-  { to: '/app/telegram-link', labelKey: 'teacher.nav.telegramLink', icon: KeyRound },
   { to: '/app/settings', labelKey: 'teacher.nav.settings', icon: Settings },
   { to: '/app/billing', labelKey: 'teacher.menu.plans', icon: CreditCard },
 ] as const
@@ -49,7 +47,6 @@ const pageMeta: Array<{ pattern: string; titleKey: string; actionTo?: string }> 
   { pattern: '/app/calendar', titleKey: 'teacher.nav.calendar', actionTo: '/app/generator' },
   { pattern: '/app/database', titleKey: 'teacher.nav.database', actionTo: '/app/generator' },
   { pattern: '/app/attendance', titleKey: 'teacher.nav.attendance', actionTo: '/app/generator' },
-  { pattern: '/app/telegram-link', titleKey: 'teacher.nav.telegramLink' },
   { pattern: '/app/settings', titleKey: 'teacher.nav.settings' },
   { pattern: '/app/generator', titleKey: 'teacher.header.create' },
   { pattern: '/app/history', titleKey: 'teacher.nav.messenger' },
