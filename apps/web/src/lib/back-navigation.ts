@@ -11,8 +11,7 @@ export function getFallbackBackPath(pathname: string) {
     pathname === '/app/calendar' ||
     pathname === '/app/database' ||
     pathname === '/app/attendance' ||
-    pathname === '/app/telegram-link' ||
-    pathname === '/app/messenger'
+pathname === '/app/messenger'
   ) {
     return '/app/dashboard'
   }

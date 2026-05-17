@@ -9,7 +9,6 @@ const updateProfileSchema = z.object({
   schoolName: z.string().max(160).nullable(),
   gradeFocus: z.string().max(120).nullable(),
   timezone: z.string().max(80).nullable(),
-  telegramHandle: z.string().max(80).nullable(),
 })
 
 export const authController = {

@@ -82,11 +82,7 @@ export function PricingPage() {
                   <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
                   Tarix va PDF eksport
                 </li>
-                <li className="flex items-start gap-3 text-sm font-medium">
-                  <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-                  Web va Telegram
-                </li>
-                <li className="flex items-start gap-3 text-sm font-medium">
+<li className="flex items-start gap-3 text-sm font-medium">
                   <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
                   Barcha AI funksiyalar
                 </li>

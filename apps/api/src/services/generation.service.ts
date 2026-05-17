@@ -8,7 +8,7 @@ import { openAiService } from './openai.service.js'
 export const generationService = {
   async generateForTeacher(input: {
     userId: string
-    source: 'web' | 'telegram'
+    source: 'web'
     payload: GeneratorRequest
   }): Promise<GeneratorResponse> {
     const feature = FEATURE_MAP[input.payload.featureKey]

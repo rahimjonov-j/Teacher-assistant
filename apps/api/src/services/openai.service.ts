@@ -83,54 +83,6 @@ export const openAiService = {
     }
   },
 
-  async generateTelegramReply(input: {
-    message: string
-    teacherName?: string | null
-  }) {
-    const client = getOpenAiClient()
-    const model = env.OPENAI_MODEL_LIGHT
-
-    const response = await client.responses.create({
-      model,
-      temperature: 0.6,
-      max_output_tokens: 700,
-      instructions: [
-        "You are Teacher Assistant's Telegram AI helper for school teachers.",
-        'Primary language: Uzbek (Latin).',
-        'Be practical, concise, and classroom-focused.',
-        "If the request is unclear, ask one short clarifying question instead of guessing.",
-        'Use short markdown sections when useful.',
-      ].join(' '),
-      input: [
-        {
-          role: 'user',
-          content: [
-            {
-              type: 'input_text',
-              text: [
-                `Teacher name: ${input.teacherName ?? 'Unknown'}`,
-                'Context: Telegram chat request.',
-                `Request: ${input.message}`,
-              ].join('\n'),
-            },
-          ],
-        },
-      ],
-    })
-
-    const output = response.output_text?.trim()
-
-    if (!output) {
-      throw new ApiError(502, 'OpenAI returned an empty Telegram reply.')
-    }
-
-    return {
-      model,
-      output,
-      usage: extractTokenUsage(response),
-    }
-  },
-
   async generateQuizAssignment(input: {
     prompt: string
     className?: string | null

@@ -724,48 +724,6 @@ export const classRepository = {
     return student
   },
 
-  async linkTelegramStudent(studentId: string, telegramUserId: number, telegramUsername?: string | null) {
-    const supabase = getSupabaseAdminClient()
-    const student = await this.getStudentById(studentId)
-
-    if (!student) {
-      throw new ApiError(404, 'Student not found.')
-    }
-
-    const { error } = await supabase.from('telegram_accounts').upsert(
-      {
-        student_id: studentId,
-        telegram_user_id: String(telegramUserId),
-        telegram_username: telegramUsername ?? null,
-        linked_at: new Date().toISOString(),
-      },
-      { onConflict: 'telegram_user_id' },
-    )
-
-    if (error) {
-      throw new ApiError(500, 'Unable to link Telegram account.')
-    }
-  },
-
-  async findStudentByTelegramUserId(telegramUserId: number) {
-    const supabase = getSupabaseAdminClient()
-    const { data, error } = await supabase
-      .from('telegram_accounts')
-      .select('student_id')
-      .eq('telegram_user_id', String(telegramUserId))
-      .not('student_id', 'is', null)
-      .maybeSingle()
-
-    if (error) {
-      throw new ApiError(500, 'Unable to load Telegram student account.')
-    }
-
-    if (!data?.student_id) {
-      return null
-    }
-
-    return this.getStudentById(data.student_id as string)
-  },
 }
 
 function randomNumericSuffix() {

@@ -3,7 +3,6 @@ declare const __APP_ENV__:
       API_URL?: string
       SUPABASE_URL?: string
       SUPABASE_ANON_KEY?: string
-      TELEGRAM_BOT_USERNAME?: string
     }
   | undefined
 
@@ -15,10 +14,6 @@ function pickFirstNonEmpty(...values: Array<string | undefined>) {
   }
 
   return ''
-}
-
-function normalizeTelegramBotUsername(value: string) {
-  return value.replace(/^@+/, '').trim()
 }
 
 export const env = {
@@ -36,11 +31,5 @@ export const env = {
     import.meta.env.VITE_SUPABASE_ANON_KEY,
     import.meta.env.SUPABASE_ANON_KEY,
     __APP_ENV__?.SUPABASE_ANON_KEY,
-  ),
-  telegramBotUsername: normalizeTelegramBotUsername(
-    pickFirstNonEmpty(
-      import.meta.env.VITE_TELEGRAM_BOT_USERNAME,
-      __APP_ENV__?.TELEGRAM_BOT_USERNAME,
-    ),
   ),
 }

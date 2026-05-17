@@ -2,7 +2,6 @@ import { useMemo, useState } from 'react'
 import { useMutation } from '@tanstack/react-query'
 import {
   FEATURE_DEFINITIONS,
-  TELEGRAM_FEATURE_COMMAND_MAP,
   type FeatureKey,
   type GeneratorResponse,
 } from '@teacher-assistant/shared'
@@ -74,7 +73,6 @@ export function GeneratorPage() {
   })
 
   const result = mutation.data?.content
-  const activeTelegramCommand = TELEGRAM_FEATURE_COMMAND_MAP[featureKey]
 
   return (
     <div className="space-y-4 animate-in pb-8">
@@ -140,12 +138,6 @@ export function GeneratorPage() {
               className="min-h-[110px]"
               placeholder={t('generator.optional')}
             />
-          </div>
-
-          <div className="rounded-2xl border border-primary/10 bg-primary/5 p-4">
-            <div className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">{t('generator.telegramCommand')}</div>
-            <div className="mt-2 text-base font-black">{activeTelegramCommand.usage}</div>
-            <div className="mt-1 text-sm text-muted-foreground">{activeTelegramCommand.description}</div>
           </div>
 
           <Button variant="gradient" className="h-14 w-full" onClick={() => mutation.mutate()} disabled={mutation.isPending || !topic}>

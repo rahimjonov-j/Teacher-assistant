@@ -20,8 +20,6 @@ export default defineConfig(({ mode }) => {
         SUPABASE_URL: rawEnv.VITE_SUPABASE_URL || rawEnv.SUPABASE_URL || '',
         SUPABASE_ANON_KEY:
           rawEnv.VITE_SUPABASE_ANON_KEY || rawEnv.SUPABASE_ANON_KEY || '',
-        TELEGRAM_BOT_USERNAME:
-          rawEnv.VITE_TELEGRAM_BOT_USERNAME || rawEnv.TELEGRAM_BOT_USERNAME || '',
       }),
     },
     build: {

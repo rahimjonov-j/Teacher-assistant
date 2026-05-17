@@ -13,7 +13,7 @@ export const contentRepository = {
     additionalInstructions: string | null
     modelName: string
     creditsConsumed: number
-    source: 'web' | 'telegram'
+    source: 'web'
   }): Promise<GeneratedContentRecord> {
     const supabase = getSupabaseAdminClient()
     const { data, error } = await supabase

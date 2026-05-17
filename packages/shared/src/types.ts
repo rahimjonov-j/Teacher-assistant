@@ -54,23 +54,12 @@ export interface FeatureDefinition {
   helperText: string
 }
 
-export interface AssistantCommandDefinition {
-  command: string
-  description: string
-  usage: string
-  example?: string
-  featureKey?: FeatureKey
-  aliases?: string[]
-  showInTelegramMenu?: boolean
-}
-
 export interface TeacherProfile {
   id: string
   email: string
   fullName: string | null
   schoolName: string | null
   gradeFocus: string | null
-  telegramHandle: string | null
   avatarUrl: string | null
   role: AppRole
   timezone: string | null
@@ -105,7 +94,7 @@ export interface UsageLogRecord {
   featureKey: FeatureKey
   creditsConsumed: number
   modelName: string
-  source: 'web' | 'telegram' | 'admin'
+  source: 'web' | 'admin'
   createdAt: string
 }
 
@@ -248,7 +237,6 @@ export interface StudentDashboardPayload {
     className: string
     groupName: string
     teacherName: string | null
-    telegramConnected: boolean
   }
   rank: number | null
   activeAssignments: StudentAssignmentRecord[]

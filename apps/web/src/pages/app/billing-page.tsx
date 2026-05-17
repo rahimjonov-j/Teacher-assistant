@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { FEATURE_DEFINITIONS, PLAN_DEFINITIONS, type TeacherDashboardPayload } from '@teacher-assistant/shared'
-import { CheckCircle2, ShoppingBag, Zap } from 'lucide-react'
+import { CheckCircle2, Zap } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { CardLoader } from '@/components/shared/loading-state'
 import { Badge } from '@/components/ui/badge'
@@ -9,7 +9,6 @@ import { Card, CardContent } from '@/components/ui/card'
 import { useI18n } from '@/hooks/use-i18n'
 import { apiRequest } from '@/lib/api'
 import { planDescriptions } from '@/lib/i18n'
-import { env } from '@/lib/env'
 import { formatCurrencyUzs, formatDate, getFeatureLabel, getPlanName } from '@/lib/format'
 import { sortPlans, type PlanConfig } from '@/lib/plans'
 
@@ -70,9 +69,6 @@ export function BillingPage() {
       <div className="space-y-3">
         {plans.map((plan) => {
           const isCurrent = subscription?.planKey === plan.key
-          const upgradeLink = env.telegramBotUsername
-            ? `https://t.me/${env.telegramBotUsername}?start=upgrade_${plan.key}`
-            : null
 
           return (
             <Card key={plan.key}>
@@ -101,13 +97,6 @@ export function BillingPage() {
                 {isCurrent ? (
                   <Button className="w-full" disabled>
                     {t('billing.currentPlanButton')}
-                  </Button>
-                ) : upgradeLink ? (
-                  <Button asChild variant="outline" className="w-full">
-                    <a href={upgradeLink} target="_blank" rel="noreferrer">
-                      <ShoppingBag className="h-4 w-4" />
-                      {t('billing.buyInTelegram')}
-                    </a>
                   </Button>
                 ) : (
                   <Button asChild variant="outline" className="w-full">

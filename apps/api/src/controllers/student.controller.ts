@@ -16,7 +16,6 @@ const submitSchema = z.object({
   answers: z.record(z.string(), z.union([z.string(), z.array(z.string())])).optional(),
   writingText: z.string().max(20000).optional().nullable(),
   audioUrl: z.string().url().optional().nullable(),
-  telegramFileId: z.string().max(300).optional().nullable(),
   gameScore: z.coerce.number().min(0).max(10000).optional().nullable(),
 })
 

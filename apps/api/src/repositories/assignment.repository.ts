@@ -433,14 +433,13 @@ export const assignmentRepository = {
     }
 
     const classId = student.class_id as string
-    const [ratingResult, allStudentsResult, telegramResult, assignmentRows, feedbackRows] = await Promise.all([
+    const [ratingResult, allStudentsResult, assignmentRows, feedbackRows] = await Promise.all([
       supabase
         .from('monthly_ratings')
         .select('student_id, total_score, completed_tasks_count')
         .eq('class_id', classId)
         .eq('period_month', currentMonthStart()),
       supabase.from('students').select('*').eq('class_id', classId).eq('status', 'active'),
-      supabase.from('telegram_accounts').select('id').eq('student_id', studentId).not('linked_at', 'is', null).maybeSingle(),
       this.listAssignmentsForStudent(studentId),
       this.listFeedback(studentId),
     ])
@@ -473,7 +472,6 @@ export const assignmentRepository = {
         className: (student.classes as any).name as string,
         groupName: (student.classes as any).group_name as string,
         teacherName: ((student.profiles as any)?.full_name as string | null) ?? null,
-        telegramConnected: Boolean(telegramResult.data),
       },
       rank,
       activeAssignments: assignmentRows.filter((assignment) => assignment.studentSubmissionStatus !== 'graded'),
@@ -630,7 +628,6 @@ export const assignmentRepository = {
       answers?: Record<string, string[] | string>
       writingText?: string | null
       audioUrl?: string | null
-      telegramFileId?: string | null
       gameScore?: number | null
     },
   ) {
@@ -689,7 +686,6 @@ export const assignmentRepository = {
       await supabase.from('speaking_submissions').insert({
         submission_id: submission.id,
         audio_url: input.audioUrl ?? null,
-        telegram_file_id: input.telegramFileId ?? null,
       })
     }
 
@@ -928,13 +924,13 @@ export const assignmentRepository = {
 
     const submissionIds = (data ?? []).map((row: any) => row.id as string)
     const assignmentIds = Array.from(new Set((data ?? []).map((row: any) => row.assignment_id as string)))
-    const speakingBySubmissionId = new Map<string, { audioUrl: string | null; telegramFileId: string | null }>()
+    const speakingBySubmissionId = new Map<string, { audioUrl: string | null }>()
     const questionsByAssignmentId = new Map<string, Array<{ id: string; questionText: string }>>()
 
     if (submissionIds.length > 0) {
       const { data: speakingRows, error: speakingError } = await supabase
         .from('speaking_submissions')
-        .select('submission_id, audio_url, telegram_file_id')
+        .select('submission_id, audio_url')
         .in('submission_id', submissionIds)
 
       if (speakingError) {
@@ -944,7 +940,6 @@ export const assignmentRepository = {
       for (const row of speakingRows ?? []) {
         speakingBySubmissionId.set(row.submission_id as string, {
           audioUrl: (row.audio_url as string | null) ?? null,
-          telegramFileId: (row.telegram_file_id as string | null) ?? null,
         })
       }
     }
@@ -981,17 +976,11 @@ export const assignmentRepository = {
       scoreAwarded: Number(row.score_awarded ?? 0),
       maxScore: Number(row.max_score ?? 0),
       audioUrl: speakingBySubmissionId.get(row.id as string)?.audioUrl ?? null,
-      telegramFileId: speakingBySubmissionId.get(row.id as string)?.telegramFileId ?? null,
       speakingAnswers: toSpeakingAnswers(
         row.answers as Record<string, string[] | string> | null,
         questionsByAssignmentId.get(row.assignment_id as string) ?? [],
       ),
     }))
-  },
-
-  async topForTelegram(studentId: string): Promise<LeaderboardEntry[]> {
-    const dashboard = await this.getStudentDashboard(studentId)
-    return dashboard.leaderboard
   },
 
   async firstActiveSpeakingAssignment(studentId: string) {

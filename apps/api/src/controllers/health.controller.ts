@@ -1,5 +1,5 @@
 import type { Request, Response } from 'express'
-import { env, hasOpenAiConfig, hasSupabaseConfig, hasTelegramConfig } from '../config/env.js'
+import { env, hasOpenAiConfig, hasSupabaseConfig } from '../config/env.js'
 
 export const healthController = {
   getStatus(_request: Request, response: Response) {
@@ -9,7 +9,6 @@ export const healthController = {
       services: {
         supabase: hasSupabaseConfig,
         openai: hasOpenAiConfig,
-        telegram: hasTelegramConfig,
       },
     })
   },

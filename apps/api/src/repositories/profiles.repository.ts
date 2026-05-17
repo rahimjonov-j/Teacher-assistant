@@ -62,7 +62,6 @@ export const profilesRepository = {
       fullName: (data.full_name as string | null) ?? null,
       schoolName: (data.school_name as string | null) ?? null,
       gradeFocus: (data.grade_focus as string | null) ?? null,
-      telegramHandle: (data.telegram_handle as string | null) ?? null,
       avatarUrl: (data.avatar_url as string | null) ?? null,
       role: ((data.role as 'teacher' | 'admin' | null) ?? 'teacher'),
       timezone: (data.timezone as string | null) ?? null,
@@ -83,7 +82,6 @@ export const profilesRepository = {
       fullName: (data.full_name as string | null) ?? null,
       schoolName: (data.school_name as string | null) ?? null,
       gradeFocus: (data.grade_focus as string | null) ?? null,
-      telegramHandle: (data.telegram_handle as string | null) ?? null,
       avatarUrl: (data.avatar_url as string | null) ?? null,
       role: ((data.role as 'teacher' | 'admin' | null) ?? 'teacher'),
       timezone: (data.timezone as string | null) ?? null,
@@ -99,7 +97,6 @@ export const profilesRepository = {
         school_name: input.schoolName,
         grade_focus: input.gradeFocus,
         timezone: input.timezone,
-        telegram_handle: input.telegramHandle,
         updated_at: new Date().toISOString(),
       })
       .eq('id', userId)

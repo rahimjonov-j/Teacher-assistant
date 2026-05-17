@@ -79,7 +79,6 @@ export function ClassesPage() {
           submittedAt: string
           maxScore: number
           audioUrl?: string | null
-          telegramFileId?: string | null
           speakingAnswers?: Array<{ questionId: string; questionText: string; audioUrl: string | null }>
         }>
       }>('/classes/submissions/pending'),
@@ -722,7 +721,6 @@ function ReviewRow({
     submittedAt: string
     maxScore: number
     audioUrl?: string | null
-    telegramFileId?: string | null
     speakingAnswers?: Array<{ questionId: string; questionText: string; audioUrl: string | null }>
   }
 }) {
@@ -774,7 +772,7 @@ function ReviewRow({
             <audio className="w-full" src={submission.audioUrl} controls />
           ) : (
             <div className="text-sm text-muted-foreground">
-              Audio web playerda topilmadi. {submission.telegramFileId ? 'Bu javob Telegram voice orqali yuborilgan.' : 'Student audio yubormagan.'}
+              Student audio yubormagan.
             </div>
           )}
         </div>

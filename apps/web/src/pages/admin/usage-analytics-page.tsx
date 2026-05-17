@@ -291,7 +291,7 @@ export function AdminUsageAnalyticsPage() {
                       <Badge
                         className={cn(
                           'border-none text-[9px] uppercase tracking-widest',
-                           row.source === 'telegram' ? 'bg-cyan-500/10 text-cyan-300' : 'bg-slate-200/70 text-slate-600 dark:bg-white/5 dark:text-slate-300',
+                           'bg-slate-200/70 text-slate-600 dark:bg-white/5 dark:text-slate-300',
                         )}
                       >
                         {row.source}

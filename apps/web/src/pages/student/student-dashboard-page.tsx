@@ -85,10 +85,7 @@ export function StudentDashboardPage() {
                 <div className="font-black">Active assignments</div>
                 <div className="text-sm text-muted-foreground">Deadlines, attempts and scores</div>
               </div>
-              <Badge variant={data.student.telegramConnected ? 'default' : 'outline'}>
-                Telegram {data.student.telegramConnected ? 'connected' : 'not connected'}
-              </Badge>
-            </div>
+              </div>
             <div className="space-y-3">
               {data.activeAssignments.map((assignment) => (
                 <Link key={assignment.id} to={`/student/assignments/${assignment.id}`} className="block rounded-2xl border border-border bg-card/70 p-4 transition-all hover:border-primary/25 hover:bg-primary/5">

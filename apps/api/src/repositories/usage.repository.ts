@@ -24,7 +24,7 @@ export const usageRepository = {
     featureKey: FeatureKey
     creditsConsumed: number
     modelName: string
-    source: 'web' | 'telegram' | 'admin'
+    source: 'web' | 'admin'
     generatedContentId?: string
     metadata?: Record<string, unknown>
   }) {
@@ -88,7 +88,7 @@ function mapUsageRow(row: any): NormalizedUsageRow {
     featureKey: row.feature_key as FeatureKey,
     creditsConsumed: Number(row.credits_consumed ?? 0),
     modelName: row.model_name as string,
-    source: row.source as 'web' | 'telegram' | 'admin',
+    source: row.source as 'web' | 'admin',
     createdAt: row.created_at as string,
     metadata,
     inputTokens: metadata.inputTokens,

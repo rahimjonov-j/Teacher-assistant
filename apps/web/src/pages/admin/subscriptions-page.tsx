@@ -262,7 +262,7 @@ export function AdminSubscriptionsPage() {
                   <Badge variant="outline" className="border-border/70 bg-white/80 dark:bg-slate-950/40">
                     Bitta boshqaruv markazi
                   </Badge>
-                  <Badge variant="gradient">Pricing + Billing + Telegram sync</Badge>
+                  <Badge variant="gradient">Pricing + Billing</Badge>
                 </div>
 
                 <div className="space-y-2">
