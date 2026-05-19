@@ -117,7 +117,7 @@ function ProtectedGate() {
   }
 
   if (!session) {
-    return <Navigate to="/login" replace />
+    return <Navigate to="/" replace />
   }
 
   return <Outlet />
@@ -132,7 +132,7 @@ function AdminGate() {
   }
 
   if (!session) {
-    return <Navigate to="/login" replace />
+    return <Navigate to="/" replace />
   }
 
   if (profile?.role !== 'admin') {
