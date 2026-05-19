@@ -420,13 +420,13 @@ export function AppRoutes() {
         </Route>
       </Route>
 
-      <Route path="/hujjatlar" element={<Suspense fallback={<FullScreenLoader />}><DocsPage /></Suspense>} />
-      <Route path="/video-darslar" element={<Suspense fallback={<FullScreenLoader />}><VideoLessonsPage /></Suspense>} />
-      <Route path="/yordam" element={<Suspense fallback={<FullScreenLoader />}><HelpPage /></Suspense>} />
-      <Route path="/aloqa" element={<Suspense fallback={<FullScreenLoader />}><ContactPage /></Suspense>} />
-      <Route path="/biz-haqimizda" element={<Suspense fallback={<FullScreenLoader />}><AboutPage /></Suspense>} />
-      <Route path="/blog" element={<Suspense fallback={<FullScreenLoader />}><BlogPage /></Suspense>} />
-      <Route path="/maxfiylik" element={<Suspense fallback={<FullScreenLoader />}><PrivacyPage /></Suspense>} />
+      <Route path="/hujjatlar" element={<LazyRoute><DocsPage /></LazyRoute>} />
+      <Route path="/video-darslar" element={<LazyRoute><VideoLessonsPage /></LazyRoute>} />
+      <Route path="/yordam" element={<LazyRoute><HelpPage /></LazyRoute>} />
+      <Route path="/aloqa" element={<LazyRoute><ContactPage /></LazyRoute>} />
+      <Route path="/biz-haqimizda" element={<LazyRoute><AboutPage /></LazyRoute>} />
+      <Route path="/blog" element={<LazyRoute><BlogPage /></LazyRoute>} />
+      <Route path="/maxfiylik" element={<LazyRoute><PrivacyPage /></LazyRoute>} />
 
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
