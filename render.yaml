@@ -28,6 +28,8 @@ services:
         value: gpt-4.1-mini
       - key: OPENAI_MODEL_STRONG
         value: gpt-4.1
+      - key: STUDENT_PASSWORD_SECRET
+        sync: false
       - key: TELEGRAM_BOT_TOKEN
         sync: false
       - key: TELEGRAM_BOT_USERNAME
@@ -36,5 +38,7 @@ services:
         sync: false
       - key: PDF_STORAGE_BUCKET
         value: generated-pdfs
+      - key: SPEAKING_AUDIO_STORAGE_BUCKET
+        value: speaking-audio
       - key: SUPER_ADMIN_EMAILS
         sync: false
