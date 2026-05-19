@@ -15,7 +15,7 @@ import {
   UserRound,
   X,
 } from 'lucide-react'
-import { Link, NavLink, Outlet, matchPath, useLocation } from 'react-router-dom'
+import { Link, NavLink, Outlet, matchPath, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '@/hooks/use-auth'
 import { useI18n } from '@/hooks/use-i18n'
 import { Button } from '@/components/ui/button'
@@ -56,6 +56,7 @@ const pageMeta: Array<{ pattern: string; titleKey: string; actionTo?: string }> 
 
 export function TeacherLayout() {
   const location = useLocation()
+  const navigate = useNavigate()
   const [drawerOpen, setDrawerOpen] = useState(false)
   const { logout, profile } = useAuth()
   const { t } = useI18n()
@@ -153,6 +154,7 @@ export function TeacherLayout() {
                 onClick={async () => {
                   setDrawerOpen(false)
                   await logout()
+                  navigate('/', { replace: true })
                 }}
               >
                 <LogOut className="h-4 w-4" />

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import {
   Activity,
   ArrowRightLeft,
@@ -170,6 +171,7 @@ function AdminSidebarContent({
 
 export function AdminLayout() {
   const { logout } = useAuth()
+  const navigate = useNavigate()
   const [drawerOpen, setDrawerOpen] = useState(false)
 
   useEffect(() => lockBodyScroll(drawerOpen), [drawerOpen])
@@ -177,6 +179,7 @@ export function AdminLayout() {
   const handleLogout = async () => {
     setDrawerOpen(false)
     await logout()
+    navigate('/', { replace: true })
   }
 
   return (
