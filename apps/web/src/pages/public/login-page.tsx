@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { Link, useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
-import { Card, CardContent } from '@/components/ui/card'
+import { GraduationCap } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -38,74 +38,113 @@ export function LoginPage() {
       toast.success('Xush kelibsiz.')
       navigate(profile.role === 'admin' ? '/admin/dashboard' : '/app/dashboard')
     } catch (error) {
-      toast.error(getUzToastError(error, 'Tizimga kirib bo\'lmadi.'))
+      toast.error(getUzToastError(error, "Tizimga kirib bo'lmadi."))
     }
   })
+
   const emailField = form.register('email')
 
   return (
-    <Card className="w-full">
-      <CardContent className="space-y-6 p-6">
-        <div>
-          <div className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">{t('common.login')}</div>
-          <h1 className="mt-2 text-3xl font-black tracking-tight">{t('public.login.title')}</h1>
-          <p className="mt-2 text-sm leading-6 text-muted-foreground">{t('public.login.subtitle')}</p>
+    <div className="w-full overflow-hidden rounded-3xl border border-border bg-card shadow-xl">
+      {/* Gradient header */}
+      <div className="relative overflow-hidden bg-gradient-to-br from-primary via-primary/90 to-violet-700 px-6 py-7">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(255,255,255,0.15),transparent_60%)]" />
+        <div className="relative flex items-center gap-3">
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-white/20 backdrop-blur-sm">
+            <GraduationCap className="h-6 w-6 text-white" />
+          </div>
+          <div>
+            <div className="text-[11px] font-bold uppercase tracking-widest text-white/60">
+              {t('common.login')}
+            </div>
+            <h1 className="text-xl font-black tracking-tight text-white">
+              {t('public.login.title')}
+            </h1>
+          </div>
         </div>
+        <p className="relative mt-3 text-sm leading-relaxed text-white/70">
+          {t('public.login.subtitle')}
+        </p>
+      </div>
 
+      <div className="space-y-5 p-6">
         {!isSupabaseConfigured ? (
-          <div className="rounded-2xl border border-border bg-secondary px-4 py-3 text-xs text-muted-foreground">
+          <div className="rounded-2xl border border-border bg-muted/50 px-4 py-3 text-xs text-muted-foreground">
             {t('public.supabaseMissing')}
           </div>
         ) : null}
 
         <form onSubmit={onSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="email">Gmail</Label>
-            <div className="flex overflow-hidden rounded-2xl border border-input bg-card/80 shadow-sm focus-within:border-primary focus-within:ring-4 focus-within:ring-primary/10">
+          <div className="space-y-1.5">
+            <Label htmlFor="email" className="text-sm font-semibold">Gmail</Label>
+            <div className="flex overflow-hidden rounded-xl border border-input bg-background shadow-sm transition-colors focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/15">
               <Input
                 id="email"
                 type="text"
                 inputMode="email"
                 autoComplete="username"
                 placeholder="username"
-                className="h-12 rounded-none border-0 bg-transparent shadow-none focus-visible:ring-0"
+                className="h-11 rounded-none border-0 bg-transparent shadow-none focus-visible:ring-0"
                 {...emailField}
                 onChange={(event) => {
                   event.target.value = normalizeGmailUsername(event.target.value)
                   void emailField.onChange(event)
                 }}
               />
-              <div className="flex shrink-0 items-center border-l border-border bg-secondary px-3 text-sm font-bold text-secondary-foreground">
+              <div className="flex shrink-0 items-center border-l border-border bg-muted px-3 text-xs font-bold text-muted-foreground">
                 {GMAIL_DOMAIN}
               </div>
             </div>
-            {form.formState.errors.email ? <p className="text-xs text-muted-foreground">{form.formState.errors.email.message}</p> : null}
+            {form.formState.errors.email ? (
+              <p className="text-xs text-destructive">{form.formState.errors.email.message}</p>
+            ) : null}
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="password">{t('common.password')}</Label>
-            <Input id="password" type="password" placeholder={t('common.password')} {...form.register('password')} />
-            {form.formState.errors.password ? <p className="text-xs text-muted-foreground">{form.formState.errors.password.message}</p> : null}
+          <div className="space-y-1.5">
+            <Label htmlFor="password" className="text-sm font-semibold">{t('common.password')}</Label>
+            <Input
+              id="password"
+              type="password"
+              placeholder="••••••••"
+              className="h-11 rounded-xl"
+              {...form.register('password')}
+            />
+            {form.formState.errors.password ? (
+              <p className="text-xs text-destructive">{form.formState.errors.password.message}</p>
+            ) : null}
           </div>
 
-          <Button type="submit" className="h-12 w-full" disabled={form.formState.isSubmitting || !isSupabaseConfigured}>
+          <Button
+            type="submit"
+            className="h-11 w-full rounded-xl font-semibold"
+            disabled={form.formState.isSubmitting || !isSupabaseConfigured}
+          >
             {form.formState.isSubmitting ? <Spinner /> : null}
             {t('common.login')}
           </Button>
         </form>
 
         <div className="flex items-center justify-between text-sm">
-          <Link to="/reset-password" className="font-semibold text-foreground underline-offset-4 hover:underline">
+          <Link
+            to="/reset-password"
+            className="font-semibold text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+          >
             {t('public.login.reset')}
           </Link>
-          <Link to="/register" className="font-semibold text-foreground underline-offset-4 hover:underline">
+          <Link
+            to="/register"
+            className="font-semibold text-primary underline-offset-4 hover:underline"
+          >
             {t('public.login.register')}
           </Link>
         </div>
-        <Button asChild variant="outline" className="w-full">
-          <Link to="/student-login">Student login</Link>
-        </Button>
-      </CardContent>
-    </Card>
+
+        <div className="border-t border-border pt-4">
+          <Button asChild variant="outline" className="h-10 w-full rounded-xl text-sm font-semibold">
+            <Link to="/student-login">Student login</Link>
+          </Button>
+        </div>
+      </div>
+    </div>
   )
 }

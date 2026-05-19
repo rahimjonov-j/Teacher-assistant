@@ -122,19 +122,15 @@ function AdminGate() {
 }
 
 function TeacherGate() {
-  const { initialized, session, profile, loading } = useAuth()
+  const { initialized, session, loading } = useAuth()
   const { t } = useI18n()
 
-  if (!initialized || loading || (session && !profile)) {
+  if (!initialized || loading) {
     return <FullScreenLoader label={t('routes.panelLoading')} />
   }
 
   if (!session) {
     return <Navigate to="/login" replace />
-  }
-
-  if (profile?.role === 'admin') {
-    return <Navigate to="/admin/dashboard" replace />
   }
 
   return <Outlet />
