@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react'
 import path from 'node:path'
 
 const LOCAL_API_URL = 'http://localhost:4000/api'
-const PRODUCTION_API_URL = 'https://teacher-assistant-api.onrender.com/api'
+const PRODUCTION_API_URL = 'https://teacher-assistant-api-kk0n.onrender.com/api'
 
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {

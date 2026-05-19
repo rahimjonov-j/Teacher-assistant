@@ -2,7 +2,7 @@
   "buildCommand": "npm run build --workspace @teacher-assistant/shared && npm run build --workspace @teacher-assistant/web",
   "devCommand": "npm run dev --workspace @teacher-assistant/web",
   "env": {
-    "VITE_API_URL": "https://teacher-assistant-api.onrender.com/api"
+    "VITE_API_URL": "https://teacher-assistant-api-kk0n.onrender.com/api"
   },
   "framework": "vite",
   "installCommand": "npm ci",
