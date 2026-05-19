@@ -316,7 +316,7 @@ export const messages: Record<AppLanguage, Record<string, string>> = {
     'settings.languageHint': 'Til darhol butun saytda almashadi.',
     'settings.theme': 'Mavzu',
     'settings.themeHint': "Ko'rinishni light yoki dark rejimga o'zgartiring.",
-    ‘settings.helpHint’: ‘Dashboard shortcutlar va Messenger tarix ro\’yxatidan foydalaning.’,
+    ‘settings.helpHint’: "Dashboard shortcutlar va Messenger tarix ro’yxatidan foydalaning.",
     'settings.aboutTitle': 'Teacher Assistant platformasi',
     'settings.aboutHint': 'Test, lesson plan, writing analysis va speaking promptlar uchun yaratilgan.',
 
