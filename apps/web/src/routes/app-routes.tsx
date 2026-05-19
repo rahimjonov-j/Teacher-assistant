@@ -25,6 +25,27 @@ const RegisterPage = lazy(async () => ({
 const LandingPage = lazy(async () => ({
   default: (await import('@/pages/public/landing-page')).LandingPage,
 }))
+const DocsPage = lazy(async () => ({
+  default: (await import('@/pages/public/static-pages')).DocsPage,
+}))
+const VideoLessonsPage = lazy(async () => ({
+  default: (await import('@/pages/public/static-pages')).VideoLessonsPage,
+}))
+const HelpPage = lazy(async () => ({
+  default: (await import('@/pages/public/static-pages')).HelpPage,
+}))
+const ContactPage = lazy(async () => ({
+  default: (await import('@/pages/public/static-pages')).ContactPage,
+}))
+const AboutPage = lazy(async () => ({
+  default: (await import('@/pages/public/static-pages')).AboutPage,
+}))
+const BlogPage = lazy(async () => ({
+  default: (await import('@/pages/public/static-pages')).BlogPage,
+}))
+const PrivacyPage = lazy(async () => ({
+  default: (await import('@/pages/public/static-pages')).PrivacyPage,
+}))
 const DashboardPage = lazy(async () => ({
   default: (await import('@/pages/app/dashboard-page')).DashboardPage,
 }))
@@ -398,6 +419,14 @@ export function AppRoutes() {
           </Route>
         </Route>
       </Route>
+
+      <Route path="/hujjatlar" element={<Suspense fallback={<FullScreenLoader />}><DocsPage /></Suspense>} />
+      <Route path="/video-darslar" element={<Suspense fallback={<FullScreenLoader />}><VideoLessonsPage /></Suspense>} />
+      <Route path="/yordam" element={<Suspense fallback={<FullScreenLoader />}><HelpPage /></Suspense>} />
+      <Route path="/aloqa" element={<Suspense fallback={<FullScreenLoader />}><ContactPage /></Suspense>} />
+      <Route path="/biz-haqimizda" element={<Suspense fallback={<FullScreenLoader />}><AboutPage /></Suspense>} />
+      <Route path="/blog" element={<Suspense fallback={<FullScreenLoader />}><BlogPage /></Suspense>} />
+      <Route path="/maxfiylik" element={<Suspense fallback={<FullScreenLoader />}><PrivacyPage /></Suspense>} />
 
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

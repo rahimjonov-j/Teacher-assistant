@@ -683,23 +683,23 @@ export function LandingPage() {
             </div>
             <div className="col">
               <h5>Yordam</h5>
-              <a href="#">Hujjatlar</a>
-              <a href="#">Video darslar</a>
-              <a href="#">Yordam markazi</a>
-              <a href="#">Aloqa</a>
+              <Link to="/hujjatlar">Hujjatlar</Link>
+              <Link to="/video-darslar">Video darslar</Link>
+              <Link to="/yordam">Yordam markazi</Link>
+              <Link to="/aloqa">Aloqa</Link>
             </div>
             <div className="col">
               <h5>Kompaniya</h5>
-              <a href="#">Biz haqimizda</a>
-              <a href="#">Blog</a>
-              <a href="#">Maxfiylik</a>
+              <Link to="/biz-haqimizda">Biz haqimizda</Link>
+              <Link to="/blog">Blog</Link>
+              <Link to="/maxfiylik">Maxfiylik</Link>
             </div>
           </div>
           <div className="footer-bottom">
             <span>© 2026 Teacher Assistant. Toshkent, O'zbekiston.</span>
             <span style={{ display: 'flex', gap: 18 }}>
-              <a href="#" style={{ color: 'var(--lp-dim)' }}>Foydalanish shartlari</a>
-              <a href="#" style={{ color: 'var(--lp-dim)' }}>Maxfiylik</a>
+              <Link to="/maxfiylik" style={{ color: 'var(--lp-dim)' }}>Foydalanish shartlari</Link>
+              <Link to="/maxfiylik" style={{ color: 'var(--lp-dim)' }}>Maxfiylik</Link>
             </span>
           </div>
         </div>
