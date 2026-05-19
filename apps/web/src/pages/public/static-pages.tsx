@@ -66,8 +66,8 @@ export function DocsPage() {
       icon: Sparkles,
       title: 'Boshlash',
       items: [
-        'Teacher Assistant platformasi — O'zbekiston o'qituvchilari uchun AI yordamchi.',
-        'Ro'yxatdan o'tib, dars rejasi, test va writing tahlili yaratishni boshlang.',
+        "Teacher Assistant platformasi — O'zbekiston o'qituvchilari uchun AI yordamchi.",
+        "Ro'yxatdan o'tib, dars rejasi, test va writing tahlili yaratishni boshlang.",
         'Har bir generator uchun kredit sarflanadi — tariflardan birini tanlang.',
       ],
     },
@@ -76,8 +76,8 @@ export function DocsPage() {
       title: 'Test yaratish',
       items: [
         'Mavzu yoki dars maqsadini kiriting.',
-        'AI avtomatik ko'p tanlovli savollar generatsiya qiladi.',
-        'Natijalari Messenger bo'limida saqlanadi va PDF eksport qilinadi.',
+        "AI avtomatik ko'p tanlovli savollar generatsiya qiladi.",
+        "Natijalari Messenger bo'limida saqlanadi va PDF eksport qilinadi.",
       ],
     },
     {
@@ -86,15 +86,15 @@ export function DocsPage() {
       items: [
         'Mavzu yoki standartni kiriting — AI vaqt taqsimoti bilan reja tuzadi.',
         'Dars bosqichlari: kirish, asosiy qism, mustahkamlash.',
-        'PDF ko'rinishida saqlash va chop etish imkoniyati mavjud.',
+        "PDF ko'rinishida saqlash va chop etish imkoniyati mavjud.",
       ],
     },
     {
       icon: MessageSquare,
       title: 'Writing tahlili',
       items: [
-        'O'quvchi matnini yoki topshiriqni kiriting.',
-        'AI grammatika, mazmun va uslub bo'yicha batafsil feedback beradi.',
+        "O'quvchi matnini yoki topshiriqni kiriting.",
+        "AI grammatika, mazmun va uslub bo'yicha batafsil feedback beradi.",
         'Har bir xatoga izoh va yaxshilash tavsiyasi ilova qilinadi.',
       ],
     },
@@ -199,7 +199,7 @@ export function HelpPage() {
   const faqs = [
     {
       q: 'Kredit nima va qanday ishlaydi?',
-      a: 'Har bir AI generatsiya (test, dars rejasi, writing tahlili) bir kredit sarflaydi. Kreditlar tanlangan tarif orqali to'ldiriladi.',
+      a: "Har bir AI generatsiya (test, dars rejasi, writing tahlili) bir kredit sarflaydi. Kreditlar tanlangan tarif orqali to'ldiriladi.",
     },
     {
       q: 'Parolni unutdim, nima qilaman?',
@@ -210,16 +210,16 @@ export function HelpPage() {
       a: 'Yaratilgan materialning detail sahifasida "PDF eksport" tugmasini bosing. Fayl avtomatik yuklab olinadi.',
     },
     {
-      q: 'Tarif o'zgartirish mumkinmi?',
-      a: 'Ha, "To'lov" bo'limidan istalgan vaqtda tarif yangilash yoki o'zgartirish mumkin.',
+      q: "Tarif o'zgartirish mumkinmi?",
+      a: "Ha, "To'lov" bo'limidan istalgan vaqtda tarif yangilash yoki o'zgartirish mumkin.",
     },
     {
       q: 'Admin panelga qanday kirish mumkin?',
-      a: 'Admin huquqi berilgan akkaunt orqali oddiy login sahifasidan kiring — tizim avtomatik admin paneliga yo'naltiradi.',
+      a: "Admin huquqi berilgan akkaunt orqali oddiy login sahifasidan kiring — tizim avtomatik admin paneliga yo'naltiradi.",
     },
     {
-      q: 'Messenger bo'limidagi materiallar qancha vaqt saqlanadi?',
-      a: 'Barcha yaratilgan materiallar akkauntingizda doimiy saqlanadi. Istagan vaqtda ko'rish va PDF eksport qilish mumkin.',
+      q: "Messenger bo'limidagi materiallar qancha vaqt saqlanadi?",
+      a: "Barcha yaratilgan materiallar akkauntingizda doimiy saqlanadi. Istagan vaqtda ko'rish va PDF eksport qilish mumkin.",
     },
   ]
 
@@ -419,19 +419,19 @@ export function BlogPage() {
 export function PrivacyPage() {
   const sections = [
     {
-      title: 'Qanday ma\'lumotlar yig\'iladi',
+      title: "Qanday ma\'lumotlar yig\'iladi",
       content:
-        'Ro\'yxatdan o\'tish va platformadan foydalanish jarayonida email manzil, ism, maktab va sinf yo\'nalishi kabi ma\'lumotlar to\'planadi. Yaratilgan materiallar akkauntingizda saqlanadi.',
+        "Ro\'yxatdan o\'tish va platformadan foydalanish jarayonida email manzil, ism, maktab va sinf yo\'nalishi kabi ma\'lumotlar to\'planadi. Yaratilgan materiallar akkauntingizda saqlanadi.",
     },
     {
-      title: 'Ma\'lumotlar qanday ishlatiladi',
+      title: "Ma\'lumotlar qanday ishlatiladi",
       content:
-        'Ma\'lumotlar faqat platformaning asosiy funksiyalari uchun ishlatiladi: akkauntni boshqarish, material yaratish tarixi va obuna holati. Uchinchi shaxslarga sotilmaydi.',
+        "Ma\'lumotlar faqat platformaning asosiy funksiyalari uchun ishlatiladi: akkauntni boshqarish, material yaratish tarixi va obuna holati. Uchinchi shaxslarga sotilmaydi.",
     },
     {
-      title: 'Ma\'lumotlar xavfsizligi',
+      title: "Ma\'lumotlar xavfsizligi",
       content:
-        'Barcha ma\'lumotlar shifrlangan holda Supabase xavfsiz serverlarida saqlanadi. Parollar hashlangan ko\'rinishda saqlanadi va hech kim tomonidan o\'qilmaydi.',
+        "Barcha ma\'lumotlar shifrlangan holda Supabase xavfsiz serverlarida saqlanadi. Parollar hashlangan ko\'rinishda saqlanadi va hech kim tomonidan o\'qilmaydi.",
     },
     {
       title: 'Cookie va analytics',
@@ -439,12 +439,12 @@ export function PrivacyPage() {
         'Platforma minimal cookie va localStorage dan foydalanadi: til sozlamasi va sessiya uchun. Tashqi analytics vositalaridan foydalanilmaydi.',
     },
     {
-      title: 'Ma\'lumotlarni o\'chirish',
+      title: "Ma\'lumotlarni o\'chirish",
       content:
-        'Akkauntingizni o\'chirish so\'rovini support@teacherass.uz manziliga yuboring. 7 ish kuni ichida barcha ma\'lumotlaringiz o\'chiriladi.',
+        "Akkauntingizni o\'chirish so\'rovini support@teacherass.uz manziliga yuboring. 7 ish kuni ichida barcha ma\'lumotlaringiz o\'chiriladi.",
     },
     {
-      title: 'Bog\'lanish',
+      title: "Bog\'lanish",
       content:
         'Maxfiylik siyosatiga oid savollar uchun support@teacherass.uz manziliga murojaat qiling.',
     },
