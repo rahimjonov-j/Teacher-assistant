@@ -67,8 +67,8 @@ export function DashboardPage() {
     <div className="space-y-5 animate-in pb-8">
 
       {/* ── Hero card ── */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary via-primary/95 to-violet-700 p-5 shadow-[0_8px_32px_-8px_rgba(99,102,241,0.5)]">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(255,255,255,0.15),transparent_65%)]" />
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-zinc-900 via-zinc-900 to-zinc-800 p-5 shadow-[0_8px_32px_-8px_rgba(0,0,0,0.5)]">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(198,248,51,0.18),transparent_60%)]" />
         <div className="relative">
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">

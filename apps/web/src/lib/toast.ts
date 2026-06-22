@@ -6,6 +6,11 @@ export function getUzToastError(error: unknown, fallback: string) {
   const message = error.message
 
   const mappings: Array<[string, string]> = [
+    ['Failed to fetch', "Serverga ulanib bo'lmadi. Internet aloqasi yoki server holatini tekshiring."],
+    ['NetworkError', "Serverga ulanib bo'lmadi. Internet aloqasi yoki server holatini tekshiring."],
+    ['Load failed', "Serverga ulanib bo'lmadi. Internet aloqasi yoki server holatini tekshiring."],
+    ['Invalid or expired session', "Sessiya tugagan. Qaytadan kiring."],
+    ['Missing bearer token', "Sessiya topilmadi. Qaytadan kiring."],
     ['Invalid login credentials', "Login yoki parol noto'g'ri."],
     ['Email not confirmed', 'Email tasdiqlanmagan.'],
     ['User already registered', 'Bu email allaqachon ro\'yxatdan o\'tgan.'],

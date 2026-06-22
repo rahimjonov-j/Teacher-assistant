@@ -33,17 +33,23 @@ export function AuthProvider({ children }: PropsWithChildren) {
       throw new Error('Supabase sozlanmagan.')
     }
 
-    try {
-      const supabase = await getSupabaseClient()
-      const { error } = await supabase.auth.signInWithPassword({ email, password })
-      if (error) {
-        throw new Error(error.message)
-      }
+    const supabase = await getSupabaseClient()
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password })
+    if (error) {
+      throw new Error(error.message)
+    }
 
+    setSession(data.session)
+
+    try {
       return await loadProfile()
-    } catch (error) {
+    } catch (profileError) {
+      // Supabase auth succeeded but loading the teacher profile failed (e.g. backend
+      // unreachable). Sign back out so we don't leave a dangling half-authenticated
+      // session that keeps failing on every reload.
+      await supabase.auth.signOut().catch(() => undefined)
       clearAuthState()
-      throw error
+      throw profileError
     }
   }, [clearAuthState, loadProfile])
 

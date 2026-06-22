@@ -64,7 +64,6 @@ export function SettingsPage() {
   })
 
   const isDarkTheme = resolvedTheme === 'dark'
-  const currentThemeLabel = isDarkTheme ? t('common.dark') : t('common.light')
 
   const initials = profile?.fullName
     ? profile.fullName.split(' ').map((w: string) => w[0]).join('').slice(0, 2).toUpperCase()
@@ -74,7 +73,7 @@ export function SettingsPage() {
     <div className="space-y-4 animate-in pb-8">
 
       {/* ── Profile hero ── */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary via-primary/95 to-violet-700 p-5">
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-zinc-900 via-zinc-900 to-zinc-800 p-5">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(255,255,255,0.15),transparent_65%)]" />
         <div className="relative flex items-center gap-4">
           <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-white/20 text-xl font-black text-white backdrop-blur-sm">

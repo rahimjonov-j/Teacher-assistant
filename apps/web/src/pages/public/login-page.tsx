@@ -45,78 +45,77 @@ export function LoginPage() {
   const emailField = form.register('email')
 
   return (
-    <div className="w-full overflow-hidden rounded-3xl border border-border bg-card shadow-xl">
-      {/* Gradient header */}
-      <div className="relative overflow-hidden bg-gradient-to-br from-primary via-primary/90 to-violet-700 px-6 py-7">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(255,255,255,0.15),transparent_60%)]" />
-        <div className="relative flex items-center gap-3">
-          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-white/20 backdrop-blur-sm">
-            <GraduationCap className="h-6 w-6 text-white" />
-          </div>
+    <div className="w-full overflow-hidden rounded-3xl border border-white/10 bg-[#15151a] shadow-[0_40px_90px_-50px_rgba(0,0,0,0.9)]">
+      {/* Header */}
+      <div className="border-b border-white/10 px-6 py-7">
+        <div className="flex items-center gap-3">
+          <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-[#c6f833] shadow-[0_0_24px_-4px_rgba(198,248,51,0.5)]">
+            <GraduationCap className="h-6 w-6 text-[#0a0a0c]" />
+          </span>
           <div>
-            <div className="text-[11px] font-bold uppercase tracking-widest text-white/60">
+            <div className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#c6f833]">
               {t('common.login')}
             </div>
-            <h1 className="text-xl font-black tracking-tight text-white">
+            <h1 className="text-xl font-bold tracking-tight text-white">
               {t('public.login.title')}
             </h1>
           </div>
         </div>
-        <p className="relative mt-3 text-sm leading-relaxed text-white/70">
+        <p className="mt-3 text-sm leading-relaxed text-white/55">
           {t('public.login.subtitle')}
         </p>
       </div>
 
       <div className="space-y-5 p-6">
         {!isSupabaseConfigured ? (
-          <div className="rounded-2xl border border-border bg-muted/50 px-4 py-3 text-xs text-muted-foreground">
+          <div className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-xs text-white/55">
             {t('public.supabaseMissing')}
           </div>
         ) : null}
 
         <form onSubmit={onSubmit} className="space-y-4">
           <div className="space-y-1.5">
-            <Label htmlFor="email" className="text-sm font-semibold">Gmail</Label>
-            <div className="flex overflow-hidden rounded-xl border border-input bg-background shadow-sm transition-colors focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/15">
+            <Label htmlFor="email" className="text-sm font-semibold text-white/80">Gmail</Label>
+            <div className="flex overflow-hidden rounded-xl border border-white/10 bg-white/[0.04] transition-colors focus-within:border-[#c6f833] focus-within:ring-2 focus-within:ring-[#c6f833]/20">
               <Input
                 id="email"
                 type="text"
                 inputMode="email"
                 autoComplete="username"
                 placeholder="username"
-                className="h-11 rounded-none border-0 bg-transparent shadow-none focus-visible:ring-0"
+                className="h-11 rounded-none border-0 bg-transparent text-white shadow-none placeholder:text-white/30 focus-visible:ring-0"
                 {...emailField}
                 onChange={(event) => {
                   event.target.value = normalizeGmailUsername(event.target.value)
                   void emailField.onChange(event)
                 }}
               />
-              <div className="flex shrink-0 items-center border-l border-border bg-muted px-3 text-xs font-bold text-muted-foreground">
+              <div className="flex shrink-0 items-center border-l border-white/10 bg-white/[0.04] px-3 text-xs font-bold text-white/50">
                 {GMAIL_DOMAIN}
               </div>
             </div>
             {form.formState.errors.email ? (
-              <p className="text-xs text-destructive">{form.formState.errors.email.message}</p>
+              <p className="text-xs text-red-400">{form.formState.errors.email.message}</p>
             ) : null}
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="password" className="text-sm font-semibold">{t('common.password')}</Label>
+            <Label htmlFor="password" className="text-sm font-semibold text-white/80">{t('common.password')}</Label>
             <Input
               id="password"
               type="password"
               placeholder="••••••••"
-              className="h-11 rounded-xl"
+              className="h-11 rounded-xl border-white/10 bg-white/[0.04] text-white placeholder:text-white/30 focus-visible:border-[#c6f833] focus-visible:ring-2 focus-visible:ring-[#c6f833]/20"
               {...form.register('password')}
             />
             {form.formState.errors.password ? (
-              <p className="text-xs text-destructive">{form.formState.errors.password.message}</p>
+              <p className="text-xs text-red-400">{form.formState.errors.password.message}</p>
             ) : null}
           </div>
 
           <Button
             type="submit"
-            className="h-11 w-full rounded-xl font-semibold"
+            className="h-11 w-full rounded-xl bg-[#c6f833] font-semibold text-[#0a0a0c] shadow-[0_14px_32px_-16px_rgba(198,248,51,0.6)] hover:bg-[#b4e81f]"
             disabled={form.formState.isSubmitting || !isSupabaseConfigured}
           >
             {form.formState.isSubmitting ? <Spinner /> : null}
@@ -127,21 +126,25 @@ export function LoginPage() {
         <div className="flex items-center justify-between text-sm">
           <Link
             to="/reset-password"
-            className="font-semibold text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+            className="font-semibold text-white/55 underline-offset-4 hover:text-white hover:underline"
           >
             {t('public.login.reset')}
           </Link>
           <Link
             to="/register"
-            className="font-semibold text-primary underline-offset-4 hover:underline"
+            className="font-semibold text-[#c6f833] underline-offset-4 hover:underline"
           >
             {t('public.login.register')}
           </Link>
         </div>
 
-        <div className="border-t border-border pt-4">
-          <Button asChild variant="outline" className="h-10 w-full rounded-xl text-sm font-semibold">
-            <Link to="/student-login">Student login</Link>
+        <div className="border-t border-white/10 pt-4">
+          <Button
+            asChild
+            variant="outline"
+            className="h-10 w-full rounded-xl border-white/15 bg-transparent text-sm font-semibold text-white hover:border-[#c6f833] hover:bg-white/[0.03] hover:text-[#c6f833]"
+          >
+            <Link to="/student-login">O‘quvchi kirishi</Link>
           </Button>
         </div>
       </div>

@@ -140,7 +140,7 @@ export function DocsPage() {
 export function VideoLessonsPage() {
   const planned = [
     { title: "Teacher Assistant'ga kirish va sozlash", duration: '5 daqiqa' },
-    { title: 'AI bilan test yaratish — amaliy qo'llanma', duration: '8 daqiqa' },
+    { title: "AI bilan test yaratish — amaliy qo'llanma", duration: '8 daqiqa' },
     { title: 'Dars rejasi generatori', duration: '6 daqiqa' },
     { title: 'Writing tahlili va feedback', duration: '7 daqiqa' },
     { title: 'Speaking savollarini tayyorlash', duration: '5 daqiqa' },
@@ -211,7 +211,7 @@ export function HelpPage() {
     },
     {
       q: "Tarif o'zgartirish mumkinmi?",
-      a: "Ha, "To'lov" bo'limidan istalgan vaqtda tarif yangilash yoki o'zgartirish mumkin.",
+      a: 'Ha, «To‘lov» bo‘limidan istalgan vaqtda tarif yangilash yoki o‘zgartirish mumkin.',
     },
     {
       q: 'Admin panelga qanday kirish mumkin?',

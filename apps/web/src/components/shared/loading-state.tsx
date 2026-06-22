@@ -12,7 +12,7 @@ export function FullScreenLoader({
   const { t } = useI18n()
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
+    <div className="fixed inset-0 z-[100] flex min-h-screen w-full items-center justify-center bg-background">
       <div className="glass-card flex items-center gap-3 px-5 py-4">
         <Spinner className="size-6 text-primary" aria-label={label || t('common.loading')} />
         <span className="text-sm font-bold text-muted-foreground">{label || t('common.loading')}</span>

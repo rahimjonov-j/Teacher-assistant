@@ -4,7 +4,6 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { Link, useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
-import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -56,68 +55,68 @@ export function RegisterPage() {
   const emailField = form.register('email')
 
   return (
-    <Card className="w-full">
-      <CardContent className="space-y-6 p-6">
+    <div className="w-full overflow-hidden rounded-3xl border border-white/10 bg-[#15151a] p-6 shadow-[0_40px_90px_-50px_rgba(0,0,0,0.9)]">
+      <div className="space-y-6">
         <div>
-          <div className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">{t('common.register')}</div>
-          <h1 className="mt-2 text-3xl font-black tracking-tight">{t('public.register.title')}</h1>
-          <p className="mt-2 text-sm leading-6 text-muted-foreground">{t('public.register.subtitle')}</p>
+          <div className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#c6f833]">{t('common.register')}</div>
+          <h1 className="mt-2 text-3xl font-bold tracking-tight text-white">{t('public.register.title')}</h1>
+          <p className="mt-2 text-sm leading-6 text-white/55">{t('public.register.subtitle')}</p>
         </div>
 
         {!isSupabaseConfigured ? (
-          <div className="rounded-2xl border border-border bg-secondary px-4 py-3 text-xs text-muted-foreground">
+          <div className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-xs text-white/55">
             {t('public.supabaseMissing')}
           </div>
         ) : null}
 
         <form onSubmit={onSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="fullName">{t('settings.fullName')}</Label>
-            <Input id="fullName" placeholder="Ali Valiyev" {...form.register('fullName')} />
+            <Label htmlFor="fullName" className="text-white/80">{t('settings.fullName')}</Label>
+            <Input id="fullName" placeholder="Ali Valiyev" className="border-white/10 bg-white/[0.04] text-white placeholder:text-white/30 focus-visible:border-[#c6f833] focus-visible:ring-2 focus-visible:ring-[#c6f833]/20" {...form.register('fullName')} />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="schoolName">{t('settings.school')}</Label>
-            <Input id="schoolName" placeholder="21-maktab" {...form.register('schoolName')} />
+            <Label htmlFor="schoolName" className="text-white/80">{t('settings.school')}</Label>
+            <Input id="schoolName" placeholder="21-maktab" className="border-white/10 bg-white/[0.04] text-white placeholder:text-white/30 focus-visible:border-[#c6f833] focus-visible:ring-2 focus-visible:ring-[#c6f833]/20" {...form.register('schoolName')} />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="email">Gmail</Label>
-            <div className="flex overflow-hidden rounded-2xl border border-input bg-card/80 shadow-sm focus-within:border-primary focus-within:ring-4 focus-within:ring-primary/10">
+            <Label htmlFor="email" className="text-white/80">Gmail</Label>
+            <div className="flex overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04] focus-within:border-[#c6f833] focus-within:ring-2 focus-within:ring-[#c6f833]/20">
               <Input
                 id="email"
                 type="text"
                 inputMode="email"
                 autoComplete="username"
                 placeholder="username"
-                className="h-12 rounded-none border-0 bg-transparent shadow-none focus-visible:ring-0"
+                className="h-12 rounded-none border-0 bg-transparent text-white shadow-none placeholder:text-white/30 focus-visible:ring-0"
                 {...emailField}
                 onChange={(event) => {
                   event.target.value = normalizeGmailUsername(event.target.value)
                   void emailField.onChange(event)
                 }}
               />
-              <div className="flex shrink-0 items-center border-l border-border bg-secondary px-3 text-sm font-bold text-secondary-foreground">
+              <div className="flex shrink-0 items-center border-l border-white/10 bg-white/[0.04] px-3 text-sm font-bold text-white/50">
                 {GMAIL_DOMAIN}
               </div>
             </div>
-            {form.formState.errors.email ? <p className="text-xs text-muted-foreground">{form.formState.errors.email.message}</p> : null}
+            {form.formState.errors.email ? <p className="text-xs text-red-400">{form.formState.errors.email.message}</p> : null}
           </div>
           <div className="space-y-2">
-            <Label htmlFor="password">{t('common.password')}</Label>
-            <Input id="password" type="password" placeholder={t('common.password')} {...form.register('password')} />
+            <Label htmlFor="password" className="text-white/80">{t('common.password')}</Label>
+            <Input id="password" type="password" placeholder={t('common.password')} className="border-white/10 bg-white/[0.04] text-white placeholder:text-white/30 focus-visible:border-[#c6f833] focus-visible:ring-2 focus-visible:ring-[#c6f833]/20" {...form.register('password')} />
           </div>
 
-          <Button type="submit" className="h-12 w-full" disabled={form.formState.isSubmitting || !isSupabaseConfigured}>
+          <Button type="submit" className="h-12 w-full bg-[#c6f833] text-[#0a0a0c] shadow-[0_14px_32px_-16px_rgba(198,248,51,0.6)] hover:bg-[#b4e81f]" disabled={form.formState.isSubmitting || !isSupabaseConfigured}>
             {form.formState.isSubmitting ? <Spinner /> : null}
             {t('common.register')}
           </Button>
         </form>
 
         <div className="text-center text-sm">
-          <Link to="/login" className="font-semibold text-foreground underline-offset-4 hover:underline">
+          <Link to="/login" className="font-semibold text-[#c6f833] underline-offset-4 hover:underline">
             {t('public.register.haveAccount')}
           </Link>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   )
 }

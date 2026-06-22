@@ -13,49 +13,49 @@
     --popover: 0 0% 100%;
     --popover-foreground: 229 34% 11%;
 
-    --primary: 231 76% 54%;
-    --primary-foreground: 0 0% 100%;
+    --primary: 240 6% 10%;
+    --primary-foreground: 60 12% 98%;
 
-    --secondary: 259 83% 95%;
-    --secondary-foreground: 262 71% 38%;
+    --secondary: 80 48% 93%;
+    --secondary-foreground: 240 6% 12%;
 
-    --muted: 226 36% 94%;
-    --muted-foreground: 230 12% 44%;
+    --muted: 240 16% 95%;
+    --muted-foreground: 240 6% 42%;
 
-    --accent: 174 68% 42%;
-    --accent-foreground: 0 0% 100%;
+    --accent: 74 89% 58%;
+    --accent-foreground: 240 8% 8%;
 
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 226 25% 88%;
-    --input: 226 25% 88%;
-    --ring: 231 76% 54%;
+    --border: 240 14% 90%;
+    --input: 240 14% 90%;
+    --ring: 240 6% 10%;
     --success: 151 62% 39%;
     --warning: 30 92% 54%;
     --radius: 1rem;
   }
 
   .dark {
-    --background: 229 34% 8%;
-    --foreground: 226 56% 96%;
-    --card: 229 30% 12%;
-    --card-foreground: 226 56% 96%;
-    --popover: 229 30% 12%;
-    --popover-foreground: 226 56% 96%;
-    --primary: 231 95% 72%;
-    --primary-foreground: 229 34% 8%;
-    --secondary: 259 34% 18%;
-    --secondary-foreground: 259 83% 90%;
-    --muted: 229 22% 17%;
-    --muted-foreground: 226 16% 70%;
-    --accent: 174 62% 48%;
-    --accent-foreground: 229 34% 8%;
+    --background: 240 8% 5%;
+    --foreground: 60 9% 96%;
+    --card: 240 6% 9%;
+    --card-foreground: 60 9% 96%;
+    --popover: 240 6% 9%;
+    --popover-foreground: 60 9% 96%;
+    --primary: 74 89% 58%;
+    --primary-foreground: 240 8% 7%;
+    --secondary: 240 6% 16%;
+    --secondary-foreground: 74 60% 88%;
+    --muted: 240 6% 15%;
+    --muted-foreground: 240 6% 66%;
+    --accent: 74 89% 58%;
+    --accent-foreground: 240 8% 7%;
     --destructive: 0 72% 62%;
     --destructive-foreground: 0 0% 100%;
-    --border: 229 18% 22%;
-    --input: 229 18% 22%;
-    --ring: 231 95% 72%;
+    --border: 240 6% 20%;
+    --input: 240 6% 20%;
+    --ring: 74 89% 58%;
     --success: 151 62% 48%;
     --warning: 30 92% 60%;
   }
@@ -76,8 +76,8 @@
     @apply min-h-screen bg-background font-sans text-foreground antialiased;
     font-family: 'Manrope', sans-serif;
     background:
-      radial-gradient(circle at top left, hsl(231 76% 92% / 0.8), transparent 30rem),
-      radial-gradient(circle at bottom right, hsl(174 68% 88% / 0.6), transparent 32rem),
+      radial-gradient(circle at top left, hsl(80 70% 90% / 0.5), transparent 30rem),
+      radial-gradient(circle at bottom right, hsl(240 16% 92% / 0.55), transparent 32rem),
       hsl(var(--background));
   }
 }

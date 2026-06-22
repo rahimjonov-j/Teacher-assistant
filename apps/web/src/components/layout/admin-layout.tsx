@@ -70,8 +70,8 @@ function AdminSidebarContent({
   return (
     <div className="flex h-full min-h-0 flex-col">
       {/* Header */}
-      <div className="relative overflow-hidden rounded-t-[2rem] bg-gradient-to-br from-primary via-primary/90 to-violet-700 px-5 pb-5 pt-5">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(255,255,255,0.12),transparent_60%)]" />
+      <div className="relative overflow-hidden rounded-t-[2rem] bg-gradient-to-br from-zinc-900 via-zinc-900 to-zinc-800 px-5 pb-5 pt-5">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(198,248,51,0.14),transparent_60%)]" />
         <div className="relative flex items-center justify-between">
           <Link to="/admin/dashboard" onClick={onNavigate} className="flex min-w-0 items-center gap-3">
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-white/20 backdrop-blur-sm">

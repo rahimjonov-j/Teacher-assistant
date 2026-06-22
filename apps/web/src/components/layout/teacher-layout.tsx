@@ -114,11 +114,11 @@ export function TeacherLayout() {
             onClick={(e) => e.stopPropagation()}
           >
             {/* User header */}
-            <div className="relative overflow-hidden bg-gradient-to-br from-primary via-primary/90 to-violet-600 px-5 pb-5 pt-5">
-              <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(255,255,255,0.12),transparent_60%)]" />
+            <div className="relative overflow-hidden bg-gradient-to-br from-zinc-900 to-zinc-800 px-5 pb-5 pt-5">
+              <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(198,248,51,0.16),transparent_60%)]" />
               <div className="relative flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white/20 text-sm font-black text-white">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#c6f833] text-sm font-black text-[#0a0a0c]">
                     {initials}
                   </div>
                   <div className="min-w-0">
@@ -210,7 +210,7 @@ export function TeacherLayout() {
           {currentPage.actionTo ? (
             <Link
               to={currentPage.actionTo}
-              className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-primary to-violet-600 text-white shadow-[0_4px_14px_-4px_rgba(99,102,241,0.6)]"
+              className="flex h-10 w-10 items-center justify-center rounded-full bg-[#c6f833] text-[#0a0a0c] shadow-[0_4px_14px_-4px_rgba(198,248,51,0.6)]"
             >
               <Sparkles className="h-4.5 w-4.5" />
             </Link>
@@ -235,10 +235,10 @@ export function TeacherLayout() {
               return (
                 <NavLink key={item.to} to={item.to} className="app-nav-item">
                   <div className={cn(
-                    'flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-primary via-violet-600 to-accent text-white transition-all duration-200',
+                    'flex h-12 w-12 items-center justify-center rounded-2xl bg-[#c6f833] text-[#0a0a0c] transition-all duration-200',
                     isActive
-                      ? 'scale-105 shadow-[0_6px_20px_-4px_rgba(99,102,241,0.7)]'
-                      : 'shadow-[0_4px_14px_-6px_rgba(99,102,241,0.5)]',
+                      ? 'scale-105 shadow-[0_6px_20px_-4px_rgba(198,248,51,0.7)]'
+                      : 'shadow-[0_4px_14px_-6px_rgba(198,248,51,0.5)]',
                   )}>
                     <item.icon className="h-5 w-5" />
                   </div>
@@ -252,7 +252,6 @@ export function TeacherLayout() {
                 to={item.to}
                 className={cn('app-nav-item', isActive && 'app-nav-item-active')}
               >
-                {isActive && <span className="absolute inset-x-3 top-1 h-0.5 rounded-full bg-primary" />}
                 <item.icon className={cn('h-5 w-5 transition-colors', isActive ? 'text-primary' : 'text-muted-foreground')} />
                 <span className={cn('text-[10px] font-semibold transition-colors', isActive ? 'text-primary' : 'text-muted-foreground')}>
                   {t(item.labelKey)}
